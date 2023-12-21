@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
-import { getBalance, getDeployerAddress } from '../action';
+import { deployContract, getBalance, getDeployerAddress } from '../action';
 
 export const program = new Command();
 
@@ -10,6 +10,8 @@ const getDeployerAddressWithEnv = async () => {
     process.env.PRIVATE_KEY ?? ''
   );
 };
+
+// TODO: make it pretty with chalk, figlet and etc.
 
 program
   .name('ZeroDev-Multichain-Deployer')
@@ -40,11 +42,17 @@ program
     'Deploy contracts deterministically using create2, in order of the chains specified'
   )
   .argument('<path-to-bytecode>', 'bytecode to deploy')
-  .option('-c, --chains <CHAINS>', 'chains to deploy to', 'all')
-  .option('-e, --expected-address <ADDRESS>', 'expected address to confirm')
+  .option('-r, --rpc-url <RPC_URL>', 'rpc url to be used for deployment')
+  .option('-c, --chains [CHAINS]', 'chains to deploy to', 'all')
+  .option('-e, --expected-address [ADDRESS]', 'expected address to confirm')
   .option('-t, --testnet', 'deploy to testnet')
   .option('-v, --verify', 'verify contracts after deployment')
-  .action(() => console.log('deploy'));
+  .action((pathToBytecode, options) => {
+    const { rpcUrl, chains, expectedAddress, testnet, verify } = options;
+    const bytecode = require(pathToBytecode);
+
+    deployContract(bytecode, chains);
+  });
 
 program
   .command('create-session-key')
