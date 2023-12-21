@@ -11,8 +11,6 @@ const getDeployerAddressWithEnv = async () => {
   );
 };
 
-// TODO: make it pretty with chalk, figlet and etc.
-
 program
   .name('ZeroDev-Multichain-Deployer')
   .description('A CLI tool for deploying contracts to multichain easily.')
