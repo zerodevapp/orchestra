@@ -7,8 +7,14 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiExtraModels, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiExtraModels,
+  ApiResponse,
+  ApiSecurity,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UseCaseProxy } from '../../usecases-proxy/usecases-proxy';
 import { UsecasesProxyModule } from '../../usecases-proxy/usecases-proxy.module';
 import { UserPresenter } from './user.presenter';
@@ -17,6 +23,7 @@ import { CreateUserDto, UpdateBalanceDto } from './user.dto';
 import { getUserUseCases } from '../../../usecases/user/getUser.usecases';
 import { createUserUseCases } from '../../../usecases/user/createUser.usecases';
 import { updateBalanceUseCases } from '../../../usecases/user/updateBalance.usecases';
+import { AdminApiKeyGuard } from '../guard/auth.guard';
 
 @Controller('user')
 @ApiTags('user')
@@ -52,7 +59,9 @@ export class UserController {
     return new UserPresenter(userCreated);
   }
 
-  @Put('balance')
+  @Put('admin/update-balance')
+  @UseGuards(AdminApiKeyGuard)
+  @ApiSecurity('AdminApiKey')
   @ApiResponseType(UserPresenter, false)
   async updateBalance(@Body() updateBalanceDto: UpdateBalanceDto) {
     const { account, amount } = updateBalanceDto;

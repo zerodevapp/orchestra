@@ -25,12 +25,15 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ResponseInterceptor());
 
   // base routing
-  // app.setGlobalPrefix('api_v1');
+  app.setGlobalPrefix('v1');
 
   // swagger config
   if (env !== 'production') {
     const config = new DocumentBuilder()
-      .addBearerAuth()
+      .addApiKey(
+        { type: 'apiKey', name: 'x-admin-api-key', in: 'header' },
+        'AdminApiKey',
+      )
       .setTitle('USDC Balance API')
       .setDescription('Simple service to manage USDC balance')
       .setVersion('1.0')
