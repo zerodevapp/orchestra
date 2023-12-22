@@ -5,18 +5,11 @@ import {
   createPimlicoBundlerClient,
 } from 'permissionless/clients/pimlico';
 import { createPublicClient, getContract, http, parseEther } from 'viem';
-import { goerli, mainnet, sepolia } from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
 import { DEPLOYER_ABI, DEPLOYER_ADDRESS, ENTRYPOINT } from '../constant';
 import { PIMLICO_API_KEY, PRIVATE_KEY, RPC_PROVIDER_API_KEY } from '../config';
+import { CHAIN_MAP } from '../constant';
 import { ensureHex } from '../utils';
-
-const CHAIN_MAP = {
-  mainnet,
-  sepolia,
-  goerli,
-  // TODO: add more
-};
 
 const buildUrl = (
   base: string,
@@ -34,7 +27,13 @@ const createClient = (
   return http(buildUrl(base, chain, version, apiKey));
 };
 
-export const deployContract = async (bytecode: string, chains: string[]) => {
+export const deployContract = async (
+  bytecode: string,
+  chains: string[],
+  salt: string,
+  expectedAddress: string,
+  verify: boolean
+) => {
   const deployments = chains.map(async (chain) => {
     if (!(chain in CHAIN_MAP)) {
       throw new Error(`chain ${chain} not supported`);

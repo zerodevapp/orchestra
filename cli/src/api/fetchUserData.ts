@@ -5,7 +5,7 @@ const BASE_URL = 'http://localhost:3000';
 
 axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
 
-export const getUser = async (account: string) => {
+export const fetchUserData = async (account: string) => {
   try {
     const response = await axios.get(`${BASE_URL}/user/`, {
       params: {

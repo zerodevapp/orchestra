@@ -1,3 +1,5 @@
+import { goerli, mainnet, sepolia } from 'viem/chains';
+
 export const DEPLOYER_ABI = [
   {
     type: 'function',
@@ -41,6 +43,11 @@ export const COUNTER_BYTECODE =
 
 export const DEPLOYER_ADDRESS = '0x24d463B612BcdF78191E858F104Ff3e6fdf8Dc54';
 
-export const SEPOLIA = 'sepolia';
-
 export const ENTRYPOINT = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789';
+
+export const CHAIN_MAP = {
+  mainnet,
+  sepolia,
+  goerli,
+  // TODO: add more
+};
