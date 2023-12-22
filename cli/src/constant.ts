@@ -1,4 +1,23 @@
-import { goerli, mainnet, sepolia } from 'viem/chains';
+import {
+  arbitrum,
+  arbitrumGoerli,
+  avalanche,
+  avalancheFuji,
+  base,
+  baseGoerli,
+  bsc,
+  mainnet,
+  goerli,
+  sepolia,
+  optimism,
+  optimismGoerli,
+  polygon,
+  polygonMumbai,
+  linea,
+  lineaTestnet,
+  opBNB,
+  astarZkatana,
+} from 'viem/chains';
 
 export const DEPLOYER_ABI = [
   {
@@ -46,10 +65,24 @@ export const DEPLOYER_ADDRESS = '0x24d463B612BcdF78191E858F104Ff3e6fdf8Dc54';
 export const ENTRYPOINT = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789';
 
 export const CHAIN_MAP = {
+  arbitrum,
+  arbitrumGoerli,
+  avalanche,
+  avalancheFuji,
+  base,
+  baseGoerli,
+  bsc,
   mainnet,
-  sepolia,
   goerli,
-  // TODO: add more
+  sepolia,
+  optimism,
+  optimismGoerli,
+  polygon,
+  polygonMumbai,
+  linea,
+  lineaTestnet,
+  opBNB,
+  astarZkatana,
 };
 
 export const PIMLICO_SUPPORTED_CHAINS = [

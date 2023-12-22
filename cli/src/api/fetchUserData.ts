@@ -1,7 +1,7 @@
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = 'http://localhost:3000/v1';
 
 axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
 

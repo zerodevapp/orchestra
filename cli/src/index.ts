@@ -1,6 +1,4 @@
 import { program } from './command';
-import figlet from 'figlet';
-import chalk from 'chalk';
 
 async function main() {
   program.parse(process.argv);
