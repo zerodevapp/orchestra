@@ -82,10 +82,10 @@ program
 program
   .command('deploy')
   .description(
-    'Deploy contracts deterministically using create2, in order of the chains specified'
+    'Deploy contracts deterministically using CREATE2, in order of the chains specified'
   )
   .argument('<path-to-bytecode>', 'file path of bytecode to deploy')
-  .argument('<salt>', 'salt to be used for create2')
+  .argument('<salt>', 'salt to be used for CREATE2')
   .option(
     '-c, --chains [CHAINS]',
     'list of chains for deploying contracts, with all selected by default',
@@ -99,17 +99,17 @@ program
       'utf8'
     );
 
-    // TODO: serperate validation logic into a function in action dir
+    if (!/^0x[0-9a-fA-F]{64}$/.test(salt)) {
+      throw new Error('Salt must be a 32 bytes hex string');
+    }
 
-    // TODO: validate salt
+    if (expectedAddress && !/^0x[0-9a-fA-F]{40}$/.test(expectedAddress)) {
+      throw new Error('Expected address must be a 20 bytes hex string');
+    }
 
-    // TODO: vaildate expected address
-
-    // validate chains
     if (chains === 'all') {
       chains = Object.keys(CHAIN_MAP);
     } else {
-      // If chains is a string of chain names separated by comma, split it into an array
       chains = chains.split(',');
     }
 
