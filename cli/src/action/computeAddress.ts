@@ -1,5 +1,4 @@
-import { keccak256 } from 'js-sha3';
-import { toBeArray, getAddress } from 'ethers';
+import { keccak256, toBytes, getAddress } from 'viem';
 
 // TODO: check if this works correctly
 export const computeAddress = (
@@ -11,11 +10,11 @@ export const computeAddress = (
     '0xff',
     creatorAddress,
     salt,
-    keccak256(toBeArray(bytecode)),
+    keccak256(toBytes(bytecode)),
   ];
 
   const create2Hash = keccak256(
-    Buffer.concat(create2Inputs.map((x) => toBeArray(x)))
+    Buffer.concat(create2Inputs.map((x) => toBytes(x)))
   );
   return getAddress('0x' + create2Hash.slice(-40));
 };

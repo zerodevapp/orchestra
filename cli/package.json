@@ -22,7 +22,6 @@
     "axios-retry": "^4.0.0",
     "commander": "^11.1.0",
     "dotenv": "^16.3.1",
-    "js-sha3": "^0.9.3",
     "permissionless": "^0.0.16",
     "viem": "^1.20.2",
     "wagmi": "^1.4.12"

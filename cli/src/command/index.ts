@@ -92,15 +92,34 @@ program
     'all'
   )
   .option('-e, --expected-address [ADDRESS]', 'expected address to confirm')
-  .option('-v, --verify', 'verify contracts after deployment', false)
-  .action((pathToBytecode, salt, options) => {
-    const { chains, expectedAddress, verify } = options;
+  .action((pathToBytecode: string, salt: string, options) => {
+    let { chains, expectedAddress } = options;
     const bytecode = fs.readFileSync(
       path.resolve(process.cwd(), pathToBytecode),
       'utf8'
     );
 
-    deployContract(bytecode, salt, chains, expectedAddress, verify);
+    // TODO: serperate validation logic into a function in action dir
+
+    // TODO: validate salt
+
+    // TODO: vaildate expected address
+
+    // validate chains
+    if (chains === 'all') {
+      chains = Object.keys(CHAIN_MAP);
+    } else {
+      // If chains is a string of chain names separated by comma, split it into an array
+      chains = chains.split(',');
+    }
+
+    chains.map((chain: string) => {
+      if (!(chain in CHAIN_MAP)) {
+        throw new Error(`chain ${chain} not supported`);
+      }
+    });
+
+    deployContract(bytecode, chains, salt, expectedAddress);
   });
 
 program
