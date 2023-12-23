@@ -1,6 +1,5 @@
 import { keccak256, toBytes, getAddress } from 'viem';
 
-// TODO: check if this works correctly
 export const computeAddress = (
   creatorAddress: string,
   salt: string,

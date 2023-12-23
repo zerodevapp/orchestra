@@ -6,23 +6,26 @@ import {
 } from 'permissionless/clients/pimlico';
 import { createPublicClient, http, parseEther } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
-import { DEPLOYER_ABI, DEPLOYER_ADDRESS, ENTRYPOINT } from '../constant';
+import {
+  DEPLOYER_ABI,
+  DEPLOYER_ADDRESS,
+  ENTRYPOINT,
+  SUPPORTED_CHAINS_MAP,
+  getChainObject,
+} from '../constant';
 import { PIMLICO_API_KEY, PRIVATE_KEY, RPC_PROVIDER_API_KEY } from '../config';
-import { CHAIN_MAP } from '../constant';
 import { ensureHex } from '../utils';
 
-const BASE_URL = 'api.pimlico.io';
-const INFURA_BASE = 'infura.io';
-const INFURA_VERSION = 'v3';
+const PIMLICO_BASE_URL = 'api.pimlico.io';
 const PIMLICO_VERSION = 'v1';
 
-const buildUrlForInfura = (chain: string) =>
-  `https://${chain}.${INFURA_BASE}/${INFURA_VERSION}/${RPC_PROVIDER_API_KEY}`;
+const buildUrlForInfura = (baseUrl: string) =>
+  `https://${baseUrl}/${RPC_PROVIDER_API_KEY}`;
 
 const buildUrlForPimlico = (chain: string) =>
-  `https://${BASE_URL}/${PIMLICO_VERSION}/${chain}/rpc?apikey=${PIMLICO_API_KEY}`;
+  `https://${PIMLICO_BASE_URL}/${PIMLICO_VERSION}/${chain}/rpc?apikey=${PIMLICO_API_KEY}`;
 
-const createClient = (chain: string) => http(buildUrlForPimlico(chain));
+const createPimlicoClient = (chain: string) => http(buildUrlForPimlico(chain));
 
 const createDeployment = async (
   chain: string,
@@ -30,15 +33,22 @@ const createDeployment = async (
   salt: string,
   expectedAddress: string
 ) => {
+  const viemChainObject = getChainObject(chain);
+  const infuraChainUrl =
+    'infura' in viemChainObject.rpcUrls ? viemChainObject.rpcUrls.infura : null;
+
+  if (!infuraChainUrl) {
+    throw new Error(`Infura RPC URL not found for chain: ${chain}`);
+  }
+  const pimlicoChainKey =
+    SUPPORTED_CHAINS_MAP[chain as keyof typeof SUPPORTED_CHAINS_MAP];
+
   const publicClient = createPublicClient({
-    transport: http(buildUrlForInfura(chain)),
+    transport: http(buildUrlForInfura(infuraChainUrl.http[0])),
   });
 
-  // TODO: generealize mapping
-  const chainKey = chain === 'mainnet' ? 'ethereum' : chain;
-
   const paymasterClient = createPimlicoPaymasterClient({
-    transport: createClient(chainKey),
+    transport: createPimlicoClient(pimlicoChainKey),
   });
 
   const signer = privateKeyToAccount(ensureHex(PRIVATE_KEY));
@@ -51,13 +61,13 @@ const createDeployment = async (
 
   const smartAccountClient = createSmartAccountClient({
     account: kernelAccount,
-    chain: CHAIN_MAP[chainKey as keyof typeof CHAIN_MAP],
-    transport: createClient(chainKey),
+    chain: viemChainObject,
+    transport: createPimlicoClient(pimlicoChainKey),
     sponsorUserOperation: paymasterClient.sponsorUserOperation,
   });
 
   const bundlerClient = createPimlicoBundlerClient({
-    transport: createClient(chainKey),
+    transport: createPimlicoClient(pimlicoChainKey),
   });
 
   const gasPrices = await bundlerClient.getUserOperationGasPrice();
