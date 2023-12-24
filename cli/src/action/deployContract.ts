@@ -8,7 +8,7 @@ import { createPublicClient, http, parseEther } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import {
   DEPLOYER_ABI,
-  DEPLOYER_ADDRESS,
+  DEPLOYER_CONTRACT_ADDRESS,
   ENTRYPOINT,
   SUPPORTED_CHAINS_MAP,
   getChainObject,
@@ -17,15 +17,15 @@ import { PIMLICO_API_KEY, PRIVATE_KEY, RPC_PROVIDER_API_KEY } from '../config';
 import { ensureHex } from '../utils';
 
 const PIMLICO_BASE_URL = 'api.pimlico.io';
-const PIMLICO_VERSION = 'v1';
 
 const buildUrlForInfura = (baseUrl: string) =>
-  `https://${baseUrl}/${RPC_PROVIDER_API_KEY}`;
+  `${baseUrl}/${RPC_PROVIDER_API_KEY}`;
 
-const buildUrlForPimlico = (chain: string) =>
-  `https://${PIMLICO_BASE_URL}/${PIMLICO_VERSION}/${chain}/rpc?apikey=${PIMLICO_API_KEY}`;
+const buildUrlForPimlico = (chain: string, version: string) =>
+  `https://${PIMLICO_BASE_URL}/${version}/${chain}/rpc?apikey=${PIMLICO_API_KEY}`;
 
-const createPimlicoClient = (chain: string) => http(buildUrlForPimlico(chain));
+const createPimlicoClient = (chain: string, version: string) =>
+  http(buildUrlForPimlico(chain, version));
 
 const createDeployment = async (
   chain: string,
@@ -48,7 +48,7 @@ const createDeployment = async (
   });
 
   const paymasterClient = createPimlicoPaymasterClient({
-    transport: createPimlicoClient(pimlicoChainKey),
+    transport: createPimlicoClient(pimlicoChainKey, 'v2'),
   });
 
   const signer = privateKeyToAccount(ensureHex(PRIVATE_KEY));
@@ -62,12 +62,12 @@ const createDeployment = async (
   const smartAccountClient = createSmartAccountClient({
     account: kernelAccount,
     chain: viemChainObject,
-    transport: createPimlicoClient(pimlicoChainKey),
+    transport: createPimlicoClient(pimlicoChainKey, 'v1'),
     sponsorUserOperation: paymasterClient.sponsorUserOperation,
   });
 
   const bundlerClient = createPimlicoBundlerClient({
-    transport: createPimlicoClient(pimlicoChainKey),
+    transport: createPimlicoClient(pimlicoChainKey, 'v1'),
   });
 
   const gasPrices = await bundlerClient.getUserOperationGasPrice();
@@ -79,7 +79,7 @@ const createDeployment = async (
   }
 
   const { request, result } = await publicClient.simulateContract({
-    address: DEPLOYER_ADDRESS,
+    address: DEPLOYER_CONTRACT_ADDRESS,
     abi: DEPLOYER_ABI,
     functionName: 'deploy',
     args: [parseEther('0'), ensureHex(salt), bytecode],

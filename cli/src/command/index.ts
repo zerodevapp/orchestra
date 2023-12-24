@@ -11,7 +11,7 @@ import {
   getDeployerAddress,
 } from '../action';
 import { PRIVATE_KEY, ZERODEV_PROJECT_ID } from '../config';
-import { CHAIN_MAP, DEPLOYER_ADDRESS } from '../constant';
+import { DEPLOYER_CONTRACT_ADDRESS, SUPPORTED_CHAINS_MAP } from '../constant';
 
 export const program = new Command();
 
@@ -46,7 +46,7 @@ program
   .description('Show the list of available chains')
   .action(() => {
     console.log('Available chains:');
-    for (const chain in CHAIN_MAP) {
+    for (const chain in SUPPORTED_CHAINS_MAP) {
       console.log(chain);
     }
   });
@@ -58,7 +58,7 @@ program
   .argument('<salt>', 'salt to be used for create2')
   .action((pathToBytecode: string, salt: string) => {
     const bytecode = fs.readFileSync(pathToBytecode, 'utf8');
-    const address = computeAddress(DEPLOYER_ADDRESS, salt, bytecode);
+    const address = computeAddress(DEPLOYER_CONTRACT_ADDRESS, salt, bytecode);
     console.log(`computed address: ${address}`);
   });
 
@@ -108,13 +108,13 @@ program
     }
 
     if (chains === 'all') {
-      chains = Object.keys(CHAIN_MAP);
+      chains = Object.keys(SUPPORTED_CHAINS_MAP);
     } else {
       chains = chains.split(',');
     }
 
     chains.map((chain: string) => {
-      if (!(chain in CHAIN_MAP)) {
+      if (!(chain in SUPPORTED_CHAINS_MAP)) {
         throw new Error(`chain ${chain} not supported`);
       }
     });

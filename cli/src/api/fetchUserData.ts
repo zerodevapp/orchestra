@@ -5,6 +5,7 @@ const BASE_URL = 'http://localhost:3000/v1';
 
 axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
 
+// TODO: modify after new zerodev backend api is ready
 export const fetchUserData = async (account: string) => {
   try {
     const response = await axios.get(`${BASE_URL}/user/`, {

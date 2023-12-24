@@ -60,10 +60,11 @@ export const DEPLOYER_ABI = [
   },
 ];
 
-export const COUNTER_BYTECODE =
+export const COUNTER_CONTRACT_BYTECODE =
   '0x608060405234801561001057600080fd5b5060cc8061001f6000396000f3fe6080604052348015600f57600080fd5b506004361060325760003560e01c806306661abd146037578063d09de08a146051575b600080fd5b603f60005481565b60405190815260200160405180910390f35b60576059565b005b6001600080828254606991906070565b9091555050565b80820180821115609057634e487b7160e01b600052601160045260246000fd5b9291505056fea264697066735822122052dc90ec1ffdb0918b4141bc3d8a5937fb172b6689fdf50d0e0361d36415834a64736f6c63430008160033';
 
-export const DEPLOYER_ADDRESS = '0xF6FAcb6959b115c502B46F6E1D8917b371395e3F';
+export const DEPLOYER_CONTRACT_ADDRESS =
+  '0xF6FAcb6959b115c502B46F6E1D8917b371395e3F';
 
 export const ENTRYPOINT = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789';
 
@@ -97,7 +98,7 @@ export const SUPPORTED_CHAINS_MAP = {
   arbitrum: 'arbitrum',
   arbitrumGoerli: 'arbitrum-goerli',
   avalanche: 'avalanche',
-  avalancheFuji: 'avalanche-fuji',
+  // avalancheFuji: 'avalanche-fuji', // does not support rpc url from viem, so exclude it for now
   base: 'base',
   // baseGoerli: 'base-goerli', // does not support from infura
   bsc: 'binance',
@@ -117,7 +118,7 @@ export const SUPPORTED_CHAINS_MAP = {
 // viem/chains string : pimlico chains string
 export const TESTNET_CHAINS_MAP = {
   arbitrumGoerli: 'arbitrum-goerli',
-  avalancheFuji: 'avalanche-fuji',
+  // avalancheFuji: 'avalanche-fuji', // does not support rpc url from viem, so exclude it for now
   // baseGoerli: 'base-goerli', // does not support from infura
   goerli: 'goerli',
   sepolia: 'sepolia',
