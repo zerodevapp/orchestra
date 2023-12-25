@@ -7,6 +7,7 @@ import { Command } from 'commander';
 import {
   computeAddress,
   deployContract,
+  generateSessionKey,
   getBalance,
   getDeployerAddress,
 } from '../action';
@@ -125,4 +126,9 @@ program
 program
   .command('create-session-key')
   .description('Create a session key')
-  .action(() => console.log('need to implement'));
+  .action(async () => {
+    const sessionKey = await generateSessionKey(
+      ZERODEV_PROJECT_ID,
+      PRIVATE_KEY
+    );
+  });
