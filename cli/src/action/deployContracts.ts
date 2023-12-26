@@ -1,11 +1,19 @@
+import {
+  Hex,
+  createPublicClient,
+  encodeFunctionData,
+  http,
+  parseAbi,
+  parseEther,
+} from 'viem';
+import { privateKeyToAccount } from 'viem/accounts';
 import { createSmartAccountClient } from 'permissionless';
 import { signerToEcdsaKernelSmartAccount } from 'permissionless/accounts';
 import {
   createPimlicoPaymasterClient,
   createPimlicoBundlerClient,
 } from 'permissionless/clients/pimlico';
-import { createPublicClient, http, parseEther } from 'viem';
-import { privateKeyToAccount } from 'viem/accounts';
+
 import {
   DEPLOYER_ABI,
   DEPLOYER_CONTRACT_ADDRESS,
@@ -13,8 +21,19 @@ import {
   SUPPORTED_CHAINS_MAP,
   getChainObject,
 } from '../constant';
-import { PIMLICO_API_KEY, PRIVATE_KEY, RPC_PROVIDER_API_KEY } from '../config';
+import {
+  PIMLICO_API_KEY,
+  PRIVATE_KEY,
+  RPC_PROVIDER_API_KEY,
+  ZERODEV_PROJECT_ID,
+} from '../config';
 import { ensureHex } from '../utils';
+import { SessionKeyProvider } from '@zerodev/sdk';
+
+const contractABI = parseAbi([
+  'function deploy(uint256 amount, bytes32 salt, bytes memory bytecode) external payable returns (address addr)',
+  'function computeAddress(bytes32 salt, bytes32 bytecodeHash) external view returns (address addr)',
+]);
 
 const PIMLICO_BASE_URL = 'api.pimlico.io';
 
@@ -29,9 +48,10 @@ const createPimlicoClient = (chain: string, version: string) =>
 
 const createDeployment = async (
   chain: string,
-  bytecode: string,
-  salt: string,
-  expectedAddress: string
+  bytecode: Hex,
+  salt: Hex,
+  expectedAddress: string | undefined,
+  serializedSessionKeyParams: string | undefined
 ) => {
   const viemChainObject = getChainObject(chain);
   const infuraChainUrl =
@@ -66,6 +86,15 @@ const createDeployment = async (
     sponsorUserOperation: paymasterClient.sponsorUserOperation,
   });
 
+  const sessionKeyProvider = serializedSessionKeyParams
+    ? await SessionKeyProvider.fromSessionKeyParams({
+        projectId: ZERODEV_PROJECT_ID,
+        sessionKeyParams: SessionKeyProvider.deserializeSessionKeyParams(
+          serializedSessionKeyParams
+        ),
+      })
+    : undefined;
+
   const bundlerClient = createPimlicoBundlerClient({
     transport: createPimlicoClient(pimlicoChainKey, 'v1'),
   });
@@ -82,11 +111,22 @@ const createDeployment = async (
     address: DEPLOYER_CONTRACT_ADDRESS,
     abi: DEPLOYER_ABI,
     functionName: 'deploy',
-    args: [parseEther('0'), ensureHex(salt), bytecode],
+    args: [parseEther('0'), salt, bytecode],
     account: kernelAccount.address,
   });
 
-  const txHash = await smartAccountClient.writeContract(request);
+  const txHash = sessionKeyProvider
+    ? (
+        await sessionKeyProvider.sendUserOperation({
+          target: DEPLOYER_CONTRACT_ADDRESS,
+          data: encodeFunctionData({
+            abi: contractABI,
+            functionName: 'deploy',
+            args: [parseEther('0'), salt, bytecode],
+          }),
+        })
+      ).hash
+    : await smartAccountClient.writeContract(request);
 
   if (expectedAddress && result !== expectedAddress) {
     console.warn(
@@ -99,14 +139,21 @@ const createDeployment = async (
   );
 };
 
-export const deployContract = async (
-  bytecode: string,
+export const deployContracts = async (
+  bytecode: Hex,
   chains: string[],
-  salt: string,
-  expectedAddress: string
+  salt: Hex,
+  expectedAddress: string | undefined,
+  serializedSessionKeyParams: string | undefined
 ) => {
   const deployments = chains.map((chain) =>
-    createDeployment(chain, bytecode, salt, expectedAddress)
+    createDeployment(
+      chain,
+      bytecode,
+      salt,
+      expectedAddress,
+      serializedSessionKeyParams
+    )
   );
 
   await Promise.all(deployments);

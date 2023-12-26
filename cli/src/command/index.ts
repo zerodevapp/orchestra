@@ -6,13 +6,14 @@ import path from 'path';
 import { Command } from 'commander';
 import {
   computeAddress,
-  deployContract,
+  deployContracts,
   generateSessionKey,
   getBalance,
   getDeployerAddress,
 } from '../action';
 import { PRIVATE_KEY, ZERODEV_PROJECT_ID } from '../config';
 import { DEPLOYER_CONTRACT_ADDRESS, SUPPORTED_CHAINS_MAP } from '../constant';
+import { ensureHex } from '../utils';
 
 export const program = new Command();
 
@@ -30,7 +31,7 @@ program
 
 program.helpInformation = function () {
   const asciiArt = chalk.blueBright(
-    figlet.textSync('ZeroDev Multichain Deployer', {
+    figlet.textSync('ZeroDev Deployer', {
       horizontalLayout: 'default',
       verticalLayout: 'default',
       width: 100,
@@ -46,10 +47,10 @@ program
   .command('chains')
   .description('Show the list of available chains')
   .action(() => {
-    console.log('Available chains:');
-    for (const chain in SUPPORTED_CHAINS_MAP) {
-      console.log(chain);
-    }
+    console.log('[Available chains]');
+    Object.keys(SUPPORTED_CHAINS_MAP).forEach((chain) =>
+      console.log(`- ${chain}`)
+    );
   });
 
 program
@@ -93,8 +94,12 @@ program
     'all'
   )
   .option('-e, --expected-address [ADDRESS]', 'expected address to confirm')
-  .action((pathToBytecode: string, salt: string, options) => {
-    let { chains, expectedAddress } = options;
+  .option(
+    '-s, --session-key-file-path [KEY]',
+    'session key file path to use for deployment'
+  )
+  .action(async (pathToBytecode: string, salt: string, options) => {
+    let { chains, expectedAddress, sessionKeyFilePath } = options;
     const bytecode = fs.readFileSync(
       path.resolve(process.cwd(), pathToBytecode),
       'utf8'
@@ -120,7 +125,23 @@ program
       }
     });
 
-    deployContract(bytecode, chains, salt, expectedAddress);
+    if (sessionKeyFilePath) {
+      if (!fs.existsSync(sessionKeyFilePath)) {
+        throw new Error('Session key file does not exist');
+      }
+    }
+
+    const serializedSessionKeyParams = sessionKeyFilePath
+      ? fs.readFileSync(sessionKeyFilePath, 'utf8')
+      : undefined;
+
+    await deployContracts(
+      ensureHex(bytecode),
+      chains,
+      ensureHex(salt),
+      expectedAddress,
+      serializedSessionKeyParams
+    );
   });
 
 program
