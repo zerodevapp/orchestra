@@ -108,13 +108,14 @@ export const SUPPORTED_CHAINS_MAP = {
   optimism: 'optimism',
   optimismGoerli: 'optimism-goerli',
   polygon: 'polygon',
-  polygonMumbai: 'mumbai', // failed to deploy with rpc error "Invalid UserOp signature or  paymaster signature"
+  // polygonMumbai: 'mumbai', // failed to deploy with rpc error "Invalid UserOp signature or  paymaster signature"
   linea: 'linea',
   lineaTestnet: 'linea-testnet',
   opBNB: 'opbnb',
   // astarZkatana: 'astarZkatana', not supported yet
 };
 
+// TODO: add command for testnet only
 // viem/chains string : pimlico chains string
 export const TESTNET_CHAINS_MAP = {
   arbitrumGoerli: 'arbitrum-goerli',
