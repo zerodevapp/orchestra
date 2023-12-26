@@ -125,10 +125,12 @@ program
 
 program
   .command('create-session-key')
-  .description('Create a session key')
+  .description('Create a session key authorized to deploy contracts')
   .action(async () => {
     const sessionKey = await generateSessionKey(
       ZERODEV_PROJECT_ID,
-      PRIVATE_KEY
+      ensureHex(PRIVATE_KEY)
     );
+    fs.writeFileSync('session-key.txt', sessionKey);
+    console.log('Session key generated and saved to session-key.txt');
   });
