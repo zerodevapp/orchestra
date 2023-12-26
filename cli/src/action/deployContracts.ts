@@ -53,7 +53,7 @@ const deployToChain = async (
   salt: Hex,
   expectedAddress: string | undefined,
   serializedSessionKeyParams: string | undefined
-) => {
+): Promise<[string, string]> => {
   const viemChainObject = getChainObject(chain);
   const infuraChainUrl =
     'infura' in viemChainObject.rpcUrls ? viemChainObject.rpcUrls.infura : null;
@@ -143,9 +143,7 @@ const deployToChain = async (
     );
   }
 
-  console.log(
-    `Contract deployed at ${result} on ${chain} with transaction hash ${txHash}`
-  );
+  return [result as string, txHash];
 };
 
 export const deployContracts = async (
@@ -155,9 +153,12 @@ export const deployContracts = async (
   expectedAddress: string | undefined,
   serializedSessionKeyParams: string | undefined
 ) => {
-  const deploymentStatus: Record<string, string> = {};
+  const deploymentStatus: Record<
+    string,
+    { status: string; result?: string; txHash?: string }
+  > = {};
   chains.forEach((chain) => {
-    deploymentStatus[chain] = 'starting...';
+    deploymentStatus[chain] = { status: 'starting...' };
   });
 
   const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
@@ -168,12 +169,18 @@ export const deployContracts = async (
     console.log('Starting deployments...');
     chains.forEach((chain) => {
       const frame =
-        deploymentStatus[chain] === 'starting...'
+        deploymentStatus[chain].status === 'starting...'
           ? chalk.green(frames[frameIndex])
           : '';
-      console.log(
-        `${frame} Deployment for ${chain} is ${deploymentStatus[chain]}`
-      );
+      if (deploymentStatus[chain].status === 'done!') {
+        console.log(
+          `Contract deployed at ${deploymentStatus[chain].result} on ${chain} with transaction hash ${deploymentStatus[chain].txHash}`
+        );
+      } else {
+        console.log(
+          `${frame} Deployment for ${chain} is ${deploymentStatus[chain].status}`
+        );
+      }
     });
     frameIndex = (frameIndex + 1) % frames.length;
   };
@@ -189,11 +196,11 @@ export const deployContracts = async (
       expectedAddress,
       serializedSessionKeyParams
     )
-      .then((txHash) => {
-        deploymentStatus[chain] = 'done!';
+      .then(([result, txHash]) => {
+        deploymentStatus[chain] = { status: 'done!', result, txHash };
       })
       .catch((error) => {
-        deploymentStatus[chain] = `failed: ${error}`;
+        deploymentStatus[chain] = { status: `failed: ${error}` };
         // TODO: throw error gracefully, or save the log to a file
         throw error;
       })
