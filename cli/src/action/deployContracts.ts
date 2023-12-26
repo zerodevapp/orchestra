@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import {
   Hex,
   createPublicClient,
@@ -13,7 +14,7 @@ import {
   createPimlicoPaymasterClient,
   createPimlicoBundlerClient,
 } from 'permissionless/clients/pimlico';
-
+import { SessionKeyProvider } from '@zerodev/sdk';
 import {
   DEPLOYER_ABI,
   DEPLOYER_CONTRACT_ADDRESS,
@@ -28,7 +29,6 @@ import {
   ZERODEV_PROJECT_ID,
 } from '../config';
 import { ensureHex } from '../utils';
-import { SessionKeyProvider } from '@zerodev/sdk';
 
 const contractABI = parseAbi([
   'function deploy(uint256 amount, bytes32 salt, bytes memory bytecode) external payable returns (address addr)',
@@ -46,7 +46,7 @@ const buildUrlForPimlico = (chain: string, version: string) =>
 const createPimlicoClient = (chain: string, version: string) =>
   http(buildUrlForPimlico(chain, version));
 
-const createDeployment = async (
+const deployToChain = async (
   chain: string,
   bytecode: Hex,
   salt: Hex,
@@ -146,15 +146,50 @@ export const deployContracts = async (
   expectedAddress: string | undefined,
   serializedSessionKeyParams: string | undefined
 ) => {
+  const deploymentStatus: Record<string, string> = {};
+  chains.forEach((chain) => {
+    deploymentStatus[chain] = 'starting...';
+  });
+
+  const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+  let frameIndex = 0;
+
+  const updateConsole = () => {
+    console.clear();
+    console.log('Starting deployments...');
+    chains.forEach((chain) => {
+      const frame =
+        deploymentStatus[chain] === 'starting...'
+          ? chalk.green(frames[frameIndex])
+          : '';
+      console.log(
+        `${frame} Deployment for ${chain} is ${deploymentStatus[chain]}`
+      );
+    });
+    frameIndex = (frameIndex + 1) % frames.length;
+  };
+
+  const interval = setInterval(updateConsole, 100);
+
   const deployments = chains.map((chain) =>
-    createDeployment(
+    deployToChain(
       chain,
       bytecode,
       salt,
       expectedAddress,
       serializedSessionKeyParams
     )
+      .then((txHash) => {
+        deploymentStatus[chain] = 'done!';
+      })
+      .catch((error) => {
+        deploymentStatus[chain] = `failed: ${error}`;
+      })
   );
 
   await Promise.all(deployments);
+  clearInterval(interval);
+  frameIndex = 0; // Reset for a clean final display
+  updateConsole(); // Final update
+  console.log('All deployments complete!');
 };
