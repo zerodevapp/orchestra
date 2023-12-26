@@ -3,6 +3,7 @@ import {
   Hex,
   createPublicClient,
   encodeFunctionData,
+  getContract,
   http,
   parseAbi,
   parseEther,
@@ -115,6 +116,13 @@ const deployToChain = async (
     account: kernelAccount.address,
   });
 
+  const deployerContract = getContract({
+    address: DEPLOYER_CONTRACT_ADDRESS,
+    abi: DEPLOYER_ABI,
+    publicClient,
+    walletClient: smartAccountClient,
+  });
+
   const txHash = sessionKeyProvider
     ? (
         await sessionKeyProvider.sendUserOperation({
@@ -126,7 +134,8 @@ const deployToChain = async (
           }),
         })
       ).hash
-    : await smartAccountClient.writeContract(request);
+    : /** @dev smartAccountClient.writeContract(request) is not used due to permissionless.js library issue. */
+      await deployerContract.write.deploy([parseEther('0'), salt, bytecode]);
 
   if (expectedAddress && result !== expectedAddress) {
     console.warn(
@@ -171,6 +180,7 @@ export const deployContracts = async (
 
   const interval = setInterval(updateConsole, 100);
 
+  // TODO: describe status of each deployment regardless of error, user should be able to see which deployment succeeded and which failed
   const deployments = chains.map((chain) =>
     deployToChain(
       chain,
@@ -184,12 +194,15 @@ export const deployContracts = async (
       })
       .catch((error) => {
         deploymentStatus[chain] = `failed: ${error}`;
+        // TODO: throw error gracefully, or save the log to a file
+        throw error;
       })
   );
 
   await Promise.all(deployments);
+
   clearInterval(interval);
   frameIndex = 0; // Reset for a clean final display
   updateConsole(); // Final update
-  console.log('All deployments complete!');
+  console.log('All deployments process successfully finished!');
 };

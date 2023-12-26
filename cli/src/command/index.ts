@@ -98,7 +98,7 @@ program
     '-s, --session-key-file-path [KEY]',
     'session key file path to use for deployment'
   )
-  .action(async (pathToBytecode: string, salt: string, options) => {
+  .action((pathToBytecode: string, salt: string, options) => {
     let { chains, expectedAddress, sessionKeyFilePath } = options;
     const bytecode = fs.readFileSync(
       path.resolve(process.cwd(), pathToBytecode),
@@ -135,7 +135,7 @@ program
       ? fs.readFileSync(sessionKeyFilePath, 'utf8')
       : undefined;
 
-    await deployContracts(
+    deployContracts(
       ensureHex(bytecode),
       chains,
       ensureHex(salt),
