@@ -116,6 +116,12 @@ const deployToChain = async (
     account: kernelAccount.address,
   });
 
+  if (expectedAddress && result !== expectedAddress) {
+    throw new Error(
+      `Contract will be deployed at ${result} on ${chain} does not match expected address ${expectedAddress}`
+    );
+  }
+
   const deployerContract = getContract({
     address: DEPLOYER_CONTRACT_ADDRESS,
     abi: DEPLOYER_ABI,
@@ -136,12 +142,6 @@ const deployToChain = async (
       ).hash
     : /** @dev smartAccountClient.writeContract(request) is not used due to permissionless.js library issue. */
       await deployerContract.write.deploy([parseEther('0'), salt, bytecode]);
-
-  if (expectedAddress && result !== expectedAddress) {
-    console.warn(
-      `Contract deployed at ${result} on ${chain} with transaction hash ${txHash} does not match expected address ${expectedAddress}`
-    );
-  }
 
   return [result as string, txHash];
 };
