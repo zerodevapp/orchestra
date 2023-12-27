@@ -29,6 +29,7 @@ program
   .usage('zerodev <command> [options]')
   .version('1.0.0');
 
+// TODO: show the help info from above not below
 program.helpInformation = function () {
   const asciiArt = chalk.blueBright(
     figlet.textSync('ZeroDev Deployer', {
@@ -78,6 +79,7 @@ program
   .action(async () => {
     const address = await getDeployerAddressWithEnv();
     const balance = await getBalance(address);
+    console.log('this command is under development, it always returns 500');
     console.log(`remaining balance: ${balance} USDC`);
   });
 
