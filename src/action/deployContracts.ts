@@ -32,8 +32,7 @@ import {
 import { ensureHex } from '../utils';
 
 const contractABI = parseAbi([
-  'function deploy(uint256 amount, bytes32 salt, bytes memory bytecode) external payable returns (address addr)',
-  'function computeAddress(bytes32 salt, bytes32 bytecodeHash) external view returns (address addr)',
+  'function fallback(bytes32 salt, bytes memory bytecode) external payable returns (address addr)',
 ]);
 
 const PIMLICO_BASE_URL = 'api.pimlico.io';
@@ -108,42 +107,33 @@ const deployToChain = async (
     throw new Error('gas prices not available');
   }
 
-  const { request, result } = await publicClient.simulateContract({
-    address: DEPLOYER_CONTRACT_ADDRESS,
-    abi: DEPLOYER_ABI,
-    functionName: 'deploy',
-    args: [parseEther('0'), salt, bytecode],
+  const result = await publicClient.call({
     account: kernelAccount.address,
+    data: ensureHex(salt + bytecode.slice(2)),
+    to: DEPLOYER_CONTRACT_ADDRESS,
   });
 
-  if (expectedAddress && result !== expectedAddress) {
+  if (expectedAddress && result.data !== expectedAddress) {
     throw new Error(
-      `Contract will be deployed at ${result} on ${chain} does not match expected address ${expectedAddress}`
+      `Contract will be deployed at ${result.data} on ${chain} does not match expected address ${expectedAddress}`
     );
   }
-
-  const deployerContract = getContract({
-    address: DEPLOYER_CONTRACT_ADDRESS,
-    abi: DEPLOYER_ABI,
-    publicClient,
-    walletClient: smartAccountClient,
-  });
 
   const txHash = sessionKeyProvider
     ? (
         await sessionKeyProvider.sendUserOperation({
           target: DEPLOYER_CONTRACT_ADDRESS,
-          data: encodeFunctionData({
-            abi: contractABI,
-            functionName: 'deploy',
-            args: [parseEther('0'), salt, bytecode],
-          }),
+          data: ensureHex(salt + bytecode.slice(2)),
         })
       ).hash
-    : /** @dev smartAccountClient.writeContract(request) is not used due to permissionless.js library issue. */
-      await deployerContract.write.deploy([parseEther('0'), salt, bytecode]);
+    : await smartAccountClient.sendTransaction({
+        to: DEPLOYER_CONTRACT_ADDRESS,
+        data: ensureHex(salt + bytecode.slice(2)),
+        maxFeePerGas: gasPrices.fast.maxFeePerGas,
+        maxPriorityFeePerGas: gasPrices.fast.maxPriorityFeePerGas,
+      });
 
-  return [result as string, txHash];
+  return [result.data as string, txHash];
 };
 
 export const deployContracts = async (
