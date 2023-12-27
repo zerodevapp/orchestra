@@ -13,7 +13,7 @@ import {
 } from '../action';
 import { PRIVATE_KEY, ZERODEV_PROJECT_ID } from '../config';
 import { DEPLOYER_CONTRACT_ADDRESS, SUPPORTED_CHAINS_MAP } from '../constant';
-import { ensureHex } from '../utils';
+import { ensureHex, validateInputs } from '../utils';
 
 export const program = new Command();
 
@@ -107,31 +107,10 @@ program
       'utf8'
     );
 
-    if (!/^0x[0-9a-fA-F]{64}$/.test(salt)) {
-      throw new Error('Salt must be a 32 bytes hex string');
-    }
+    chains =
+      chains === 'all' ? Object.keys(SUPPORTED_CHAINS_MAP) : chains.split(',');
 
-    if (expectedAddress && !/^0x[0-9a-fA-F]{40}$/.test(expectedAddress)) {
-      throw new Error('Expected address must be a 20 bytes hex string');
-    }
-
-    if (chains === 'all') {
-      chains = Object.keys(SUPPORTED_CHAINS_MAP);
-    } else {
-      chains = chains.split(',');
-    }
-
-    chains.map((chain: string) => {
-      if (!(chain in SUPPORTED_CHAINS_MAP)) {
-        throw new Error(`chain ${chain} not supported`);
-      }
-    });
-
-    if (sessionKeyFilePath) {
-      if (!fs.existsSync(sessionKeyFilePath)) {
-        throw new Error('Session key file does not exist');
-      }
-    }
+    validateInputs(bytecode, salt, expectedAddress, chains, sessionKeyFilePath);
 
     const serializedSessionKeyParams = sessionKeyFilePath
       ? fs.readFileSync(sessionKeyFilePath, 'utf8')
