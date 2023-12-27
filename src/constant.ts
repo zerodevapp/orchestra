@@ -108,7 +108,7 @@ export const SUPPORTED_CHAINS_MAP = {
   optimism: 'optimism',
   optimismGoerli: 'optimism-goerli',
   polygon: 'polygon',
-  // polygonMumbai: 'mumbai', // failed to deploy with rpc error "Invalid UserOp signature or  paymaster signature"
+  polygonMumbai: 'mumbai',
   linea: 'linea',
   lineaTestnet: 'linea-testnet',
   opBNB: 'opbnb',
