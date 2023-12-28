@@ -17,7 +17,6 @@ import {
 } from 'permissionless/clients/pimlico';
 import { SessionKeyProvider } from '@zerodev/sdk';
 import {
-  DEPLOYER_ABI,
   DEPLOYER_CONTRACT_ADDRESS,
   ENTRYPOINT,
   SUPPORTED_CHAINS_MAP,
