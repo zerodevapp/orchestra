@@ -1,4 +1,4 @@
-export type Hex = `0x${string}`;
+import { Hex } from 'viem';
 
 export function ensureHex(str: string): Hex {
   if (!str.startsWith('0x')) {

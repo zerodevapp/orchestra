@@ -4,7 +4,7 @@ import { SUPPORTED_CHAINS_MAP } from '../constant';
 export const validateInputs = (
   bytecode: string,
   salt: string,
-  expectedAddress: string,
+  expectedAddress: string | undefined,
   chains: string[],
   sessionKeyFilePath: string | undefined
 ) => {

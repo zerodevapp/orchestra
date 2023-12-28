@@ -1,10 +1,10 @@
-import { keccak256, toBytes, getAddress } from 'viem';
+import { keccak256, toBytes, getAddress, Hex } from 'viem';
 
 export const computeAddress = (
   creatorAddress: string,
-  salt: string,
-  bytecode: string
-): string => {
+  bytecode: string,
+  salt: string
+): Hex => {
   const create2Inputs = [
     '0xff',
     creatorAddress,

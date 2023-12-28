@@ -1,8 +1,6 @@
 import { LocalAccountSigner } from '@alchemy/aa-core';
-import { ensureHex } from '../utils';
 import {
   ECDSAProvider,
-  ParamOperator,
   SessionKeyProvider,
   getPermissionFromABI,
 } from '@zerodev/sdk';
