@@ -136,7 +136,7 @@ program
   )
   .argument(
     '<path-to-bytecode>',
-    'file path of the deployed bytecode, not init code'
+    'file path of bytecode to deploy, a.k.a. init code'
   )
   .argument('<salt>', 'salt used for depolyment')
   .option(
@@ -166,5 +166,38 @@ program
 program
   .command('sync-deployment')
   .description(
-    'check if the specified contract is deployed via deterministic-deployment-proxy. if it is, extract bytecode from it and deploy to other networks'
-  );
+    'deploy contracts to the networks that have not been deployed yet'
+  )
+  .argument(
+    '<path-to-bytecode>',
+    'file path of bytecode to deploy, a.k.a. init code'
+  )
+  .argument('<salt>', 'salt used for depolyment')
+  .action(async (pathToBytecode: string, salt: string) => {
+    const bytecode = fs
+      .readFileSync(path.resolve(process.cwd(), pathToBytecode), 'utf8')
+      .replace(/\n+$/, '');
+
+    validateInputs(bytecode, salt, undefined, [], undefined);
+
+    const chains = Object.keys(SUPPORTED_CHAINS_MAP);
+
+    const { notDeployedChains } = await findDeployment(
+      ensureHex(bytecode),
+      ensureHex(salt),
+      chains
+    );
+
+    if (notDeployedChains.length === 0) {
+      console.log('No deployment needed');
+      return;
+    }
+
+    await deployContracts(
+      ensureHex(bytecode),
+      notDeployedChains,
+      ensureHex(salt),
+      undefined,
+      undefined
+    );
+  });
