@@ -20,15 +20,7 @@ import {
   RPC_PROVIDER_API_KEY,
   ZERODEV_PROJECT_ID,
 } from '../config';
-import { ensureHex } from '../utils';
-
-const PIMLICO_BASE_URL = 'api.pimlico.io';
-
-const buildUrlForInfura = (chain: string) =>
-  `https://${chain}.infura.io/v3/${RPC_PROVIDER_API_KEY}`;
-
-const buildUrlForPimlico = (chain: string, version: string) =>
-  `https://${PIMLICO_BASE_URL}/${version}/${chain}/rpc?apikey=${PIMLICO_API_KEY}`;
+import { ensureHex, buildUrlForPimlico, buildUrlForInfura } from '../utils';
 
 const createPimlicoClient = (chain: string, version: string) =>
   http(buildUrlForPimlico(chain, version));
