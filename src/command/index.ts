@@ -13,6 +13,7 @@ import {
 import { PRIVATE_KEY, ZERODEV_PROJECT_ID } from '../config';
 import { DEPLOYER_CONTRACT_ADDRESS, SUPPORTED_CHAINS_MAP } from '../constant';
 import { ensureHex, validateInputs } from '../utils';
+import { findDeployment } from '../action/findDeployment';
 
 export const program = new Command();
 
@@ -60,7 +61,7 @@ program
   .argument('<salt>', 'salt to be used for create2')
   .action((pathToBytecode: string, salt: string) => {
     const bytecode = fs.readFileSync(pathToBytecode, 'utf8');
-    const address = computeAddress(DEPLOYER_CONTRACT_ADDRESS, salt, bytecode);
+    const address = computeAddress(DEPLOYER_CONTRACT_ADDRESS, bytecode, salt);
     console.log(`computed address: ${address}`);
   });
 
@@ -77,7 +78,10 @@ program
   .description(
     'Deploy contracts deterministically using CREATE2, in order of the chains specified'
   )
-  .argument('<path-to-bytecode>', 'file path of bytecode to deploy')
+  .argument(
+    '<path-to-bytecode>',
+    'file path of bytecode to deploy, a.k.a. init code'
+  )
   .argument('<salt>', 'salt to be used for CREATE2')
   .option(
     '-c, --chains [CHAINS]',
@@ -124,3 +128,43 @@ program
     fs.writeFileSync('session-key.txt', sessionKey);
     console.log('Session key generated and saved to session-key.txt');
   });
+
+program
+  .command('check-deployment')
+  .description(
+    'check whether the contract has already been deployed on the specified networks'
+  )
+  .argument(
+    '<path-to-bytecode>',
+    'file path of the deployed bytecode, not init code'
+  )
+  .argument('<salt>', 'salt used for depolyment')
+  .option(
+    '-c, --chains [CHAINS]',
+    'list of chains to check, with all selected by default',
+    'all'
+  )
+  .action(async (pathToBytecode: string, salt: string, options) => {
+    let { chains } = options;
+    const bytecode = fs
+      .readFileSync(path.resolve(process.cwd(), pathToBytecode), 'utf8')
+      .replace(/\n+$/, '');
+
+    chains =
+      chains === 'all' ? Object.keys(SUPPORTED_CHAINS_MAP) : chains.split(',');
+
+    validateInputs(bytecode, salt, undefined, chains, undefined);
+
+    const { contractAddress, deployedChains, notDeployedChains } =
+      await findDeployment(ensureHex(bytecode), ensureHex(salt), chains);
+
+    console.log(`contract address: ${contractAddress}`);
+    console.log(`deployed chains: ${deployedChains.join(', ')}`);
+    console.log(`not deployed chains: ${notDeployedChains.join(', ')}`);
+  });
+
+program
+  .command('sync-deployment')
+  .description(
+    'check if the specified contract is deployed via deterministic-deployment-proxy. if it is, extract bytecode from it and deploy to other networks'
+  );
