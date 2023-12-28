@@ -1,13 +1,5 @@
 import chalk from 'chalk';
-import {
-  Hex,
-  createPublicClient,
-  encodeFunctionData,
-  getContract,
-  http,
-  parseAbi,
-  parseEther,
-} from 'viem';
+import { Hex, createPublicClient, http, getAddress } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { createSmartAccountClient } from 'permissionless';
 import { signerToEcdsaKernelSmartAccount } from 'permissionless/accounts';
@@ -32,8 +24,8 @@ import { ensureHex } from '../utils';
 
 const PIMLICO_BASE_URL = 'api.pimlico.io';
 
-const buildUrlForInfura = (baseUrl: string) =>
-  `${baseUrl}/${RPC_PROVIDER_API_KEY}`;
+const buildUrlForInfura = (chain: string) =>
+  `https://${chain}.infura.io/v3/${RPC_PROVIDER_API_KEY}`;
 
 const buildUrlForPimlico = (chain: string, version: string) =>
   `https://${PIMLICO_BASE_URL}/${version}/${chain}/rpc?apikey=${PIMLICO_API_KEY}`;
@@ -49,17 +41,12 @@ const deployToChain = async (
   serializedSessionKeyParams: string | undefined
 ): Promise<[string, string]> => {
   const viemChainObject = getChainObject(chain);
-  const infuraChainUrl =
-    'infura' in viemChainObject.rpcUrls ? viemChainObject.rpcUrls.infura : null;
 
-  if (!infuraChainUrl) {
-    throw new Error(`Infura RPC URL not found for chain: ${chain}`);
-  }
   const pimlicoChainKey =
     SUPPORTED_CHAINS_MAP[chain as keyof typeof SUPPORTED_CHAINS_MAP];
 
   const publicClient = createPublicClient({
-    transport: http(buildUrlForInfura(infuraChainUrl.http[0])),
+    transport: http(buildUrlForInfura(viemChainObject.network)),
   });
 
   const paymasterClient = createPimlicoPaymasterClient({
@@ -128,7 +115,7 @@ const deployToChain = async (
         maxPriorityFeePerGas: gasPrices.fast.maxPriorityFeePerGas,
       });
 
-  return [result.data as string, txHash];
+  return [getAddress(result.data as string), txHash];
 };
 
 export const deployContracts = async (
