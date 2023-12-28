@@ -1,16 +1,19 @@
 import {
   arbitrum,
   arbitrumGoerli,
+  arbitrumSepolia,
   avalanche,
   avalancheFuji,
   base,
   baseGoerli,
+  baseSepolia,
   bsc,
   mainnet,
   goerli,
   sepolia,
   optimism,
   optimismGoerli,
+  optimismSepolia,
   polygon,
   polygonMumbai,
   linea,
@@ -34,16 +37,19 @@ export const ENTRYPOINT = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789';
 const VIEM_CHAINS = {
   arbitrum,
   arbitrumGoerli,
+  arbitrumSepolia,
   avalanche,
   avalancheFuji,
   base,
   baseGoerli,
+  baseSepolia,
   bsc,
   mainnet,
   goerli,
   sepolia,
   optimism,
   optimismGoerli,
+  optimismSepolia,
   polygon,
   polygonMumbai,
   linea,
@@ -60,23 +66,22 @@ export const getChainObject = (chainName: string) => {
 // viem/chains string : pimlico chains string
 export const SUPPORTED_CHAINS_MAP = {
   arbitrum: 'arbitrum',
-  // arbitrumGoerli: 'arbitrum-goerli', // chain is not working now
+  arbitrumSepolia: 'arbitrum-sepolia', // Insufficient Pimlico balance for sponsorship, please top up - Balance required: 0.000134 USD, Balance available: 0 USD
   avalanche: 'avalanche',
-  // avalancheFuji: 'avalanche-fuji', // does not support rpc url from viem, so exclude it for now
+  avalancheFuji: 'avalanche-fuji',
   base: 'base',
-  // baseGoerli: 'base-goerli', // does not support from infura
+  baseSepolia: 'base-sepolia', // not supported by infura
   bsc: 'binance',
   mainnet: 'ethereum',
-  goerli: 'goerli',
   sepolia: 'sepolia',
   optimism: 'optimism',
-  optimismGoerli: 'optimism-goerli',
+  optimismSepolia: 'optimism-sepolia', // not supported by pimlico
   polygon: 'polygon',
   polygonMumbai: 'mumbai',
   linea: 'linea',
   lineaTestnet: 'linea-testnet',
   opBNB: 'opbnb',
-  // astarZkatana: 'astarZkatana', not supported yet
+  astarZkatana: 'astarZkatana', // not supported by infura
 };
 
 // TODO: add command for testnet only, integrate with SUPPORTED_CHAINS_MAP
