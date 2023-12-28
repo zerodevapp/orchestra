@@ -6,7 +6,7 @@ import {
 } from 'viem';
 
 import { privateKeyToAccount } from 'viem/accounts';
-import { createSmartAccountClient } from 'permissionless';
+import { SendUserOperationParameters, createSmartAccountClient } from 'permissionless';
 import { signerToEcdsaKernelSmartAccount } from 'permissionless/accounts';
 import { SessionKeyProvider } from '@zerodev/sdk';
 
@@ -39,7 +39,6 @@ const deployToChain = async (
   serializedSessionKeyParams: string | undefined
 ): Promise<[string, string]> => {
   const viemChainObject = getChainObject(chain);
-  console.log(viemChainObject)
   const infuraChainUrl =
     'infura' in viemChainObject.rpcUrls ? viemChainObject.rpcUrls.infura : null;
 
@@ -93,22 +92,27 @@ const deployToChain = async (
       `Contract will be deployed at ${result.data} on ${chain} does not match expected address ${expectedAddress}`
     );
   }
+  
+  const op = await smartAccountClient.prepareUserOperationRequest({
+    userOperation : {
+      callData : await kernelAccount.encodeCallData({
+        to: DEPLOYER_CONTRACT_ADDRESS,
+        data: ensureHex(salt + bytecode.slice(2)),
+        value: 0n
+      })
+    }
+  })
 
-  const txHash = sessionKeyProvider
+  const opHash = sessionKeyProvider
     ? (
         await sessionKeyProvider.sendUserOperation({
           target: DEPLOYER_CONTRACT_ADDRESS,
           data: ensureHex(salt + bytecode.slice(2)),
         })
       ).hash
-    : await smartAccountClient.sendTransaction({
-        to: DEPLOYER_CONTRACT_ADDRESS,
-        data: ensureHex(salt + bytecode.slice(2)),
-        maxFeePerGas: gasPrices.maxFeePerGas,
-        maxPriorityFeePerGas: gasPrices.maxPriorityFeePerGas,
-      });
+    : await smartAccountClient.sendUserOperation({ userOperation : op});
 
-  return [result.data as string, txHash];
+  return [result.data as string, opHash];
 };
 
 export const deployContracts = async (

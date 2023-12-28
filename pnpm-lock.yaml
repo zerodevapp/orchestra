@@ -27,8 +27,8 @@ dependencies:
     specifier: ^16.3.1
     version: 16.3.1
   permissionless:
-    specifier: ^0.0.19
-    version: 0.0.19(viem@1.21.1)
+    specifier: 0.0.0-main.20231228T183316
+    version: 0.0.0-main.20231228T183316(viem@1.21.1)
   viem:
     specifier: ^1.21.1
     version: 1.21.1(typescript@5.3.3)(zod@3.22.4)
@@ -3665,8 +3665,8 @@ packages:
     resolution: {integrity: sha512-d+RQGp0MAYTIaDBIMmOfMwz3E+LOZnxx1HZd5R18mmCZY0QBlK0LDZfPc8FW8Ed2DlvsuE6PRjroDY+wg4+j/Q==}
     dev: false
 
-  /permissionless@0.0.19(viem@1.21.1):
-    resolution: {integrity: sha512-EXc5cAc7QP71LwyVfGBh2+G6UDpfYzPC46SNB27fXQI/B4ktHqlqgOMohSmXZ/uH9d30Lqq8SlQGIlmOsK4F+Q==}
+  /permissionless@0.0.0-main.20231228T183316(viem@1.21.1):
+    resolution: {integrity: sha512-OTvhkyYYBBqIGPxUJLaAkZYXK0Ofzm89UcNOWS0Mzbwv13nWyao0Irng+jwLJUaxz0xPnuyMgSgd3OH4IfIKHg==}
     peerDependencies:
       viem: ^1.19.4
     dependencies:

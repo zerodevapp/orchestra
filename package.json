@@ -22,7 +22,7 @@
     "axios-retry": "^4.0.0",
     "commander": "^11.1.0",
     "dotenv": "^16.3.1",
-    "permissionless": "^0.0.19",
+    "permissionless": "0.0.0-main.20231228T183316",
     "viem": "^1.21.1",
     "wagmi": "^1.4.12"
   },

@@ -12,5 +12,4 @@ function getEnvVar(name: string): string {
 
 export const ZERODEV_PROJECT_ID = getEnvVar('ZERODEV_PROJECT_ID');
 export const PRIVATE_KEY = getEnvVar('PRIVATE_KEY');
-export const PIMLICO_API_KEY = getEnvVar('PIMLICO_API_KEY');
 export const RPC_PROVIDER_API_KEY = getEnvVar('RPC_PROVIDER_API_KEY');
