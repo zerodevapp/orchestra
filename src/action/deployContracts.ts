@@ -31,10 +31,6 @@ import {
 } from '../config';
 import { ensureHex } from '../utils';
 
-const contractABI = parseAbi([
-  'function fallback(bytes32 salt, bytes memory bytecode) external payable returns (address addr)',
-]);
-
 const PIMLICO_BASE_URL = 'api.pimlico.io';
 
 const buildUrlForInfura = (baseUrl: string) =>

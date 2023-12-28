@@ -117,7 +117,7 @@ export const SUPPORTED_CHAINS_MAP = {
   // astarZkatana: 'astarZkatana', not supported yet
 };
 
-// TODO: add command for testnet only
+// TODO: add command for testnet only, integrate with SUPPORTED_CHAINS_MAP
 // viem/chains string : pimlico chains string
 export const TESTNET_CHAINS_MAP = {
   arbitrumGoerli: 'arbitrum-goerli',
