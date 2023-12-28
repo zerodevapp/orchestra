@@ -8,7 +8,6 @@ import {
   computeAddress,
   deployContracts,
   generateSessionKey,
-  getBalance,
   getDeployerAddress,
 } from '../action';
 import { PRIVATE_KEY, ZERODEV_PROJECT_ID } from '../config';
