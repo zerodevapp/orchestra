@@ -91,10 +91,9 @@ program
   )
   .action((pathToBytecode: string, salt: string, options) => {
     let { chains, expectedAddress, sessionKeyFilePath } = options;
-    const bytecode = fs.readFileSync(
-      path.resolve(process.cwd(), pathToBytecode),
-      'utf8'
-    );
+    const bytecode = fs
+      .readFileSync(path.resolve(process.cwd(), pathToBytecode), 'utf8')
+      .replace(/\n+$/, '');
 
     chains =
       chains === 'all' ? Object.keys(SUPPORTED_CHAINS_MAP) : chains.split(',');
