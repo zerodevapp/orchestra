@@ -15,24 +15,24 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@alchemy/aa-core": "^1.2.2",
-    "@zerodev/sdk": "^4.5.1",
+    "@alchemy/aa-core": "^1.2.3",
+    "@zerodev/sdk": "^4.5.2",
     "@zerodevapp/sdk": "^3.2.12",
-    "axios": "^1.6.2",
+    "axios": "^1.6.3",
     "axios-retry": "^4.0.0",
     "commander": "^11.1.0",
     "dotenv": "^16.3.1",
-    "permissionless": "^0.0.16",
-    "viem": "^1.20.2",
+    "permissionless": "^0.0.19",
+    "viem": "^1.21.1",
     "wagmi": "^1.4.12"
   },
   "devDependencies": {
     "@types/figlet": "^1.5.8",
-    "@types/node": "^18.17.17",
+    "@types/node": "^18.19.3",
     "chalk": "4.1.2",
     "ethers": "^6.9.1",
     "figlet": "^1.7.0",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
   }
 }
