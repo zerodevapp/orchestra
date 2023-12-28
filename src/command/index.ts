@@ -74,16 +74,6 @@ program
   });
 
 program
-  .command('get-balance')
-  .description('Get the deployer USDC balance')
-  .action(async () => {
-    const address = await getDeployerAddressWithEnv();
-    const balance = await getBalance(address);
-    console.log('this command is under development, it always returns 500');
-    console.log(`remaining balance: ${balance} USDC`);
-  });
-
-program
   .command('deploy')
   .description(
     'Deploy contracts deterministically using CREATE2, in order of the chains specified'
