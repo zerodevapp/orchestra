@@ -30,6 +30,7 @@
     "@types/figlet": "^1.5.8",
     "@types/node": "^18.19.3",
     "chalk": "4.1.2",
+    "cli-table3": "^0.6.3",
     "ethers": "^6.9.1",
     "figlet": "^1.7.0",
     "ts-node": "^10.9.2",

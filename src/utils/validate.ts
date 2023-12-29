@@ -28,13 +28,32 @@ export const validateInputs = (
   }
 };
 
-export const processAndValidateChains = (chainOption: string): Chain[] => {
+interface CommandOptions {
+  testnetAll?: boolean;
+  mainnetAll?: boolean;
+}
+
+export const processAndValidateChains = (
+  chainOption: string,
+  options: CommandOptions
+): Chain[] => {
   const supportedChains = getSupportedChains();
 
-  const chains =
-    chainOption === 'all'
-      ? supportedChains.map((chain) => chain.name)
-      : chainOption.split(',');
+  let chains: string[];
+  if (options.testnetAll) {
+    chains = supportedChains
+      .filter((chain) => chain.type === 'testnet')
+      .map((chain) => chain.name);
+  } else if (options.mainnetAll) {
+    chains = supportedChains
+      .filter((chain) => chain.type === 'mainnet')
+      .map((chain) => chain.name);
+  } else {
+    chains =
+      chainOption === 'all'
+        ? supportedChains.map((chain) => chain.name)
+        : chainOption.split(',');
+  }
 
   const chainObjects: Chain[] = chains.map((chainName: string) => {
     const chain = supportedChains.find((c) => c.name === chainName);

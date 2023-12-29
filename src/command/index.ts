@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import figlet from 'figlet';
 import chalk from 'chalk';
+import Table from 'cli-table3';
 import { Command } from 'commander';
 import {
   computeAddress,
@@ -43,10 +44,20 @@ program
   .command('chains')
   .description('Show the list of available chains')
   .action(() => {
-    console.log('[Available chains]');
-    getSupportedChains().forEach((chain) => {
-      console.log(`- ${chain.name} (${chain.type})`);
+    const chains = getSupportedChains().map((chain) => [
+      chain.name,
+      chain.type,
+    ]);
+
+    const table = new Table({
+      head: ['Name', 'Type'],
+      chars: { mid: '', 'left-mid': '', 'mid-mid': '', 'right-mid': '' },
     });
+
+    chains.forEach((chain) => table.push(chain));
+
+    console.log('[Available chains]');
+    console.log(table.toString());
   });
 
 program
@@ -88,11 +99,16 @@ program
     'all'
   )
   .option('-e, --expected-address [ADDRESS]', 'expected address to confirm')
+  .option('-t, --testnet-all', 'select all testnets', false)
+  .option('-m, --mainnet-all', 'select all mainnets', false)
   .action((pathToBytecode: string, salt: string, options) => {
-    const { chains, expectedAddress, sessionKeyFilePath } = options;
+    const { chains, expectedAddress, testnetAll, mainnetAll } = options;
     const bytecode = readBytecodeFromFile(pathToBytecode);
 
-    const chainObjects = processAndValidateChains(chains);
+    const chainObjects = processAndValidateChains(chains, {
+      testnetAll,
+      mainnetAll,
+    });
 
     deployContracts(
       ensureHex(bytecode),
@@ -102,6 +118,7 @@ program
     );
   });
 
+/** @notice 400 error on base-sepolia */
 program
   .command('check-deployment')
   .description(
@@ -117,11 +134,16 @@ program
     'list of chains to check, with all selected by default',
     'all'
   )
+  .option('-t, --testnet-all', 'select all testnets')
+  .option('-m, --mainnet-all', 'select all mainnets')
   .action(async (pathToBytecode: string, salt: string, options) => {
-    const { chains } = options;
+    const { chains, testnetAll, mainnetAll } = options;
     const bytecode = readBytecodeFromFile(pathToBytecode);
 
-    const chainObjects = processAndValidateChains(chains);
+    const chainObjects = processAndValidateChains(chains, {
+      testnetAll,
+      mainnetAll,
+    });
 
     const { contractAddress, deployedChains, notDeployedChains } =
       await findDeployment(ensureHex(bytecode), ensureHex(salt), chainObjects);
