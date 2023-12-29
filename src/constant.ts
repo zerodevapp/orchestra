@@ -22,9 +22,6 @@ import {
   astarZkatana,
 } from 'viem/chains';
 
-const BYTES_ZERO =
-  '0x0000000000000000000000000000000000000000000000000000000000000000';
-
 export const COUNTER_CONTRACT_BYTECODE =
   '0x608060405234801561001057600080fd5b5060cc8061001f6000396000f3fe6080604052348015600f57600080fd5b506004361060325760003560e01c806306661abd146037578063d09de08a146051575b600080fd5b603f60005481565b60405190815260200160405180910390f35b60576059565b005b6001600080828254606991906070565b9091555050565b80820180821115609057634e487b7160e01b600052601160045260246000fd5b9291505056fea264697066735822122052dc90ec1ffdb0918b4141bc3d8a5937fb172b6689fdf50d0e0361d36415834a64736f6c63430008160033';
 
@@ -97,41 +94,3 @@ export const TESTNET_CHAINS_MAP = {
   lineaTestnet: 'linea-testnet',
 };
 
-export const PIMLICO_SUPPORTED_CHAINS = [
-  'arbitrum-goerli',
-  'arbitrum-sepolia',
-  'arbitrum',
-  'avalanche-fuji',
-  'avalanche',
-  'base-goerli',
-  'base',
-  'binance-testnet',
-  'binance',
-  'celo-alfajores-testnet',
-  'celo',
-  'chiado-testnet',
-  'dfk-chain-test',
-  'dfk-chain',
-  'ethereum',
-  'fuse',
-  'gnosis',
-  'goerli',
-  'klaytn-baobab',
-  'klaytn-cypress',
-  'linea-testnet',
-  'linea',
-  'lyra',
-  'mantle',
-  'mumbai',
-  'nautilus',
-  'opbnb',
-  'optimism-goerli',
-  'optimism',
-  'parallel-l3-testnet',
-  'polygon',
-  'scroll-alpha-testnet',
-  'scroll-sepolia-testnet',
-  'scroll',
-  'sepolia',
-  'xai-goerli-orbit',
-];

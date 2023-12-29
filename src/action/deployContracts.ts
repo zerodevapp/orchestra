@@ -1,29 +1,37 @@
 import chalk from 'chalk';
-import { Hex, createPublicClient, http, getAddress } from 'viem';
+import { Hex, createPublicClient, http } from 'viem';
+
 import { privateKeyToAccount } from 'viem/accounts';
-import { createSmartAccountClient } from 'permissionless';
-import { signerToEcdsaKernelSmartAccount } from 'permissionless/accounts';
 import {
-  createPimlicoPaymasterClient,
-  createPimlicoBundlerClient,
-} from 'permissionless/clients/pimlico';
+  SendUserOperationParameters,
+  createSmartAccountClient,
+} from 'permissionless';
+import { signerToEcdsaKernelSmartAccount } from 'permissionless/accounts';
 import { SessionKeyProvider } from '@zerodev/sdk';
+
+import {
+  createZeroDevBundlerClient,
+  createZeroDevPaymasterClient,
+} from '../clients/ZeroDevClient';
 import {
   DEPLOYER_CONTRACT_ADDRESS,
   ENTRYPOINT,
-  SUPPORTED_CHAINS_MAP,
   getChainObject,
 } from '../constant';
 import {
-  PIMLICO_API_KEY,
   PRIVATE_KEY,
   RPC_PROVIDER_API_KEY,
   ZERODEV_PROJECT_ID,
 } from '../config';
-import { ensureHex, buildUrlForPimlico, buildUrlForInfura } from '../utils';
+import { ensureHex } from '../utils';
 
-const createPimlicoClient = (chain: string, version: string) =>
-  http(buildUrlForPimlico(chain, version));
+const buildUrlForInfura = (baseUrl: string) =>
+  `${baseUrl}/${RPC_PROVIDER_API_KEY}`;
+
+const ZERODEV_URL = 'https://meta-aa-provider.onrender.com/api/v2';
+
+const createZeroDevClient = (mode: string, projectId: string) =>
+  http(`${ZERODEV_URL}/${mode}/${projectId}`);
 
 const deployToChain = async (
   chain: string,
@@ -33,16 +41,22 @@ const deployToChain = async (
   serializedSessionKeyParams: string | undefined
 ): Promise<[string, string]> => {
   const viemChainObject = getChainObject(chain);
+  const infuraChainUrl =
+    'infura' in viemChainObject.rpcUrls ? viemChainObject.rpcUrls.infura : null;
 
-  const pimlicoChainKey =
-    SUPPORTED_CHAINS_MAP[chain as keyof typeof SUPPORTED_CHAINS_MAP];
+  if (!infuraChainUrl) {
+    throw new Error(`Infura RPC URL not found for chain: ${chain}`);
+  }
 
   const publicClient = createPublicClient({
-    transport: http(buildUrlForInfura(viemChainObject.network)),
+    transport: http(buildUrlForInfura(infuraChainUrl.http[0])),
   });
 
-  const paymasterClient = createPimlicoPaymasterClient({
-    transport: createPimlicoClient(pimlicoChainKey, 'v2'),
+  const gasPrices = await publicClient.estimateFeesPerGas();
+
+  const paymasterClient = createZeroDevPaymasterClient({
+    chain: viemChainObject,
+    transport: createZeroDevClient('paymaster', ZERODEV_PROJECT_ID),
   });
 
   const signer = privateKeyToAccount(ensureHex(PRIVATE_KEY));
@@ -56,7 +70,7 @@ const deployToChain = async (
   const smartAccountClient = createSmartAccountClient({
     account: kernelAccount,
     chain: viemChainObject,
-    transport: createPimlicoClient(pimlicoChainKey, 'v1'),
+    transport: createZeroDevClient('bundler', ZERODEV_PROJECT_ID),
     sponsorUserOperation: paymasterClient.sponsorUserOperation,
   });
 
@@ -68,18 +82,6 @@ const deployToChain = async (
         ),
       })
     : undefined;
-
-  const bundlerClient = createPimlicoBundlerClient({
-    transport: createPimlicoClient(pimlicoChainKey, 'v1'),
-  });
-
-  const gasPrices = await bundlerClient.getUserOperationGasPrice();
-  if (
-    gasPrices.fast.maxFeePerGas === undefined ||
-    gasPrices.fast.maxPriorityFeePerGas === undefined
-  ) {
-    throw new Error('gas prices not available');
-  }
 
   const result = await publicClient.call({
     account: kernelAccount.address,
@@ -93,21 +95,26 @@ const deployToChain = async (
     );
   }
 
-  const txHash = sessionKeyProvider
+  const op = await smartAccountClient.prepareUserOperationRequest({
+    userOperation: {
+      callData: await kernelAccount.encodeCallData({
+        to: DEPLOYER_CONTRACT_ADDRESS,
+        data: ensureHex(salt + bytecode.slice(2)),
+        value: 0n,
+      }),
+    },
+  });
+
+  const opHash = sessionKeyProvider
     ? (
         await sessionKeyProvider.sendUserOperation({
           target: DEPLOYER_CONTRACT_ADDRESS,
           data: ensureHex(salt + bytecode.slice(2)),
         })
       ).hash
-    : await smartAccountClient.sendTransaction({
-        to: DEPLOYER_CONTRACT_ADDRESS,
-        data: ensureHex(salt + bytecode.slice(2)),
-        maxFeePerGas: gasPrices.fast.maxFeePerGas,
-        maxPriorityFeePerGas: gasPrices.fast.maxPriorityFeePerGas,
-      });
+    : await smartAccountClient.sendUserOperation({ userOperation: op });
 
-  return [getAddress(result.data as string), txHash];
+  return [result.data as string, opHash];
 };
 
 export const deployContracts = async (
