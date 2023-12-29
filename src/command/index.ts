@@ -134,8 +134,8 @@ program
     'list of chains to check, with all selected by default',
     'all'
   )
-  .option('-t, --testnet-all', 'select all testnets')
-  .option('-m, --mainnet-all', 'select all mainnets')
+  .option('-t, --testnet-all', 'select all testnets', false)
+  .option('-m, --mainnet-all', 'select all mainnets', false)
   .action(async (pathToBytecode: string, salt: string, options) => {
     const { chains, testnetAll, mainnetAll } = options;
     const bytecode = readBytecodeFromFile(pathToBytecode);
