@@ -1,6 +1,6 @@
 # Contract Deployment Tool
 
-This tool is a command line tool that allows you to deploy contracts to multiple chains determinitically with a single command. It uses the [ZeroDev](https://zerodev.app) service to deploy contracts.
+This tool is a command line tool that allows you to deploy contracts to multiple chains deterministically with a single command. It uses the [ZeroDev](https://zerodev.app) service to deploy contracts.
 
 ## Configuration
 
