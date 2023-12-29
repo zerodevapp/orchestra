@@ -25,7 +25,6 @@ program
   .usage('zerodev <command> [options]')
   .version('1.0.0');
 
-// TODO: show the help info from above, not below
 program.helpInformation = function () {
   const asciiArt = chalk.blueBright(
     figlet.textSync('ZeroDev Deployer', {
@@ -37,7 +36,7 @@ program.helpInformation = function () {
   );
 
   const originalHelpInformation = Command.prototype.helpInformation.call(this);
-  return `${asciiArt}\n\n\n${originalHelpInformation}`;
+  return `\n\n${asciiArt}\n\n\n${originalHelpInformation}`;
 };
 
 program
