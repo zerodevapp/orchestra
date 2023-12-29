@@ -1,3 +1,3 @@
 export * from './format';
 export * from './validate';
-export * from './bytecode';
+export * from './file';

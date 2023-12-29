@@ -8,7 +8,7 @@ import { SessionKeyProvider } from '@zerodev/sdk';
 import { createZeroDevPaymasterClient } from '../clients/ZeroDevClient';
 import { Chain, DEPLOYER_CONTRACT_ADDRESS, ENTRYPOINT } from '../constant';
 import { PRIVATE_KEY } from '../config';
-import { ensureHex } from '../utils';
+import { ensureHex, writeErrorLogToFile } from '../utils';
 import { createZeroDevClient } from '../clients';
 
 const deployToChain = async (
@@ -93,9 +93,10 @@ export const deployContracts = async (
   const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
   let frameIndex = 0;
 
+  // Update console with deployment status, note that this clear the console. what it means is you cannot use console.log to print anything else
   const updateConsole = () => {
     console.clear();
-    console.log('Starting deployments...');
+    console.log('🏁 Starting deployments...');
     chains.forEach((chain) => {
       const frame =
         deploymentStatus[chain.name].status === 'starting...'
@@ -120,16 +121,17 @@ export const deployContracts = async (
 
   const interval = setInterval(updateConsole, 100);
 
-  // TODO: describe status of each deployment regardless of error, user should be able to see which deployment succeeded and which failed
   const deployments = chains.map((chain) =>
     deployToChain(chain, bytecode, salt, expectedAddress)
       .then(([result, txHash]) => {
         deploymentStatus[chain.name] = { status: 'done!', result, txHash };
       })
       .catch((error) => {
-        deploymentStatus[chain.name] = { status: `failed: ${error}` };
-        // TODO: throw error gracefully, or save the log to a file
-        throw error;
+        deploymentStatus[chain.name] = {
+          status: `failed! ❌ check the error log at "./log" directory`,
+        };
+        // save error log to file instead of throwing error
+        writeErrorLogToFile(chain.name, error);
       })
   );
 
@@ -138,5 +140,5 @@ export const deployContracts = async (
   clearInterval(interval);
   frameIndex = 0; // Reset for a clean final display
   updateConsole(); // Final update
-  console.log('All deployments process successfully finished!');
+  console.log('🏁 All deployments process successfully finished!');
 };

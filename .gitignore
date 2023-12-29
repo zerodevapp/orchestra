@@ -3,3 +3,4 @@ node_modules
 dist
 bytecode
 session-key.txt
+log
