@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { SUPPORTED_CHAINS_MAP } from '../constant';
+import { Chain, SUPPORTED_CHAINS } from '../constant';
 
 export const validateInputs = (
   bytecode: string,
@@ -20,13 +20,21 @@ export const validateInputs = (
     throw new Error('Expected address must be a 20 bytes hex string');
   }
 
-  chains.forEach((chain: string) => {
-    if (!(chain in SUPPORTED_CHAINS_MAP)) {
-      throw new Error(`chain ${chain} not supported`);
+  for (const chain of chains) {
+    if (!SUPPORTED_CHAINS.map((chain) => chain.name).includes(chain)) {
+      throw new Error(`Chain ${chain} is not supported`);
     }
-  });
+  }
 
   if (sessionKeyFilePath && !fs.existsSync(sessionKeyFilePath)) {
     throw new Error('Session key file does not exist');
+  }
+};
+
+export const validateRpcUrl = (chains: Chain[]) => {
+  for (const chain of chains) {
+    if (!chain.rpcUrl) {
+      throw new Error(`RPC url for chain ${chain.name} is not specified`);
+    }
   }
 };

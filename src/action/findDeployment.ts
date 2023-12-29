@@ -1,12 +1,12 @@
 import { Hex, createPublicClient, http } from 'viem';
-import { DEPLOYER_CONTRACT_ADDRESS, getChainObject } from '../constant';
+import { Chain, DEPLOYER_CONTRACT_ADDRESS } from '../constant';
 import { computeAddress } from './computeAddress';
 import { buildUrlForInfura } from '../utils';
 
 export const findDeployment = async (
   bytecode: Hex,
   salt: Hex,
-  chains: string[]
+  chains: Chain[]
 ) => {
   const contractAddress = computeAddress(
     DEPLOYER_CONTRACT_ADDRESS,

@@ -11,7 +11,7 @@ import {
   getDeployerAddress,
 } from '../action';
 import { PRIVATE_KEY, ZERODEV_PROJECT_ID } from '../config';
-import { DEPLOYER_CONTRACT_ADDRESS, SUPPORTED_CHAINS_MAP } from '../constant';
+import { DEPLOYER_CONTRACT_ADDRESS, SUPPORTED_CHAINS } from '../constant';
 import { ensureHex, validateInputs } from '../utils';
 import { findDeployment } from '../action/findDeployment';
 
@@ -49,9 +49,9 @@ program
   .description('Show the list of available chains')
   .action(() => {
     console.log('[Available chains]');
-    Object.keys(SUPPORTED_CHAINS_MAP).forEach((chain) =>
-      console.log(`- ${chain}`)
-    );
+    SUPPORTED_CHAINS.forEach((chain) => {
+      console.log(`- ${chain.name} (${chain.type})`);
+    });
   });
 
 program
@@ -100,7 +100,9 @@ program
       .replace(/\n+$/, '');
 
     chains =
-      chains === 'all' ? Object.keys(SUPPORTED_CHAINS_MAP) : chains.split(',');
+      chains === 'all'
+        ? SUPPORTED_CHAINS.map((chain) => chain.name)
+        : chains.split(',');
 
     validateInputs(bytecode, salt, expectedAddress, chains, sessionKeyFilePath);
 
@@ -151,7 +153,9 @@ program
       .replace(/\n+$/, '');
 
     chains =
-      chains === 'all' ? Object.keys(SUPPORTED_CHAINS_MAP) : chains.split(',');
+      chains === 'all'
+        ? SUPPORTED_CHAINS.map((chain) => chain.name)
+        : chains.split(',');
 
     validateInputs(bytecode, salt, undefined, chains, undefined);
 
@@ -173,6 +177,7 @@ program
     'file path of bytecode to deploy, a.k.a. init code'
   )
   .argument('<salt>', 'salt used for depolyment')
+  // TODO: add option for mainnet or testnet
   .action(async (pathToBytecode: string, salt: string) => {
     const bytecode = fs
       .readFileSync(path.resolve(process.cwd(), pathToBytecode), 'utf8')
@@ -180,12 +185,10 @@ program
 
     validateInputs(bytecode, salt, undefined, [], undefined);
 
-    const chains = Object.keys(SUPPORTED_CHAINS_MAP);
-
     const { notDeployedChains } = await findDeployment(
       ensureHex(bytecode),
       ensureHex(salt),
-      chains
+      SUPPORTED_CHAINS
     );
 
     if (notDeployedChains.length === 0) {

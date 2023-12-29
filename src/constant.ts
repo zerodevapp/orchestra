@@ -1,18 +1,14 @@
 import {
   arbitrum,
-  arbitrumGoerli,
   arbitrumSepolia,
   avalanche,
   avalancheFuji,
   base,
-  baseGoerli,
   baseSepolia,
   bsc,
   mainnet,
-  goerli,
   sepolia,
   optimism,
-  optimismGoerli,
   optimismSepolia,
   polygon,
   polygonMumbai,
@@ -22,75 +18,122 @@ import {
   astarZkatana,
 } from 'viem/chains';
 
-export const COUNTER_CONTRACT_BYTECODE =
-  '0x608060405234801561001057600080fd5b5060cc8061001f6000396000f3fe6080604052348015600f57600080fd5b506004361060325760003560e01c806306661abd146037578063d09de08a146051575b600080fd5b603f60005481565b60405190815260200160405180910390f35b60576059565b005b6001600080828254606991906070565b9091555050565b80820180821115609057634e487b7160e01b600052601160045260246000fd5b9291505056fea264697066735822122052dc90ec1ffdb0918b4141bc3d8a5937fb172b6689fdf50d0e0361d36415834a64736f6c63430008160033';
-
 /** @dev deterministic-deployment-proxy contract address */
 export const DEPLOYER_CONTRACT_ADDRESS =
   '0x4e59b44847b379578588920ca78fbf26c0b4956c';
 
 export const ENTRYPOINT = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789';
 
-const VIEM_CHAINS = {
-  arbitrum,
-  arbitrumGoerli,
-  arbitrumSepolia,
-  avalanche,
-  avalancheFuji,
-  base,
-  baseGoerli,
-  baseSepolia,
-  bsc,
-  mainnet,
-  goerli,
-  sepolia,
-  optimism,
-  optimismGoerli,
-  optimismSepolia,
-  polygon,
-  polygonMumbai,
-  linea,
-  lineaTestnet,
-  opBNB,
-  astarZkatana,
-};
+export type Network = 'mainnet' | 'testnet';
 
-export const getChainObject = (chainName: string) => {
-  return VIEM_CHAINS[chainName as keyof typeof VIEM_CHAINS];
-};
+export interface Chain {
+  name: string;
+  rpcUrl: string | null;
+  viemChainObject: any;
+  type: Network;
+}
 
-// TODO: manage mainnet and testnet together
-// viem/chains string : pimlico chains string
-export const SUPPORTED_CHAINS_MAP = {
-  arbitrum: 'arbitrum',
-  arbitrumSepolia: 'arbitrum-sepolia', // Insufficient Pimlico balance for sponsorship, please top up - Balance required: 0.000134 USD, Balance available: 0 USD
-  avalanche: 'avalanche',
-  avalancheFuji: 'avalanche-fuji',
-  base: 'base',
-  baseSepolia: 'base-sepolia', // not supported by infura
-  bsc: 'binance',
-  mainnet: 'ethereum',
-  sepolia: 'sepolia',
-  optimism: 'optimism',
-  optimismSepolia: 'optimism-sepolia', // not supported by pimlico
-  polygon: 'polygon',
-  polygonMumbai: 'mumbai',
-  linea: 'linea',
-  lineaTestnet: 'linea-testnet',
-  opBNB: 'opbnb',
-  astarZkatana: 'astarZkatana', // not supported by infura
-};
-
-// TODO: add command for testnet only, integrate with SUPPORTED_CHAINS_MAP
-// viem/chains string : pimlico chains string
-export const TESTNET_CHAINS_MAP = {
-  arbitrumGoerli: 'arbitrum-goerli',
-  // avalancheFuji: 'avalanche-fuji', // does not support rpc url from viem, so exclude it for now
-  // baseGoerli: 'base-goerli', // does not support from infura
-  goerli: 'goerli',
-  sepolia: 'sepolia',
-  optimismGoerli: 'optimism-goerli',
-  polygonMumbai: 'mumbai',
-  lineaTestnet: 'linea-testnet',
-};
-
+export const SUPPORTED_CHAINS: Chain[] = [
+  {
+    name: 'arbitrum',
+    rpcUrl: process.env.ARBITRUM_RPC_URL || null,
+    viemChainObject: arbitrum,
+    type: 'mainnet',
+  },
+  {
+    name: 'arbitrum-sepolia',
+    rpcUrl: process.env.ARBITRUM_SEPOLIA_RPC_URL || null,
+    viemChainObject: arbitrumSepolia,
+    type: 'testnet',
+  },
+  {
+    name: 'avalanche',
+    rpcUrl: process.env.AVALANCHE_RPC_URL || null,
+    viemChainObject: avalanche,
+    type: 'mainnet',
+  },
+  {
+    name: 'avalanche-fuji',
+    rpcUrl: process.env.AVALANCHE_FUJI_RPC_URL || null,
+    viemChainObject: avalancheFuji,
+    type: 'testnet',
+  },
+  {
+    name: 'base',
+    rpcUrl: process.env.BASE_RPC_URL || null,
+    viemChainObject: base,
+    type: 'mainnet',
+  },
+  {
+    name: 'base-sepolia',
+    rpcUrl: process.env.BASE_SEPOLIA_RPC_URL || null,
+    viemChainObject: baseSepolia,
+    type: 'testnet',
+  },
+  {
+    name: 'bsc',
+    rpcUrl: process.env.BSC_RPC_URL || null,
+    viemChainObject: bsc,
+    type: 'mainnet',
+  },
+  {
+    name: 'mainnet',
+    rpcUrl: process.env.MAINNET_RPC_URL || null,
+    viemChainObject: mainnet,
+    type: 'mainnet',
+  },
+  {
+    name: 'sepolia',
+    rpcUrl: process.env.SEPOILA_RPC_URL || null,
+    viemChainObject: sepolia,
+    type: 'testnet',
+  },
+  {
+    name: 'optimism',
+    rpcUrl: process.env.OPTIMISM_RPC_URL || null,
+    viemChainObject: optimism,
+    type: 'mainnet',
+  },
+  {
+    name: 'optimism-sepolia',
+    rpcUrl: process.env.OPTIMISM_SEPOLIA_RPC_URL || null,
+    viemChainObject: optimismSepolia,
+    type: 'testnet',
+  },
+  {
+    name: 'polygon',
+    rpcUrl: process.env.POLYGON_RPC_URL || null,
+    viemChainObject: polygon,
+    type: 'mainnet',
+  },
+  {
+    name: 'polygon-mumbai',
+    rpcUrl: process.env.POLYGON_MUMBAI_RPC_URL || null,
+    viemChainObject: polygonMumbai,
+    type: 'testnet',
+  },
+  {
+    name: 'linea',
+    rpcUrl: process.env.LINEA_RPC_URL || null,
+    viemChainObject: linea,
+    type: 'mainnet',
+  },
+  {
+    name: 'linea-testnet',
+    rpcUrl: process.env.LINEA_TESTNET_RPC_URL || null,
+    viemChainObject: lineaTestnet,
+    type: 'testnet',
+  },
+  {
+    name: 'opbnb',
+    rpcUrl: process.env.OPBNB_RPC_URL || null,
+    viemChainObject: opBNB,
+    type: 'mainnet',
+  },
+  {
+    name: 'astarZkatana',
+    rpcUrl: process.env.ASTAR_ZKATANA_RPC_URL || null,
+    viemChainObject: astarZkatana,
+    type: 'testnet',
+  },
+];

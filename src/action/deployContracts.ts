@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { Hex, createPublicClient, http } from 'viem';
+import { Hex, createPublicClient, getAddress, http } from 'viem';
 
 import { privateKeyToAccount } from 'viem/accounts';
 import {
@@ -8,16 +8,11 @@ import {
 } from 'permissionless';
 import { signerToEcdsaKernelSmartAccount } from 'permissionless/accounts';
 import { SessionKeyProvider } from '@zerodev/sdk';
-
 import {
   createZeroDevBundlerClient,
   createZeroDevPaymasterClient,
 } from '../clients/ZeroDevClient';
-import {
-  DEPLOYER_CONTRACT_ADDRESS,
-  ENTRYPOINT,
-  getChainObject,
-} from '../constant';
+import { Chain, DEPLOYER_CONTRACT_ADDRESS, ENTRYPOINT } from '../constant';
 import {
   PRIVATE_KEY,
   RPC_PROVIDER_API_KEY,
@@ -25,37 +20,28 @@ import {
 } from '../config';
 import { ensureHex } from '../utils';
 
-const buildUrlForInfura = (baseUrl: string) =>
-  `${baseUrl}/${RPC_PROVIDER_API_KEY}`;
-
 const ZERODEV_URL = 'https://meta-aa-provider.onrender.com/api/v2';
 
 const createZeroDevClient = (mode: string, projectId: string) =>
   http(`${ZERODEV_URL}/${mode}/${projectId}`);
 
 const deployToChain = async (
-  chain: string,
+  chain: Chain,
   bytecode: Hex,
   salt: Hex,
   expectedAddress: string | undefined,
   serializedSessionKeyParams: string | undefined
 ): Promise<[string, string]> => {
-  const viemChainObject = getChainObject(chain);
-  const infuraChainUrl =
-    'infura' in viemChainObject.rpcUrls ? viemChainObject.rpcUrls.infura : null;
-
-  if (!infuraChainUrl) {
-    throw new Error(`Infura RPC URL not found for chain: ${chain}`);
-  }
-
   const publicClient = createPublicClient({
-    transport: http(buildUrlForInfura(infuraChainUrl.http[0])),
+    chain: chain.viemChainObject,
+    // zerodev bundler supports both public and bundler rpc
+    transport: createZeroDevClient('bundler', ZERODEV_PROJECT_ID),
   });
 
   const gasPrices = await publicClient.estimateFeesPerGas();
 
   const paymasterClient = createZeroDevPaymasterClient({
-    chain: viemChainObject,
+    chain: chain.viemChainObject,
     transport: createZeroDevClient('paymaster', ZERODEV_PROJECT_ID),
   });
 
@@ -69,7 +55,7 @@ const deployToChain = async (
 
   const smartAccountClient = createSmartAccountClient({
     account: kernelAccount,
-    chain: viemChainObject,
+    chain: chain.viemChainObject,
     transport: createZeroDevClient('bundler', ZERODEV_PROJECT_ID),
     sponsorUserOperation: paymasterClient.sponsorUserOperation,
   });
@@ -114,12 +100,12 @@ const deployToChain = async (
       ).hash
     : await smartAccountClient.sendUserOperation({ userOperation: op });
 
-  return [result.data as string, opHash];
+  return [getAddress(result.data as string), opHash];
 };
 
 export const deployContracts = async (
   bytecode: Hex,
-  chains: string[],
+  chains: Chain[],
   salt: Hex,
   expectedAddress: string | undefined,
   serializedSessionKeyParams: string | undefined
