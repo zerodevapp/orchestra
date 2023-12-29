@@ -56,7 +56,11 @@ program
   .argument('<salt>', 'salt to be used for create2')
   .action((pathToBytecode: string, salt: string) => {
     const bytecode = readBytecodeFromFile(pathToBytecode);
-    const address = computeAddress(DEPLOYER_CONTRACT_ADDRESS, bytecode, salt);
+    const address = computeAddress(
+      DEPLOYER_CONTRACT_ADDRESS,
+      ensureHex(bytecode),
+      ensureHex(salt)
+    );
     console.log(`computed address: ${address}`);
   });
 

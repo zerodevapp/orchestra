@@ -1,19 +1,10 @@
-import { keccak256, toBytes, getAddress, Hex } from 'viem';
+import { Hex, getContractAddress } from 'viem';
 
-export const computeAddress = (
-  creatorAddress: string,
-  bytecode: string,
-  salt: string
-): Hex => {
-  const create2Inputs = [
-    '0xff',
-    creatorAddress,
+export const computeAddress = (from: Hex, bytecode: Hex, salt: Hex): Hex => {
+  return getContractAddress({
+    bytecode,
+    from,
+    opcode: 'CREATE2',
     salt,
-    keccak256(toBytes(bytecode)),
-  ];
-
-  const create2Hash = keccak256(
-    Buffer.concat(create2Inputs.map((x) => toBytes(x)))
-  );
-  return getAddress('0x' + create2Hash.slice(-40));
+  });
 };
