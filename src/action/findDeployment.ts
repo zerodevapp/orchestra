@@ -1,6 +1,11 @@
-import { Hex, createPublicClient } from 'viem';
+import { Hex, createPublicClient, http } from 'viem';
 import { Chain, DEPLOYER_CONTRACT_ADDRESS } from '../constant';
 import { computeAddress } from './computeAddress';
+
+const ZERODEV_URL = 'https://meta-aa-provider.onrender.com/api/v2';
+
+const createZeroDevClient = (mode: string, projectId: string) =>
+  http(`${ZERODEV_URL}/${mode}/${projectId}`);
 
 export const findDeployment = async (
   bytecode: Hex,
@@ -43,7 +48,3 @@ export const findDeployment = async (
 
   return { contractAddress, deployedChains, notDeployedChains };
 };
-
-function createZeroDevClient(arg0: string, projectId: string): any {
-  throw new Error('Function not implemented.');
-}

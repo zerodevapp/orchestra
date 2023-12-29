@@ -124,6 +124,8 @@ program
       await findDeployment(ensureHex(bytecode), ensureHex(salt), chainObjects);
 
     console.log(`contract address: ${contractAddress}`);
-    console.log(`deployed chains: ${deployedChains.join(', ')}`);
-    console.log(`not deployed chains: ${notDeployedChains.join(', ')}`);
+    console.log('deployed on:');
+    deployedChains.forEach((chain) => console.log(`- ${chain.name}`));
+    console.log('not deployed on:');
+    notDeployedChains.forEach((chain) => console.log(`- ${chain.name}`));
   });
