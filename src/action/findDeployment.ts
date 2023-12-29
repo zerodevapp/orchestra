@@ -1,11 +1,7 @@
 import { Hex, createPublicClient, http } from 'viem';
 import { Chain, DEPLOYER_CONTRACT_ADDRESS } from '../constant';
 import { computeAddress } from './computeAddress';
-
-const ZERODEV_URL = 'https://meta-aa-provider.onrender.com/api/v2';
-
-const createZeroDevClient = (mode: string, projectId: string) =>
-  http(`${ZERODEV_URL}/${mode}/${projectId}`);
+import { createZeroDevClient } from '../clients';
 
 export const findDeployment = async (
   bytecode: Hex,

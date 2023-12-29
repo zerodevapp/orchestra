@@ -9,11 +9,7 @@ import { createZeroDevPaymasterClient } from '../clients/ZeroDevClient';
 import { Chain, DEPLOYER_CONTRACT_ADDRESS, ENTRYPOINT } from '../constant';
 import { PRIVATE_KEY } from '../config';
 import { ensureHex } from '../utils';
-
-const ZERODEV_URL = 'https://meta-aa-provider.onrender.com/api/v2';
-
-const createZeroDevClient = (mode: string, projectId: string) =>
-  http(`${ZERODEV_URL}/${mode}/${projectId}`);
+import { createZeroDevClient } from '../clients';
 
 const deployToChain = async (
   chain: Chain,

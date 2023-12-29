@@ -18,6 +18,8 @@ import {
   astarZkatana,
 } from 'viem/chains';
 
+export const ZERODEV_URL = 'https://meta-aa-provider.onrender.com/api/v2';
+
 /** @dev deterministic-deployment-proxy contract address */
 export const DEPLOYER_CONTRACT_ADDRESS =
   '0x4e59b44847b379578588920ca78fbf26c0b4956c';
