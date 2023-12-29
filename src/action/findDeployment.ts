@@ -3,6 +3,23 @@ import { Chain, DEPLOYER_CONTRACT_ADDRESS } from '../constant';
 import { computeAddress } from './computeAddress';
 import { createZeroDevClient } from '../clients';
 
+const checkDeploymentOnChain = async (chain: Chain, contractAddress: Hex) => {
+  if (chain.projectId === null) {
+    throw new Error(`PROJECT_ID for chain ${chain.name} is not specified`);
+  }
+
+  const publicClient = createPublicClient({
+    chain: chain.viemChainObject,
+    // zerodev bundler supports both public and bundler rpc
+    transport: createZeroDevClient('bundler', chain.projectId),
+  });
+  const deployedBytecode = await publicClient.getBytecode({
+    address: contractAddress,
+  });
+
+  return deployedBytecode ? 'deployed' : 'notDeployed';
+};
+
 export const findDeployment = async (
   bytecode: Hex,
   salt: Hex,
@@ -14,25 +31,8 @@ export const findDeployment = async (
     salt
   );
 
-  const checkDeploymentOnChain = async (chain: Chain) => {
-    if (chain.projectId === null) {
-      throw new Error(`PROJECT_ID for chain ${chain.name} is not specified`);
-    }
-
-    const publicClient = createPublicClient({
-      chain: chain.viemChainObject,
-      // zerodev bundler supports both public and bundler rpc
-      transport: createZeroDevClient('bundler', chain.projectId),
-    });
-    const deployedBytecode = await publicClient.getBytecode({
-      address: contractAddress,
-    });
-
-    return deployedBytecode ? 'deployed' : 'notDeployed';
-  };
-
   const deploymentResults = await Promise.all(
-    chains.map((chain) => checkDeploymentOnChain(chain))
+    chains.map((chain) => checkDeploymentOnChain(chain, contractAddress))
   );
 
   const deployedChains = chains.filter(
