@@ -75,7 +75,7 @@ const deployToChain = async (
   return [getAddress(result.data as string), opHash];
 };
 
-// Update console with deployment status, note that this clear the console. what it means is you cannot use console.log to print anything else
+// Update console with deployment status, note that this clears the console and you cannot use console.log to print anything else
 const updateConsole = (
   chains: Chain[],
   deploymentStatus: Record<
