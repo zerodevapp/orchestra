@@ -1,4 +1,7 @@
+import dotenv from 'dotenv';
 import { program } from './command';
+
+dotenv.config();
 
 async function main() {
   program.parse(process.argv);

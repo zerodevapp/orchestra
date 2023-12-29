@@ -1,25 +1,21 @@
 #!/usr/bin/env node
 import figlet from 'figlet';
 import chalk from 'chalk';
-import fs from 'fs';
-import path from 'path';
 import { Command } from 'commander';
 import {
   computeAddress,
   deployContracts,
-  generateSessionKey,
+  findDeployment,
   getDeployerAddress,
 } from '../action';
-import { PRIVATE_KEY, ZERODEV_PROJECT_ID } from '../config';
-import { DEPLOYER_CONTRACT_ADDRESS, SUPPORTED_CHAINS } from '../constant';
-import { ensureHex, validateInputs } from '../utils';
-import { findDeployment } from '../action/findDeployment';
+import { DEPLOYER_CONTRACT_ADDRESS, getSupportedChains } from '../constant';
+import {
+  ensureHex,
+  processAndValidateChains,
+  readBytecodeFromFile,
+} from '../utils';
 
 export const program = new Command();
-
-const getDeployerAddressWithEnv = async () => {
-  return await getDeployerAddress(ZERODEV_PROJECT_ID, PRIVATE_KEY);
-};
 
 program
   .name('ZeroDev-Multichain-Deployer')
@@ -29,7 +25,7 @@ program
   .usage('zerodev <command> [options]')
   .version('1.0.0');
 
-// TODO: show the help info from above not below
+// TODO: show the help info from above, not below
 program.helpInformation = function () {
   const asciiArt = chalk.blueBright(
     figlet.textSync('ZeroDev Deployer', {
@@ -49,7 +45,7 @@ program
   .description('Show the list of available chains')
   .action(() => {
     console.log('[Available chains]');
-    SUPPORTED_CHAINS.forEach((chain) => {
+    getSupportedChains().forEach((chain) => {
       console.log(`- ${chain.name} (${chain.type})`);
     });
   });
@@ -60,7 +56,7 @@ program
   .argument('<path-to-bytecode>', 'file path of bytecode to deploy')
   .argument('<salt>', 'salt to be used for create2')
   .action((pathToBytecode: string, salt: string) => {
-    const bytecode = fs.readFileSync(pathToBytecode, 'utf8');
+    const bytecode = readBytecodeFromFile(pathToBytecode);
     const address = computeAddress(DEPLOYER_CONTRACT_ADDRESS, bytecode, salt);
     console.log(`computed address: ${address}`);
   });
@@ -69,7 +65,7 @@ program
   .command('get-deployer-address')
   .description("Get the deployer's address")
   .action(async () => {
-    const address = await getDeployerAddressWithEnv();
+    const address = await getDeployerAddress();
     console.log(`deployer address: ${address}`);
   });
 
@@ -89,46 +85,18 @@ program
     'all'
   )
   .option('-e, --expected-address [ADDRESS]', 'expected address to confirm')
-  .option(
-    '-s, --session-key-file-path [KEY]',
-    'session key file path to use for deployment'
-  )
   .action((pathToBytecode: string, salt: string, options) => {
-    let { chains, expectedAddress, sessionKeyFilePath } = options;
-    const bytecode = fs
-      .readFileSync(path.resolve(process.cwd(), pathToBytecode), 'utf8')
-      .replace(/\n+$/, '');
+    const { chains, expectedAddress, sessionKeyFilePath } = options;
+    const bytecode = readBytecodeFromFile(pathToBytecode);
 
-    chains =
-      chains === 'all'
-        ? SUPPORTED_CHAINS.map((chain) => chain.name)
-        : chains.split(',');
-
-    validateInputs(bytecode, salt, expectedAddress, chains, sessionKeyFilePath);
-
-    const serializedSessionKeyParams = sessionKeyFilePath
-      ? fs.readFileSync(sessionKeyFilePath, 'utf8')
-      : undefined;
+    const chainObjects = processAndValidateChains(chains);
 
     deployContracts(
       ensureHex(bytecode),
-      chains,
+      chainObjects,
       ensureHex(salt),
-      expectedAddress,
-      serializedSessionKeyParams
+      expectedAddress
     );
-  });
-
-program
-  .command('create-session-key')
-  .description('Create a session key authorized to deploy contracts')
-  .action(async () => {
-    const sessionKey = await generateSessionKey(
-      ZERODEV_PROJECT_ID,
-      ensureHex(PRIVATE_KEY)
-    );
-    fs.writeFileSync('session-key.txt', sessionKey);
-    console.log('Session key generated and saved to session-key.txt');
   });
 
 program
@@ -147,60 +115,15 @@ program
     'all'
   )
   .action(async (pathToBytecode: string, salt: string, options) => {
-    let { chains } = options;
-    const bytecode = fs
-      .readFileSync(path.resolve(process.cwd(), pathToBytecode), 'utf8')
-      .replace(/\n+$/, '');
+    const { chains } = options;
+    const bytecode = readBytecodeFromFile(pathToBytecode);
 
-    chains =
-      chains === 'all'
-        ? SUPPORTED_CHAINS.map((chain) => chain.name)
-        : chains.split(',');
-
-    validateInputs(bytecode, salt, undefined, chains, undefined);
+    const chainObjects = processAndValidateChains(chains);
 
     const { contractAddress, deployedChains, notDeployedChains } =
-      await findDeployment(ensureHex(bytecode), ensureHex(salt), chains);
+      await findDeployment(ensureHex(bytecode), ensureHex(salt), chainObjects);
 
     console.log(`contract address: ${contractAddress}`);
     console.log(`deployed chains: ${deployedChains.join(', ')}`);
     console.log(`not deployed chains: ${notDeployedChains.join(', ')}`);
-  });
-
-program
-  .command('sync-deployment')
-  .description(
-    'deploy contracts to the networks that have not been deployed yet'
-  )
-  .argument(
-    '<path-to-bytecode>',
-    'file path of bytecode to deploy, a.k.a. init code'
-  )
-  .argument('<salt>', 'salt used for depolyment')
-  // TODO: add option for mainnet or testnet
-  .action(async (pathToBytecode: string, salt: string) => {
-    const bytecode = fs
-      .readFileSync(path.resolve(process.cwd(), pathToBytecode), 'utf8')
-      .replace(/\n+$/, '');
-
-    validateInputs(bytecode, salt, undefined, [], undefined);
-
-    const { notDeployedChains } = await findDeployment(
-      ensureHex(bytecode),
-      ensureHex(salt),
-      SUPPORTED_CHAINS
-    );
-
-    if (notDeployedChains.length === 0) {
-      console.log('No deployment needed');
-      return;
-    }
-
-    await deployContracts(
-      ensureHex(bytecode),
-      notDeployedChains,
-      ensureHex(salt),
-      undefined,
-      undefined
-    );
   });

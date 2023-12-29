@@ -2,22 +2,12 @@ import chalk from 'chalk';
 import { Hex, createPublicClient, getAddress, http } from 'viem';
 
 import { privateKeyToAccount } from 'viem/accounts';
-import {
-  SendUserOperationParameters,
-  createSmartAccountClient,
-} from 'permissionless';
+import { createSmartAccountClient } from 'permissionless';
 import { signerToEcdsaKernelSmartAccount } from 'permissionless/accounts';
 import { SessionKeyProvider } from '@zerodev/sdk';
-import {
-  createZeroDevBundlerClient,
-  createZeroDevPaymasterClient,
-} from '../clients/ZeroDevClient';
+import { createZeroDevPaymasterClient } from '../clients/ZeroDevClient';
 import { Chain, DEPLOYER_CONTRACT_ADDRESS, ENTRYPOINT } from '../constant';
-import {
-  PRIVATE_KEY,
-  RPC_PROVIDER_API_KEY,
-  ZERODEV_PROJECT_ID,
-} from '../config';
+import { PRIVATE_KEY } from '../config';
 import { ensureHex } from '../utils';
 
 const ZERODEV_URL = 'https://meta-aa-provider.onrender.com/api/v2';
@@ -29,20 +19,21 @@ const deployToChain = async (
   chain: Chain,
   bytecode: Hex,
   salt: Hex,
-  expectedAddress: string | undefined,
-  serializedSessionKeyParams: string | undefined
+  expectedAddress: string | undefined
 ): Promise<[string, string]> => {
+  if (chain.projectId === null) {
+    throw new Error(`PROJECT_ID for chain ${chain.name} is not specified`);
+  }
+
   const publicClient = createPublicClient({
     chain: chain.viemChainObject,
     // zerodev bundler supports both public and bundler rpc
-    transport: createZeroDevClient('bundler', ZERODEV_PROJECT_ID),
+    transport: createZeroDevClient('bundler', chain.projectId),
   });
-
-  const gasPrices = await publicClient.estimateFeesPerGas();
 
   const paymasterClient = createZeroDevPaymasterClient({
     chain: chain.viemChainObject,
-    transport: createZeroDevClient('paymaster', ZERODEV_PROJECT_ID),
+    transport: createZeroDevClient('paymaster', chain.projectId),
   });
 
   const signer = privateKeyToAccount(ensureHex(PRIVATE_KEY));
@@ -56,18 +47,9 @@ const deployToChain = async (
   const smartAccountClient = createSmartAccountClient({
     account: kernelAccount,
     chain: chain.viemChainObject,
-    transport: createZeroDevClient('bundler', ZERODEV_PROJECT_ID),
+    transport: createZeroDevClient('bundler', chain.projectId),
     sponsorUserOperation: paymasterClient.sponsorUserOperation,
   });
-
-  const sessionKeyProvider = serializedSessionKeyParams
-    ? await SessionKeyProvider.fromSessionKeyParams({
-        projectId: ZERODEV_PROJECT_ID,
-        sessionKeyParams: SessionKeyProvider.deserializeSessionKeyParams(
-          serializedSessionKeyParams
-        ),
-      })
-    : undefined;
 
   const result = await publicClient.call({
     account: kernelAccount.address,
@@ -91,14 +73,9 @@ const deployToChain = async (
     },
   });
 
-  const opHash = sessionKeyProvider
-    ? (
-        await sessionKeyProvider.sendUserOperation({
-          target: DEPLOYER_CONTRACT_ADDRESS,
-          data: ensureHex(salt + bytecode.slice(2)),
-        })
-      ).hash
-    : await smartAccountClient.sendUserOperation({ userOperation: op });
+  const opHash = await smartAccountClient.sendUserOperation({
+    userOperation: op,
+  });
 
   return [getAddress(result.data as string), opHash];
 };
@@ -107,15 +84,14 @@ export const deployContracts = async (
   bytecode: Hex,
   chains: Chain[],
   salt: Hex,
-  expectedAddress: string | undefined,
-  serializedSessionKeyParams: string | undefined
+  expectedAddress: string | undefined
 ) => {
   const deploymentStatus: Record<
     string,
     { status: string; result?: string; txHash?: string }
   > = {};
   chains.forEach((chain) => {
-    deploymentStatus[chain] = { status: 'starting...' };
+    deploymentStatus[chain.name] = { status: 'starting...' };
   });
 
   const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
@@ -126,16 +102,20 @@ export const deployContracts = async (
     console.log('Starting deployments...');
     chains.forEach((chain) => {
       const frame =
-        deploymentStatus[chain].status === 'starting...'
+        deploymentStatus[chain.name].status === 'starting...'
           ? chalk.green(frames[frameIndex])
           : '';
-      if (deploymentStatus[chain].status === 'done!') {
+      if (deploymentStatus[chain.name].status === 'done!') {
         console.log(
-          `Contract deployed at ${deploymentStatus[chain].result} on ${chain} with transaction hash ${deploymentStatus[chain].txHash}`
+          `Contract deployed at ${deploymentStatus[chain.name].result} on ${
+            chain.name
+          } with transaction hash ${deploymentStatus[chain.name].txHash}`
         );
       } else {
         console.log(
-          `${frame} Deployment for ${chain} is ${deploymentStatus[chain].status}`
+          `${frame} Deployment for ${chain.name} is ${
+            deploymentStatus[chain.name].status
+          }`
         );
       }
     });
@@ -146,18 +126,12 @@ export const deployContracts = async (
 
   // TODO: describe status of each deployment regardless of error, user should be able to see which deployment succeeded and which failed
   const deployments = chains.map((chain) =>
-    deployToChain(
-      chain,
-      bytecode,
-      salt,
-      expectedAddress,
-      serializedSessionKeyParams
-    )
+    deployToChain(chain, bytecode, salt, expectedAddress)
       .then(([result, txHash]) => {
-        deploymentStatus[chain] = { status: 'done!', result, txHash };
+        deploymentStatus[chain.name] = { status: 'done!', result, txHash };
       })
       .catch((error) => {
-        deploymentStatus[chain] = { status: `failed: ${error}` };
+        deploymentStatus[chain.name] = { status: `failed: ${error}` };
         // TODO: throw error gracefully, or save the log to a file
         throw error;
       })

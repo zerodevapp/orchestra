@@ -1,7 +1,6 @@
-import { Hex, createPublicClient, http } from 'viem';
+import { Hex, createPublicClient } from 'viem';
 import { Chain, DEPLOYER_CONTRACT_ADDRESS } from '../constant';
 import { computeAddress } from './computeAddress';
-import { buildUrlForInfura } from '../utils';
 
 export const findDeployment = async (
   bytecode: Hex,
@@ -14,12 +13,16 @@ export const findDeployment = async (
     salt
   );
 
-  const checkDeploymentOnChain = async (chain: string) => {
-    const viemChainObject = getChainObject(chain);
-    const publicClient = createPublicClient({
-      transport: http(buildUrlForInfura(viemChainObject.network)),
-    });
+  const checkDeploymentOnChain = async (chain: Chain) => {
+    if (chain.projectId === null) {
+      throw new Error(`PROJECT_ID for chain ${chain.name} is not specified`);
+    }
 
+    const publicClient = createPublicClient({
+      chain: chain.viemChainObject,
+      // zerodev bundler supports both public and bundler rpc
+      transport: createZeroDevClient('bundler', chain.projectId),
+    });
     const deployedBytecode = await publicClient.getBytecode({
       address: contractAddress,
     });
@@ -40,3 +43,7 @@ export const findDeployment = async (
 
   return { contractAddress, deployedChains, notDeployedChains };
 };
+
+function createZeroDevClient(arg0: string, projectId: string): any {
+  throw new Error('Function not implemented.');
+}

@@ -1,11 +1,10 @@
 import fs from 'fs';
-import { Chain, SUPPORTED_CHAINS } from '../constant';
+import { Chain, getSupportedChains } from '../constant';
 
 export const validateInputs = (
   bytecode: string,
   salt: string,
   expectedAddress: string | undefined,
-  chains: string[],
   sessionKeyFilePath: string | undefined
 ) => {
   if (!/^0x[0-9a-fA-F]*$/.test(bytecode)) {
@@ -20,21 +19,33 @@ export const validateInputs = (
     throw new Error('Expected address must be a 20 bytes hex string');
   }
 
-  for (const chain of chains) {
-    if (!SUPPORTED_CHAINS.map((chain) => chain.name).includes(chain)) {
-      throw new Error(`Chain ${chain} is not supported`);
-    }
-  }
-
   if (sessionKeyFilePath && !fs.existsSync(sessionKeyFilePath)) {
     throw new Error('Session key file does not exist');
   }
 };
 
-export const validateRpcUrl = (chains: Chain[]) => {
+export const processAndValidateChains = (chainOption: string): Chain[] => {
+  const supportedChains = getSupportedChains();
+
+  const chains =
+    chainOption === 'all'
+      ? supportedChains.map((chain) => chain.name)
+      : chainOption.split(',');
+
+  const chainObjects: Chain[] = chains.map((chainName: string) => {
+    const chain = supportedChains.find((c) => c.name === chainName);
+    if (!chain) throw new Error(`Chain ${chainName} is not supported`);
+    return chain;
+  });
+
+  validateChains(chainObjects);
+  return chainObjects;
+};
+
+const validateChains = (chains: Chain[]) => {
   for (const chain of chains) {
-    if (!chain.rpcUrl) {
-      throw new Error(`RPC url for chain ${chain.name} is not specified`);
+    if (!chain.projectId) {
+      throw new Error(`PROJECT_ID for chain ${chain.name} is not specified`);
     }
   }
 };

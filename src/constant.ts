@@ -28,111 +28,111 @@ export type Network = 'mainnet' | 'testnet';
 
 export interface Chain {
   name: string;
-  rpcUrl: string | null;
+  projectId: string | null;
   viemChainObject: any;
   type: Network;
 }
 
-export const SUPPORTED_CHAINS: Chain[] = [
+export const getSupportedChains = (): Chain[] => [
   {
     name: 'arbitrum',
-    rpcUrl: process.env.ARBITRUM_RPC_URL || null,
+    projectId: process.env.ARBITRUM_PROJECT_ID || null,
     viemChainObject: arbitrum,
     type: 'mainnet',
   },
   {
     name: 'arbitrum-sepolia',
-    rpcUrl: process.env.ARBITRUM_SEPOLIA_RPC_URL || null,
+    projectId: process.env.ARBITRUM_SEPOLIA_PROJECT_ID || null,
     viemChainObject: arbitrumSepolia,
     type: 'testnet',
   },
   {
     name: 'avalanche',
-    rpcUrl: process.env.AVALANCHE_RPC_URL || null,
+    projectId: process.env.AVALANCHE_PROJECT_ID || null,
     viemChainObject: avalanche,
     type: 'mainnet',
   },
   {
     name: 'avalanche-fuji',
-    rpcUrl: process.env.AVALANCHE_FUJI_RPC_URL || null,
+    projectId: process.env.AVALANCHE_FUJI_PROJECT_ID || null,
     viemChainObject: avalancheFuji,
     type: 'testnet',
   },
   {
     name: 'base',
-    rpcUrl: process.env.BASE_RPC_URL || null,
+    projectId: process.env.BASE_PROJECT_ID || null,
     viemChainObject: base,
     type: 'mainnet',
   },
   {
     name: 'base-sepolia',
-    rpcUrl: process.env.BASE_SEPOLIA_RPC_URL || null,
+    projectId: process.env.BASE_SEPOLIA_PROJECT_ID || null,
     viemChainObject: baseSepolia,
     type: 'testnet',
   },
   {
     name: 'bsc',
-    rpcUrl: process.env.BSC_RPC_URL || null,
+    projectId: process.env.BSC_PROJECT_ID || null,
     viemChainObject: bsc,
     type: 'mainnet',
   },
   {
     name: 'mainnet',
-    rpcUrl: process.env.MAINNET_RPC_URL || null,
+    projectId: process.env.MAINNET_PROJECT_ID || null,
     viemChainObject: mainnet,
     type: 'mainnet',
   },
   {
     name: 'sepolia',
-    rpcUrl: process.env.SEPOILA_RPC_URL || null,
+    projectId: process.env.SEPOILA_PROJECT_ID || null,
     viemChainObject: sepolia,
     type: 'testnet',
   },
   {
     name: 'optimism',
-    rpcUrl: process.env.OPTIMISM_RPC_URL || null,
+    projectId: process.env.OPTIMISM_PROJECT_ID || null,
     viemChainObject: optimism,
     type: 'mainnet',
   },
   {
     name: 'optimism-sepolia',
-    rpcUrl: process.env.OPTIMISM_SEPOLIA_RPC_URL || null,
+    projectId: process.env.OPTIMISM_SEPOLIA_PROJECT_ID || null,
     viemChainObject: optimismSepolia,
     type: 'testnet',
   },
   {
     name: 'polygon',
-    rpcUrl: process.env.POLYGON_RPC_URL || null,
+    projectId: process.env.POLYGON_PROJECT_ID || null,
     viemChainObject: polygon,
     type: 'mainnet',
   },
   {
     name: 'polygon-mumbai',
-    rpcUrl: process.env.POLYGON_MUMBAI_RPC_URL || null,
+    projectId: process.env.POLYGON_MUMBAI_PROJECT_ID || null,
     viemChainObject: polygonMumbai,
     type: 'testnet',
   },
   {
     name: 'linea',
-    rpcUrl: process.env.LINEA_RPC_URL || null,
+    projectId: process.env.LINEA_PROJECT_ID || null,
     viemChainObject: linea,
     type: 'mainnet',
   },
   {
     name: 'linea-testnet',
-    rpcUrl: process.env.LINEA_TESTNET_RPC_URL || null,
+    projectId: process.env.LINEA_TESTNET_PROJECT_ID || null,
     viemChainObject: lineaTestnet,
     type: 'testnet',
   },
   {
     name: 'opbnb',
-    rpcUrl: process.env.OPBNB_RPC_URL || null,
+    projectId: process.env.OPBNB_PROJECT_ID || null,
     viemChainObject: opBNB,
     type: 'mainnet',
   },
   {
-    name: 'astarZkatana',
-    rpcUrl: process.env.ASTAR_ZKATANA_RPC_URL || null,
+    name: 'astar-zkatana',
+    projectId: process.env.ASTAR_ZKATANA_PROJECT_ID || null,
     viemChainObject: astarZkatana,
     type: 'testnet',
   },
