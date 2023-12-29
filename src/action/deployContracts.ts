@@ -4,7 +4,6 @@ import { Hex, createPublicClient, getAddress, http } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { createSmartAccountClient } from 'permissionless';
 import { signerToEcdsaKernelSmartAccount } from 'permissionless/accounts';
-import { SessionKeyProvider } from '@zerodev/sdk';
 import { createZeroDevPaymasterClient } from '../clients/ZeroDevClient';
 import { Chain, DEPLOYER_CONTRACT_ADDRESS, ENTRYPOINT } from '../constant';
 import { PRIVATE_KEY } from '../config';
@@ -76,6 +75,73 @@ const deployToChain = async (
   return [getAddress(result.data as string), opHash];
 };
 
+// Update console with deployment status, note that this clear the console. what it means is you cannot use console.log to print anything else
+const updateConsole = (
+  chains: Chain[],
+  deploymentStatus: Record<
+    string,
+    { status: string; result?: string; txHash?: string }
+  >,
+  frames: string[],
+  frameIndex: number
+) => {
+  console.clear();
+  console.log('🏁 Starting deployments...');
+  chains.forEach((chain) => {
+    const frame =
+      deploymentStatus[chain.name].status === 'starting...'
+        ? chalk.green(frames[frameIndex])
+        : '';
+    if (deploymentStatus[chain.name].status === 'done!') {
+      console.log(
+        `🟢 Contract deployed at ${deploymentStatus[chain.name].result} on ${
+          chain.name
+        } with transaction hash ${deploymentStatus[chain.name].txHash}`
+      );
+    } else if (deploymentStatus[chain.name].status.startsWith('failed!')) {
+      console.log(
+        `❌ ${frame} Deployment for ${chain.name} is ${
+          deploymentStatus[chain.name].status
+        }`
+      );
+    } else {
+      console.log(
+        `${frame} Deployment for ${chain.name} is ${
+          deploymentStatus[chain.name].status
+        }`
+      );
+    }
+  });
+};
+
+const deployToChainAndUpdateStatus = async (
+  chain: Chain,
+  bytecode: Hex,
+  salt: Hex,
+  expectedAddress: string | undefined,
+  deploymentStatus: Record<
+    string,
+    { status: string; result?: string; txHash?: string }
+  >
+) => {
+  try {
+    const [result, txHash] = await deployToChain(
+      chain,
+      bytecode,
+      salt,
+      expectedAddress
+    );
+    deploymentStatus[chain.name] = { status: 'done!', result, txHash };
+  } catch (error) {
+    deploymentStatus[chain.name] = {
+      status: `failed! check the error log at "./log" directory`,
+    };
+    const errorInstance =
+      error instanceof Error ? error : new Error(String(error));
+    writeErrorLogToFile(chain.name, errorInstance);
+  }
+};
+
 export const deployContracts = async (
   bytecode: Hex,
   chains: Chain[],
@@ -93,52 +159,30 @@ export const deployContracts = async (
   const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
   let frameIndex = 0;
 
-  // Update console with deployment status, note that this clear the console. what it means is you cannot use console.log to print anything else
-  const updateConsole = () => {
-    console.clear();
-    console.log('🏁 Starting deployments...');
-    chains.forEach((chain) => {
-      const frame =
-        deploymentStatus[chain.name].status === 'starting...'
-          ? chalk.green(frames[frameIndex])
-          : '';
-      if (deploymentStatus[chain.name].status === 'done!') {
-        console.log(
-          `Contract deployed at ${deploymentStatus[chain.name].result} on ${
-            chain.name
-          } with transaction hash ${deploymentStatus[chain.name].txHash}`
-        );
-      } else {
-        console.log(
-          `${frame} Deployment for ${chain.name} is ${
-            deploymentStatus[chain.name].status
-          }`
-        );
-      }
-    });
-    frameIndex = (frameIndex + 1) % frames.length;
-  };
-
-  const interval = setInterval(updateConsole, 100);
+  const interval = setInterval(
+    () =>
+      updateConsole(
+        chains,
+        deploymentStatus,
+        frames,
+        frameIndex++ % frames.length
+      ),
+    100
+  );
 
   const deployments = chains.map((chain) =>
-    deployToChain(chain, bytecode, salt, expectedAddress)
-      .then(([result, txHash]) => {
-        deploymentStatus[chain.name] = { status: 'done!', result, txHash };
-      })
-      .catch((error) => {
-        deploymentStatus[chain.name] = {
-          status: `failed! ❌ check the error log at "./log" directory`,
-        };
-        // save error log to file instead of throwing error
-        writeErrorLogToFile(chain.name, error);
-      })
+    deployToChainAndUpdateStatus(
+      chain,
+      bytecode,
+      salt,
+      expectedAddress,
+      deploymentStatus
+    )
   );
 
   await Promise.all(deployments);
 
   clearInterval(interval);
-  frameIndex = 0; // Reset for a clean final display
-  updateConsole(); // Final update
+  updateConsole(chains, deploymentStatus, frames, 0); // Final update
   console.log('🏁 All deployments process successfully finished!');
 };
