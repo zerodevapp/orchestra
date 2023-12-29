@@ -1,5 +1,7 @@
 # Contract Deployment Tool
 
+This tool is a command line tool that allows you to deploy contracts to multiple chains determinitically with a single command. It uses the [ZeroDev](https://zerodev.app) service to deploy contracts.
+
 ## Configuration
 
 1. Inside the `cli` directory, create a `.env` file and fill it out by refering to `.env.example.`
@@ -21,7 +23,6 @@ All commands should be prefixed with `zerodev`
 - `create-session-key`: Create a session key authorized to deploy contracts
 - `help [command]`: display help for command
 
-## Known Issues
+## Supported Networks
 
-- An error 'Invalid UserOp signature or paymaster signature' occurs when deploying a contract to the Polygon Mumbai testnet.
-- Deploying a contract to the Optimism Goerli testnet with a session key results in the error 'AA25 invalid account nonce'
+This tool supports all network supported by ZeroDev. Check details [here](https://docs.zerodev.app/supported-networks)
