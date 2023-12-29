@@ -23,6 +23,7 @@ zerodev deploy [options] <path-to-bytecode> <salt>
 
 - For example, if you want to deploy a contract to the Optimism Sepolia and Polygon Mumbai testnet(if you want to deploy to all testnets, use `-t` `--testnet-all` flag instead of `-c` `--chain` flag) with `bytecode` file and zero bytes `salt`, you can run the following command
 
+```
 zerodev deploy ./bytecode 0x0000000000000000000000000000000000000000000000000000000000000000 -c optimism-sepolia,polygon-mumbai
 
 ```
@@ -44,4 +45,3 @@ All commands should be prefixed with `zerodev`
 ## Supported Networks
 
 This tool supports all network supported by ZeroDev. Check details [here](https://docs.zerodev.app/supported-networks)
-```
