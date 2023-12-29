@@ -1,21 +1,25 @@
 import fs from 'fs';
 import { Chain, getSupportedChains } from '../constant';
 
+const BYTECODE_REGEX = /^0x[0-9a-fA-F]*$/;
+const SALT_REGEX = /^0x[0-9a-fA-F]{64}$/;
+const ADDRESS_REGEX = /^0x[0-9a-fA-F]{40}$/;
+
 export const validateInputs = (
   bytecode: string,
   salt: string,
   expectedAddress: string | undefined,
   sessionKeyFilePath: string | undefined
 ) => {
-  if (!/^0x[0-9a-fA-F]*$/.test(bytecode)) {
+  if (!BYTECODE_REGEX.test(bytecode)) {
     throw new Error('Bytecode must be a hexadecimal string');
   }
 
-  if (!/^0x[0-9a-fA-F]{64}$/.test(salt)) {
+  if (!SALT_REGEX.test(salt)) {
     throw new Error('Salt must be a 32 bytes hex string');
   }
 
-  if (expectedAddress && !/^0x[0-9a-fA-F]{40}$/.test(expectedAddress)) {
+  if (expectedAddress && !ADDRESS_REGEX.test(expectedAddress)) {
     throw new Error('Expected address must be a 20 bytes hex string');
   }
 
