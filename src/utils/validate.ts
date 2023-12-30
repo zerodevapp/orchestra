@@ -1,5 +1,4 @@
-import fs from 'fs';
-import { Chain, getSupportedChains } from '../constant';
+import { Chain, getSupportedChains } from "../constant";
 
 const BYTECODE_REGEX = /^0x[0-9a-fA-F]*$/;
 const SALT_REGEX = /^0x[0-9a-fA-F]{64}$/;
@@ -8,23 +7,18 @@ const ADDRESS_REGEX = /^0x[0-9a-fA-F]{40}$/;
 export const validateInputs = (
   bytecode: string,
   salt: string,
-  expectedAddress: string | undefined,
-  sessionKeyFilePath: string | undefined
+  expectedAddress: string | undefined
 ) => {
   if (!BYTECODE_REGEX.test(bytecode)) {
-    throw new Error('Bytecode must be a hexadecimal string');
+    throw new Error("Bytecode must be a hexadecimal string");
   }
 
   if (!SALT_REGEX.test(salt)) {
-    throw new Error('Salt must be a 32 bytes hex string');
+    throw new Error("Salt must be a 32 bytes hex string");
   }
 
   if (expectedAddress && !ADDRESS_REGEX.test(expectedAddress)) {
-    throw new Error('Expected address must be a 20 bytes hex string');
-  }
-
-  if (sessionKeyFilePath && !fs.existsSync(sessionKeyFilePath)) {
-    throw new Error('Session key file does not exist');
+    throw new Error("Expected address must be a 20 bytes hex string");
   }
 };
 
@@ -42,17 +36,17 @@ export const processAndValidateChains = (
   let chains: string[];
   if (options.testnetAll) {
     chains = supportedChains
-      .filter((chain) => chain.type === 'testnet')
+      .filter((chain) => chain.type === "testnet")
       .map((chain) => chain.name);
   } else if (options.mainnetAll) {
     chains = supportedChains
-      .filter((chain) => chain.type === 'mainnet')
+      .filter((chain) => chain.type === "mainnet")
       .map((chain) => chain.name);
   } else {
     chains =
-      chainOption === 'all'
+      chainOption === "all"
         ? supportedChains.map((chain) => chain.name)
-        : chainOption.split(',');
+        : chainOption.split(",");
   }
 
   const chainObjects: Chain[] = chains.map((chainName: string) => {
