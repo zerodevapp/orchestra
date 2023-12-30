@@ -172,7 +172,7 @@ program
 
 program
   .command('generate-salt')
-  .description('generate a random 32 bytes salt')
+  .description('generate a random 32 bytes salt, or convert the input to salt')
   .option('-i, --input <input>', 'input to be converted to salt')
   .action((options) => {
     let salt;
