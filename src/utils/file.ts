@@ -20,3 +20,18 @@ export const writeErrorLogToFile = (chainName: string, error: Error): void => {
     error.toString()
   );
 };
+
+export const clearFiles = (dir: string) => {
+  const absoluteLogDir = path.resolve(process.cwd(), dir);
+
+  fs.readdirSync(absoluteLogDir).forEach((file) => {
+    const filePath = path.join(absoluteLogDir, file);
+    if (fs.statSync(filePath).isFile()) {
+      try {
+        fs.unlinkSync(filePath);
+      } catch (error) {
+        console.error(`Failed to delete file ${filePath}:`, error);
+      }
+    }
+  });
+};

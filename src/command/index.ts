@@ -11,6 +11,7 @@ import {
 } from '../action';
 import { DEPLOYER_CONTRACT_ADDRESS, getSupportedChains } from '../constant';
 import {
+  clearFiles,
   ensureHex,
   processAndValidateChains,
   readBytecodeFromFile,
@@ -155,4 +156,12 @@ program
     deployedChains.forEach((chain) => console.log(`- ${chain.name}`));
     console.log('not deployed on:');
     notDeployedChains.forEach((chain) => console.log(`- ${chain.name}`));
+  });
+
+program
+  .command('clear-log')
+  .description('clear the log files')
+  .action(() => {
+    clearFiles('./log');
+    console.log('done!');
   });
