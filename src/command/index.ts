@@ -98,14 +98,14 @@ program
     'file path of bytecode to deploy, a.k.a. init code'
   )
   .argument('<salt>', 'salt to be used for CREATE2')
+  .option('-t, --testnet-all', 'select all testnets', false)
+  .option('-m, --mainnet-all', 'select all mainnets', false)
   .option(
     '-c, --chains [CHAINS]',
     'list of chains for deploying contracts, with all selected by default',
     'all'
   )
   .option('-e, --expected-address [ADDRESS]', 'expected address to confirm')
-  .option('-t, --testnet-all', 'select all testnets', false)
-  .option('-m, --mainnet-all', 'select all mainnets', false)
   .action((pathToBytecode: string, salt: string, options) => {
     const { chains, expectedAddress, testnetAll, mainnetAll } = options;
     const bytecode = readBytecodeFromFile(pathToBytecode);
