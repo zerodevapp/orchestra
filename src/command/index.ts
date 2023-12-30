@@ -46,7 +46,9 @@ program
   .action(() => {
     const chains = getSupportedChains().map((chain) => [
       chain.name,
-      chain.type,
+      chain.type === 'mainnet'
+        ? chalk.blue(chain.type)
+        : chalk.green(chain.type),
     ]);
 
     const table = new Table({
