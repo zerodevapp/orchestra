@@ -80,7 +80,7 @@ const updateConsole = (
   chains: Chain[],
   deploymentStatus: Record<
     string,
-    { status: string; result?: string; txHash?: string }
+    { status: string; result?: string; opHash?: string }
   >,
   frames: string[],
   frameIndex: number
@@ -96,8 +96,9 @@ const updateConsole = (
       console.log(
         `🟢 Contract deployed at ${deploymentStatus[chain.name].result} on ${
           chain.name
-        } with transaction hash ${deploymentStatus[chain.name].txHash}`
+        } with userOp hash ${deploymentStatus[chain.name].opHash}`
       );
+      console.log("Jiffyscan link for the transaction: https://jiffyscan.xyz/userOpHash/" + deploymentStatus[chain.name].opHash)
     } else if (deploymentStatus[chain.name].status.startsWith('failed!')) {
       console.log(
         `❌ ${frame} Deployment for ${chain.name} is ${
@@ -121,17 +122,17 @@ const deployToChainAndUpdateStatus = async (
   expectedAddress: string | undefined,
   deploymentStatus: Record<
     string,
-    { status: string; result?: string; txHash?: string }
+    { status: string; result?: string; opHash?: string }
   >
 ) => {
   try {
-    const [result, txHash] = await deployToChain(
+    const [result, opHash] = await deployToChain(
       chain,
       bytecode,
       salt,
       expectedAddress
     );
-    deploymentStatus[chain.name] = { status: 'done!', result, txHash };
+    deploymentStatus[chain.name] = { status: 'done!', result, opHash };
   } catch (error) {
     deploymentStatus[chain.name] = {
       status: `failed! check the error log at "./log" directory`,
@@ -150,7 +151,7 @@ export const deployContracts = async (
 ) => {
   const deploymentStatus: Record<
     string,
-    { status: string; result?: string; txHash?: string }
+    { status: string; result?: string; opHash?: string }
   > = {};
   chains.forEach((chain) => {
     deploymentStatus[chain.name] = { status: 'starting...' };
