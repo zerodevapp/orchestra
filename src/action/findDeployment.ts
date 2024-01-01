@@ -21,6 +21,7 @@ const checkDeploymentOnChain = async (
         // zerodev bundler supports both public and bundler rpc
         transport: createZeroDevClient("bundler", chain.projectId)
     })
+
     const deployedBytecode = await publicClient.getBytecode({
         address: contractAddress
     })

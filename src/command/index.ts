@@ -95,11 +95,12 @@ program
     .description(
         "Deploy contracts deterministically using CREATE2, in order of the chains specified"
     )
-    .argument(
-        "<path-to-bytecode>",
+    .argument("<salt>", "salt to be used for CREATE2")
+    .option(
+        "-f, --file <path-to-bytecode>",
         "file path of bytecode to deploy, a.k.a. init code"
     )
-    .argument("<salt>", "salt to be used for CREATE2")
+    .option("-b, --bytecode <bytecode>", "bytecode to deploy")
     .option("-t, --testnet-all", "select all testnets", false)
     .option("-m, --mainnet-all", "select all mainnets", false)
     .option(
@@ -108,18 +109,29 @@ program
         "all"
     )
     .option("-e, --expected-address [ADDRESS]", "expected address to confirm")
-    .action((pathToBytecode: string, salt: string, options) => {
-        const { chains, expectedAddress, testnetAll, mainnetAll } = options
-        const bytecode = readBytecodeFromFile(pathToBytecode)
+    .action((salt: string, options) => {
+        const {
+            file,
+            bytecode,
+            testnetAll,
+            mainnetAll,
+            chains,
+            expectedAddress
+        } = options
 
-        validateInputs(bytecode, salt, expectedAddress)
+        validateInputs(file, bytecode, salt, expectedAddress)
         const chainObjects = processAndValidateChains(chains, {
             testnetAll,
             mainnetAll
         })
 
+        let bytecodeToDeploy = bytecode
+        if (file) {
+            bytecodeToDeploy = readBytecodeFromFile(file)
+        }
+
         deployContracts(
-            ensureHex(bytecode),
+            ensureHex(bytecodeToDeploy),
             chainObjects,
             ensureHex(salt),
             expectedAddress
@@ -132,11 +144,12 @@ program
     .description(
         "check whether the contract has already been deployed on the specified networks"
     )
-    .argument(
-        "<path-to-bytecode>",
+    .argument("<salt>", "salt used for depolyment")
+    .option(
+        "-f, --file <path-to-bytecode>",
         "file path of bytecode to deploy, a.k.a. init code"
     )
-    .argument("<salt>", "salt used for depolyment")
+    .option("-b, --bytecode <bytecode>", "bytecode to deploy")
     .option(
         "-c, --chains [CHAINS]",
         "list of chains to check, with all selected by default",
@@ -144,19 +157,23 @@ program
     )
     .option("-t, --testnet-all", "select all testnets", false)
     .option("-m, --mainnet-all", "select all mainnets", false)
-    .action(async (pathToBytecode: string, salt: string, options) => {
-        const { chains, testnetAll, mainnetAll } = options
-        const bytecode = readBytecodeFromFile(pathToBytecode)
+    .action(async (salt: string, options) => {
+        const { file, bytecode, chains, testnetAll, mainnetAll } = options
 
-        validateInputs(bytecode, salt, undefined)
+        validateInputs(file, bytecode, salt, undefined)
         const chainObjects = processAndValidateChains(chains, {
             testnetAll,
             mainnetAll
         })
 
+        let bytecodeToDeploy = bytecode
+        if (file) {
+            bytecodeToDeploy = readBytecodeFromFile(file)
+        }
+
         const { address, deployedChains, notDeployedChains } =
             await findDeployment(
-                ensureHex(bytecode),
+                ensureHex(bytecodeToDeploy),
                 ensureHex(salt),
                 chainObjects
             )
