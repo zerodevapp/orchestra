@@ -6,7 +6,10 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/src/index.js",
-    "dev": "ts-node src/index.ts"
+    "dev": "ts-node src/index.ts",
+    "format": "biome format . --write",
+    "lint": "biome check .",
+    "lint:fix": "pnpm run lint --apply"
   },
   "bin": {
     "zerodev": "./dist/index.js"
@@ -15,18 +18,23 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@alchemy/aa-core": "^1.2.3",
     "@zerodev/sdk": "^4.5.2",
     "@zerodevapp/sdk": "^3.2.12",
     "axios": "^1.6.3",
     "axios-retry": "^4.0.0",
     "commander": "^11.1.0",
     "dotenv": "^16.3.1",
-    "permissionless": "0.0.0-main.20231228T183316",
+    "permissionless": "0.0.20",
     "viem": "^1.21.1",
     "wagmi": "^1.4.12"
   },
   "devDependencies": {
+      "@biomejs/biome": "^1.0.0",
+      "@changesets/changelog-git": "^0.1.14",
+      "@changesets/changelog-github": "^0.4.8",
+      "@changesets/cli": "^2.26.2",
+      "@size-limit/esbuild-why": "^9.0.0",
+      "@size-limit/preset-small-lib": "^9.0.0",
     "@types/figlet": "^1.5.8",
     "@types/node": "^18.19.3",
     "chalk": "4.1.2",

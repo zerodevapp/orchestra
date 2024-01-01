@@ -1,5 +1,5 @@
-import { http } from 'viem';
-import { ZERODEV_URL } from '../constant';
+import { http } from "viem"
+import { ZERODEV_URL } from "../constant"
 
 export const createZeroDevClient = (mode: string, projectId: string) =>
-  http(`${ZERODEV_URL}/${mode}/${projectId}`);
+    http(`${ZERODEV_URL}/${mode}/${projectId}`)
