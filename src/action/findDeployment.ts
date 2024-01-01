@@ -1,11 +1,11 @@
-import { Address, Hex, createPublicClient, http } from "viem"
+import { Address, Hex, createPublicClient } from "viem"
+import { createZeroDevClient } from "../clients"
 import { Chain, DEPLOYER_CONTRACT_ADDRESS } from "../constant"
 import { computeAddress } from "./computeAddress"
-import { createZeroDevClient } from "../clients"
 
 export enum DeploymentStatus {
-    Deployed,
-    NotDeployed
+    Deployed = 0,
+    NotDeployed = 1
 }
 
 const checkDeploymentOnChain = async (

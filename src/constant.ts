@@ -1,21 +1,22 @@
 import {
+    Chain as ViemChain,
     arbitrum,
     arbitrumSepolia,
+    astarZkatana,
     avalanche,
     avalancheFuji,
     base,
     baseSepolia,
     bsc,
+    linea,
+    lineaTestnet,
     mainnet,
-    sepolia,
+    opBNB,
     optimism,
     optimismSepolia,
     polygon,
     polygonMumbai,
-    linea,
-    lineaTestnet,
-    opBNB,
-    astarZkatana
+    sepolia
 } from "viem/chains"
 
 export const ZERODEV_URL = "https://meta-aa-provider.onrender.com/api/v2"
@@ -34,7 +35,7 @@ export enum Network {
 export interface Chain {
     name: string
     projectId: string | null
-    viemChainObject: any
+    viemChainObject: ViemChain
     type: Network
 }
 

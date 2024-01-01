@@ -1,23 +1,17 @@
-import { privateKeyToAccount } from "viem/accounts"
-import { ensureHex } from "../utils"
-import { PRIVATE_KEY } from "../config"
 import {
     Address,
-    pad,
+    concat,
     encodeFunctionData,
     getContractAddress,
     keccak256,
-    concat,
+    pad,
     slice
 } from "viem"
+import { privateKeyToAccount } from "viem/accounts"
+import { PRIVATE_KEY } from "../config"
+import { ensureHex } from "../utils"
 export const getDeployerAddress = (): Address => {
-    // find the first projectId set by the user
     const signer = privateKeyToAccount(ensureHex(PRIVATE_KEY))
-    // bytes32 salt = bytes32(uint256(keccak256(abi.encodePacked(_data, _index))) & type(uint96).max);
-    //KernelAccountAbi.("initialize", [
-    //     "0xd9AB5096a832b9ce79914329DAEE236f8Eea0390",
-    //     signer.address
-    // ]);
     const KernelAccountAbi = [
         {
             inputs: [

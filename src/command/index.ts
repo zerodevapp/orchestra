@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-import figlet from "figlet"
+import crypto from "crypto"
 import chalk from "chalk"
 import Table from "cli-table3"
-import crypto from "crypto"
 import { Command } from "commander"
+import figlet from "figlet"
 import {
     computeAddress,
     deployContracts,
@@ -59,7 +59,9 @@ program
             chars: { mid: "", "left-mid": "", "mid-mid": "", "right-mid": "" }
         })
 
-        chains.forEach((chain) => table.push(chain))
+        for (const chain of chains) {
+            table.push(chain)
+        }
 
         console.log("[Available chains]")
         console.log(table.toString())
@@ -161,9 +163,13 @@ program
 
         console.log(`contract address: ${address}`)
         console.log("deployed on:")
-        deployedChains.forEach((chain) => console.log(`- ${chain.name}`))
+        for (const chain of deployedChains) {
+            console.log(`- ${chain.name}`)
+        }
         console.log("not deployed on:")
-        notDeployedChains.forEach((chain) => console.log(`- ${chain.name}`))
+        for (const chain of notDeployedChains) {
+            console.log(`- ${chain.name}`)
+        }
     })
 
 program

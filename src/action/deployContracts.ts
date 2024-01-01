@@ -1,14 +1,14 @@
 import chalk from "chalk"
-import { Hex, createPublicClient, getAddress, http } from "viem"
+import { Hex, createPublicClient, getAddress } from "viem"
 
-import { privateKeyToAccount } from "viem/accounts"
 import { createSmartAccountClient } from "permissionless"
 import { signerToEcdsaKernelSmartAccount } from "permissionless/accounts"
-import { createZeroDevPaymasterClient } from "../clients/ZeroDevClient"
-import { Chain, DEPLOYER_CONTRACT_ADDRESS, ENTRYPOINT } from "../constant"
-import { PRIVATE_KEY } from "../config"
-import { ensureHex, writeErrorLogToFile } from "../utils"
+import { privateKeyToAccount } from "viem/accounts"
 import { createZeroDevClient } from "../clients"
+import { createZeroDevPaymasterClient } from "../clients/ZeroDevClient"
+import { PRIVATE_KEY } from "../config"
+import { Chain, DEPLOYER_CONTRACT_ADDRESS, ENTRYPOINT } from "../constant"
+import { ensureHex, writeErrorLogToFile } from "../utils"
 
 const deployToChain = async (
     chain: Chain,
@@ -87,7 +87,7 @@ const updateConsole = (
 ) => {
     console.clear()
     console.log("🏁 Starting deployments...")
-    chains.forEach((chain) => {
+    for (const chain of chains) {
         const frame =
             deploymentStatus[chain.name].status === "starting..."
                 ? chalk.green(frames[frameIndex])
@@ -101,8 +101,9 @@ const updateConsole = (
                 }`
             )
             console.log(
-                "Jiffyscan link for the transaction: https://jiffyscan.xyz/userOpHash/" +
+                `🔗 Jiffyscan link for the transaction: https://jiffyscan.xyz/userOpHash/${
                     deploymentStatus[chain.name].opHash
+                }`
             )
         } else if (deploymentStatus[chain.name].status.startsWith("failed!")) {
             console.log(
@@ -117,7 +118,7 @@ const updateConsole = (
                 }`
             )
         }
-    })
+    }
 }
 
 const deployToChainAndUpdateStatus = async (
@@ -158,9 +159,9 @@ export const deployContracts = async (
         string,
         { status: string; result?: string; opHash?: string }
     > = {}
-    chains.forEach((chain) => {
+    for (const chain of chains) {
         deploymentStatus[chain.name] = { status: "starting..." }
-    })
+    }
 
     const frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
     let frameIndex = 0

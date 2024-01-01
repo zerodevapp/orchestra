@@ -1,3 +1,7 @@
+import { type BundlerActions, bundlerActions } from "permissionless"
+import { deepHexlify } from "permissionless"
+import { UserOperation } from "permissionless/types"
+import { UserOperationWithBigIntAsHex } from "permissionless/types/userOperation"
 import type {
     Account,
     Address,
@@ -7,10 +11,6 @@ import type {
     Transport
 } from "viem"
 import { Client, createClient } from "viem"
-import { type BundlerActions, bundlerActions } from "permissionless"
-import { deepHexlify } from "permissionless"
-import { UserOperation } from "permissionless/types"
-import { UserOperationWithBigIntAsHex } from "permissionless/types/userOperation"
 
 export const createZeroDevBundlerClient = <
     transport extends Transport,
@@ -77,11 +77,15 @@ export const sponsorUserOperation = async <
     client: Client<TTransport, TChain, TAccount, ZeroDevPaymasterRpcSchema>,
     args: ZeroDevSponsorUserOperationParameters
 ): Promise<SponsorUserOperationReturnType> => {
+    if (!client.chain || client.chain.id === undefined) {
+        throw new Error("Chain or chain ID is undefined")
+    }
+
     const response = await client.request({
         method: "zd_sponsorUserOperation",
         params: [
             {
-                chainId: client.chain?.id!,
+                chainId: client.chain.id,
                 userOp: deepHexlify(
                     args.userOperation
                 ) as UserOperationWithBigIntAsHex,

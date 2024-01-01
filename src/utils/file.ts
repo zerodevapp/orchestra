@@ -24,7 +24,7 @@ export const writeErrorLogToFile = (chainName: string, error: Error): void => {
 export const clearFiles = (dir: string) => {
     const absoluteLogDir = path.resolve(process.cwd(), dir)
 
-    fs.readdirSync(absoluteLogDir).forEach((file) => {
+    for (const file of fs.readdirSync(absoluteLogDir)) {
         const filePath = path.join(absoluteLogDir, file)
         if (fs.statSync(filePath).isFile()) {
             try {
@@ -33,5 +33,5 @@ export const clearFiles = (dir: string) => {
                 console.error(`Failed to delete file ${filePath}:`, error)
             }
         }
-    })
+    }
 }
