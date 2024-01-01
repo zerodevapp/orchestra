@@ -18,8 +18,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@zerodev/sdk": "^4.5.2",
-    "@zerodevapp/sdk": "^3.2.12",
+    "@kerneljs/core": "0.0.1-alpha.5",
+    "@kerneljs/ecdsa-validator": "0.0.1-alpha.11",
     "axios": "^1.6.3",
     "axios-retry": "^4.0.0",
     "commander": "^11.1.0",

@@ -84,7 +84,7 @@ program
     .command("get-deployer-address")
     .description("Get the deployer's address")
     .action(async () => {
-        const address = await getDeployerAddress()
+        const address = getDeployerAddress()
         console.log(`deployer address: ${address}`)
     })
 
@@ -152,14 +152,14 @@ program
             mainnetAll
         })
 
-        const { contractAddress, deployedChains, notDeployedChains } =
+        const { address, deployedChains, notDeployedChains } =
             await findDeployment(
                 ensureHex(bytecode),
                 ensureHex(salt),
                 chainObjects
             )
 
-        console.log(`contract address: ${contractAddress}`)
+        console.log(`contract address: ${address}`)
         console.log("deployed on:")
         deployedChains.forEach((chain) => console.log(`- ${chain.name}`))
         console.log("not deployed on:")

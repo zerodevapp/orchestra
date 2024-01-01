@@ -1,9 +1,17 @@
-import { Hex, createPublicClient, http } from "viem"
+import { Address, Hex, createPublicClient, http } from "viem"
 import { Chain, DEPLOYER_CONTRACT_ADDRESS } from "../constant"
 import { computeAddress } from "./computeAddress"
 import { createZeroDevClient } from "../clients"
 
-const checkDeploymentOnChain = async (chain: Chain, contractAddress: Hex) => {
+export enum DeploymentStatus {
+    Deployed,
+    NotDeployed
+}
+
+const checkDeploymentOnChain = async (
+    chain: Chain,
+    contractAddress: Hex
+): Promise<DeploymentStatus> => {
     if (chain.projectId === null) {
         throw new Error(`PROJECT_ID for chain ${chain.name} is not specified`)
     }
@@ -17,30 +25,32 @@ const checkDeploymentOnChain = async (chain: Chain, contractAddress: Hex) => {
         address: contractAddress
     })
 
-    return deployedBytecode ? "deployed" : "notDeployed"
+    return deployedBytecode
+        ? DeploymentStatus.Deployed
+        : DeploymentStatus.NotDeployed
 }
 
 export const findDeployment = async (
     bytecode: Hex,
     salt: Hex,
     chains: Chain[]
-) => {
-    const contractAddress = computeAddress(
-        DEPLOYER_CONTRACT_ADDRESS,
-        bytecode,
-        salt
-    )
+): Promise<{
+    address: Address
+    deployedChains: Chain[]
+    notDeployedChains: Chain[]
+}> => {
+    const address = computeAddress(DEPLOYER_CONTRACT_ADDRESS, bytecode, salt)
 
     const deploymentResults = await Promise.all(
-        chains.map((chain) => checkDeploymentOnChain(chain, contractAddress))
+        chains.map((chain) => checkDeploymentOnChain(chain, address))
     )
 
     const deployedChains = chains.filter(
-        (_, index) => deploymentResults[index] === "deployed"
+        (_, index) => deploymentResults[index] === DeploymentStatus.Deployed
     )
     const notDeployedChains = chains.filter(
-        (_, index) => deploymentResults[index] === "notDeployed"
+        (_, index) => deploymentResults[index] === DeploymentStatus.NotDeployed
     )
 
-    return { contractAddress, deployedChains, notDeployedChains }
+    return { address, deployedChains, notDeployedChains }
 }
