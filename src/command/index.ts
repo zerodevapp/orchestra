@@ -5,7 +5,7 @@ import Table from "cli-table3"
 import { Command } from "commander"
 import figlet from "figlet"
 import {
-    computeAddress,
+    computeContractAddress,
     deployContracts,
     findDeployment,
     getDeployerAddress
@@ -74,7 +74,7 @@ program
     .argument("<salt>", "salt to be used for create2")
     .action((pathToBytecode: string, salt: string) => {
         const bytecode = readBytecodeFromFile(pathToBytecode)
-        const address = computeAddress(
+        const address = computeContractAddress(
             DEPLOYER_CONTRACT_ADDRESS,
             ensureHex(bytecode),
             ensureHex(salt)
@@ -86,7 +86,7 @@ program
     .command("get-deployer-address")
     .description("Get the deployer's address")
     .action(async () => {
-        const address = getDeployerAddress()
+        const address = getDeployerAddress(0n)
         console.log(`deployer address: ${address}`)
     })
 

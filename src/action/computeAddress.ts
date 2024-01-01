@@ -1,6 +1,6 @@
 import { Address, Hex, getContractAddress } from "viem"
 
-export const computeAddress = (
+export const computeContractAddress = (
     from: Hex,
     bytecode: Hex,
     salt: Hex

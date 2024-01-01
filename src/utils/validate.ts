@@ -46,6 +46,8 @@ export const processAndValidateChains = (
     options: CommandOptions
 ): Chain[] => {
     const supportedChains = getSupportedChains()
+    if (chainOption.length !== 0 && options.mainnetAll && options.testnetAll)
+        throw new Error("Cannot use more than one of -c, -t, -m options")
 
     let chains: string[]
     if (options.testnetAll) {

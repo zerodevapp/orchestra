@@ -5,12 +5,13 @@ import {
     getContractAddress,
     keccak256,
     pad,
-    slice
+    slice,
+    toHex
 } from "viem"
 import { privateKeyToAccount } from "viem/accounts"
 import { PRIVATE_KEY } from "../config"
 import { ensureHex } from "../utils"
-export const getDeployerAddress = (): Address => {
+export const getDeployerAddress = (index: bigint): Address => {
     const signer = privateKeyToAccount(ensureHex(PRIVATE_KEY))
     const KernelAccountAbi = [
         {
@@ -31,13 +32,17 @@ export const getDeployerAddress = (): Address => {
             stateMutability: "payable",
             type: "function"
         }
-    ] as const
+    ]
+
     const data = encodeFunctionData({
         abi: KernelAccountAbi,
         functionName: "initialize",
         args: ["0xd9AB5096a832b9ce79914329DAEE236f8Eea0390", signer.address]
     })
-    const salt = slice(keccak256(concat([data, pad("0x00")])), 20)
+    const salt = slice(
+        keccak256(concat([data, pad(index ? toHex(index) : "0x00")])),
+        20
+    )
     const kernelAddress = getContractAddress({
         from: "0x5de4839a76cf55d0c90e2061ef4386d962E15ae3" as Address,
         bytecodeHash: ensureHex(

@@ -1,11 +1,12 @@
 import { Address, Hex, createPublicClient } from "viem"
 import { createZeroDevClient } from "../clients"
 import { Chain, DEPLOYER_CONTRACT_ADDRESS } from "../constant"
-import { computeAddress } from "./computeAddress"
+import { computeContractAddress } from "./computeAddress"
 
 export enum DeploymentStatus {
     Deployed = 0,
-    NotDeployed = 1
+    NotDeployed = 1,
+    Error
 }
 
 const checkDeploymentOnChain = async (
@@ -25,6 +26,7 @@ const checkDeploymentOnChain = async (
     const deployedBytecode = await publicClient.getBytecode({
         address: contractAddress
     })
+    console.log(deployedBytecode)
 
     return deployedBytecode
         ? DeploymentStatus.Deployed
@@ -39,11 +41,20 @@ export const findDeployment = async (
     address: Address
     deployedChains: Chain[]
     notDeployedChains: Chain[]
+    errorChains?: Chain[]
 }> => {
-    const address = computeAddress(DEPLOYER_CONTRACT_ADDRESS, bytecode, salt)
+    const address = computeContractAddress(
+        DEPLOYER_CONTRACT_ADDRESS,
+        bytecode,
+        salt
+    )
 
     const deploymentResults = await Promise.all(
-        chains.map((chain) => checkDeploymentOnChain(chain, address))
+        chains.map((chain) =>
+            checkDeploymentOnChain(chain, address).catch(
+                () => DeploymentStatus.Error
+            )
+        )
     )
 
     const deployedChains = chains.filter(
@@ -52,6 +63,9 @@ export const findDeployment = async (
     const notDeployedChains = chains.filter(
         (_, index) => deploymentResults[index] === DeploymentStatus.NotDeployed
     )
+    const errorChains = chains.filter(
+        (_, index) => deploymentResults[index] === DeploymentStatus.Error
+    )
 
-    return { address, deployedChains, notDeployedChains }
+    return { address, deployedChains, notDeployedChains, errorChains }
 }
