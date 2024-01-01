@@ -9,7 +9,7 @@ export const validateInputs = (
     salt: string,
     expectedAddress: string | undefined
 ) => {
-    if (!BYTECODE_REGEX.test(bytecode)) {
+    if (!BYTECODE_REGEX.test(bytecode) || bytecode.length % 2 !== 0) {
         throw new Error("Bytecode must be a hexadecimal string")
     }
 
@@ -32,6 +32,8 @@ export const processAndValidateChains = (
     options: CommandOptions
 ): Chain[] => {
     const supportedChains = getSupportedChains()
+    if (chainOption.length !== 0 && options.mainnetAll && options.testnetAll)
+        throw new Error("Cannot use more than one of -c, -t, -m options")
 
     let chains: string[]
     if (options.testnetAll) {

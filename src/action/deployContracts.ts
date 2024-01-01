@@ -9,6 +9,19 @@ import { createZeroDevPaymasterClient } from "../clients/ZeroDevClient"
 import { PRIVATE_KEY } from "../config"
 import { Chain, DEPLOYER_CONTRACT_ADDRESS, ENTRYPOINT } from "../constant"
 import { ensureHex, writeErrorLogToFile } from "../utils"
+import { Address } from "wagmi"
+import { computeContractAddress } from "./computeAddress"
+
+class AlreadyDeployedError extends Error {
+    address: Address
+    constructor(address: Address, chainName: string) {
+        super(
+            `Contract already deployed on Address ${address} for chain ${chainName}`
+        )
+        this.name = "AlreadyDeployedError"
+        this.address = address
+    }
+}
 
 const deployToChain = async (
     chain: Chain,
@@ -46,11 +59,25 @@ const deployToChain = async (
         sponsorUserOperation: paymasterClient.sponsorUserOperation
     })
 
-    const result = await publicClient.call({
-        account: kernelAccount.address,
-        data: ensureHex(salt + bytecode.slice(2)),
-        to: DEPLOYER_CONTRACT_ADDRESS
-    })
+    const result = await publicClient
+        .call({
+            account: kernelAccount.address,
+            data: ensureHex(salt + bytecode.slice(2)),
+            to: DEPLOYER_CONTRACT_ADDRESS
+        })
+        .catch(async (error: Error) => {
+            const address = computeContractAddress(
+                DEPLOYER_CONTRACT_ADDRESS,
+                bytecode,
+                salt
+            )
+            if ((await publicClient.getBytecode({ address })) !== "0x") {
+                throw new AlreadyDeployedError(address, chain.name)
+            }
+            throw new Error(
+                `Error calling contract ${DEPLOYER_CONTRACT_ADDRESS} on ${chain.name}: ${error}`
+            )
+        })
 
     if (expectedAddress && result.data !== expectedAddress) {
         throw new Error(
@@ -59,6 +86,7 @@ const deployToChain = async (
     }
 
     const op = await smartAccountClient.prepareUserOperationRequest({
+        account: kernelAccount,
         userOperation: {
             callData: await kernelAccount.encodeCallData({
                 to: DEPLOYER_CONTRACT_ADDRESS,
@@ -69,10 +97,11 @@ const deployToChain = async (
     })
 
     const opHash = await smartAccountClient.sendUserOperation({
+        account: kernelAccount,
         userOperation: op
     })
 
-    return [getAddress(result.data as string), opHash]
+    return [getAddress(result.data as Address), opHash]
 }
 
 // Update console with deployment status, note that this clears the console and you cannot use console.log to print anything else
@@ -104,6 +133,12 @@ const updateConsole = (
                 `🔗 Jiffyscan link for the transaction: https://jiffyscan.xyz/userOpHash/${
                     deploymentStatus[chain.name].opHash
                 }`
+            )
+        } else if (deploymentStatus[chain.name].status === "already deployed") {
+            console.log(
+                `🟢 Contract already deployed at ${
+                    deploymentStatus[chain.name].result
+                } on ${chain.name}`
             )
         } else if (deploymentStatus[chain.name].status.startsWith("failed!")) {
             console.log(
@@ -140,12 +175,19 @@ const deployToChainAndUpdateStatus = async (
         )
         deploymentStatus[chain.name] = { status: "done!", result, opHash }
     } catch (error) {
-        deploymentStatus[chain.name] = {
-            status: `failed! check the error log at "./log" directory`
+        if (error instanceof AlreadyDeployedError) {
+            deploymentStatus[chain.name] = {
+                status: `already deployed`,
+                result: error.address
+            }
+        } else {
+            deploymentStatus[chain.name] = {
+                status: `failed! check the error log at "./log" directory`
+            }
+            const errorInstance =
+                error instanceof Error ? error : new Error(String(error))
+            writeErrorLogToFile(chain.name, errorInstance)
         }
-        const errorInstance =
-            error instanceof Error ? error : new Error(String(error))
-        writeErrorLogToFile(chain.name, errorInstance)
     }
 }
 
