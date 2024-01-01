@@ -136,7 +136,7 @@ const updateConsole = (
             )
         } else if (deploymentStatus[chain.name].status === "already deployed") {
             console.log(
-                `🟢 Contract already deployed at ${
+                `🟡 Contract already deployed at ${
                     deploymentStatus[chain.name].result
                 } on ${chain.name}`
             )
