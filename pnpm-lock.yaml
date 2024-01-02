@@ -11,6 +11,9 @@ dependencies:
   '@kerneljs/ecdsa-validator':
     specifier: 0.0.1-alpha.11
     version: 0.0.1-alpha.11(@kerneljs/core@0.0.1-alpha.5)(permissionless@0.0.20)(viem@1.21.3)
+  '@kerneljs/presets':
+    specifier: 0.0.1-alpha.3
+    version: 0.0.1-alpha.3(@kerneljs/core@0.0.1-alpha.5)(@kerneljs/ecdsa-validator@0.0.1-alpha.11)(permissionless@0.0.20)(typescript@5.3.3)(viem@1.21.3)
   axios:
     specifier: ^1.6.3
     version: 1.6.3
@@ -681,6 +684,22 @@ packages:
       viem: 1.21.3(typescript@5.3.3)
     dev: false
 
+  /@kerneljs/presets@0.0.1-alpha.3(@kerneljs/core@0.0.1-alpha.5)(@kerneljs/ecdsa-validator@0.0.1-alpha.11)(permissionless@0.0.20)(typescript@5.3.3)(viem@1.21.3):
+    resolution: {integrity: sha512-HzVafEUpWsSSUxkjx08itHgW3ci9JhrQldqjckIilC+EJkNHUIW8nNPu3+tdUf68sGHHAlMjjXcqKFDtAdPLnQ==}
+    peerDependencies:
+      '@kerneljs/core': ^0.0.1-alpha.5
+      '@kerneljs/ecdsa-validator': ^0.0.1-alpha.11
+      permissionless: ^0.0.20
+      typescript: ^5.0.0
+      viem: ^1.21.3
+    dependencies:
+      '@kerneljs/core': 0.0.1-alpha.5(permissionless@0.0.20)(viem@1.21.3)
+      '@kerneljs/ecdsa-validator': 0.0.1-alpha.11(@kerneljs/core@0.0.1-alpha.5)(permissionless@0.0.20)(viem@1.21.3)
+      permissionless: 0.0.20(viem@1.21.3)
+      typescript: 5.3.3
+      viem: 1.21.3(typescript@5.3.3)
+    dev: false
+
   /@lit-labs/ssr-dom-shim@1.1.2:
     resolution: {integrity: sha512-jnOD+/+dSrfTWYfSXBXlo5l5f0q1UuJo3tkbMDCYA2lKUYq79jaxqtGEvnRoh049nt1vdo1+45RinipU6FGY2g==}
     dev: false
@@ -916,6 +935,7 @@ packages:
     dependencies:
       is-glob: 4.0.3
       micromatch: 4.0.5
+      napi-wasm: 1.1.0
     dev: false
     bundledDependencies:
       - napi-wasm
@@ -3693,6 +3713,10 @@ packages:
     dependencies:
       picocolors: 1.0.0
     dev: true
+
+  /napi-wasm@1.1.0:
+    resolution: {integrity: sha512-lHwIAJbmLSjF9VDRm9GoVOy9AGp3aIvkjv+Kvz9h16QR3uSVYH78PNQUnT2U4X53mhlnV2M7wrhibQ3GHicDmg==}
+    dev: false
 
   /node-addon-api@2.0.2:
     resolution: {integrity: sha512-Ntyt4AIXyaLIuMHF6IOoTakB3K+RWxwtsHNRxllEoA6vPwP9o4866g6YWDLUdnucilZhmkxiHwHr11gAENw+QA==}
