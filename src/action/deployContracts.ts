@@ -12,19 +12,20 @@ import { ensureHex, writeErrorLogToFile } from "../utils"
 import { computeContractAddress } from "./computeAddress"
 import { SmartAccountClient } from "permissionless"
 import { createKernelAccountClient, getZeroDevBundlerRPC } from "../clients"
+import { checkDeploymentOnChain } from "./findDeployment"
 
 class AlreadyDeployedError extends Error {
     address: Address
-    constructor(address: Address, chainName: string) {
+    constructor(address: Address) {
         super(
-            `Contract already deployed on Address ${address} for chain ${chainName}`
+            `Contract already deployed on Address ${address}`
         )
         this.name = "AlreadyDeployedError"
         this.address = address
     }
 }
 
-const deployToChain = async (
+export const deployToChain = async (
     kernelAccountClient: SmartAccountClient,
     publicClient: PublicClient,
     bytecode: Hex,
@@ -43,24 +44,19 @@ const deployToChain = async (
                 bytecode,
                 salt
             )
-            if ((await publicClient.getBytecode({ address })) !== "0x") {
+            if (await checkDeploymentOnChain(publicClient, address)) {
                 throw new AlreadyDeployedError(
-                    address,
-                    kernelAccountClient.chain!.name
+                    address
                 )
             }
             throw new Error(
-                `Error calling contract ${DEPLOYER_CONTRACT_ADDRESS} on ${
-                    kernelAccountClient.chain!.name
-                }: ${error}`
+                `Error calling contract ${DEPLOYER_CONTRACT_ADDRESS} : ${error}`
             )
         })
 
     if (expectedAddress && result.data !== expectedAddress) {
         throw new Error(
-            `Contract will be deployed at ${result.data} on ${
-                kernelAccountClient.chain!.name
-            } does not match expected address ${expectedAddress}`
+            `Contract will be deployed at ${result.data} does not match expected address ${expectedAddress}`
         )
     }
 
@@ -129,7 +125,7 @@ const updateConsole = (
     }
 }
 
-const deployToChainAndUpdateStatus = async (
+export const deployToChainAndUpdateStatus = async (
     kernelAccountClient: SmartAccountClient,
     publicClient: PublicClient,
     chain: Chain,

@@ -8,7 +8,7 @@ export enum DeploymentStatus {
     Error
 }
 
-const checkDeploymentOnChain = async (
+export const checkDeploymentOnChain = async (
     publicClient: PublicClient,
     contractAddress: Hex
 ): Promise<DeploymentStatus> => {

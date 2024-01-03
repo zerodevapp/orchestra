@@ -24,7 +24,7 @@ export const program = new Command()
 program
     .name("ZeroDev-Multichain-Deployer")
     .description(
-        "A CLI tool for deploying contracts to multichain with account abstraction"
+        "tool for deploying contracts to multichain with account abstraction"
     )
     .usage("zerodev <command> [options]")
     .version("1.0.0")

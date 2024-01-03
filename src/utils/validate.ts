@@ -19,11 +19,9 @@ export const validateInputs = (
         throw new Error("Only one of filePath and bytecode can be specified")
     }
 
-    if (filePath && !BYTECODE_REGEX.test(readBytecodeFromFile(filePath))) {
-        throw new Error("Bytecode must be a hexadecimal string")
-    }
+    bytecode = filePath ? readBytecodeFromFile(filePath) : bytecode
 
-    if (bytecode && !BYTECODE_REGEX.test(bytecode)) {
+    if (!BYTECODE_REGEX.test(bytecode!) || bytecode!.length % 2 !== 0) {
         throw new Error("Bytecode must be a hexadecimal string")
     }
 

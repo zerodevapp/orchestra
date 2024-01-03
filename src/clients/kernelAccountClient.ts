@@ -8,7 +8,7 @@ import {
     UserOperation,
     createSmartAccountClient
 } from "permissionless"
-import { http, createPublicClient, zeroAddress } from "viem"
+import { http, createPublicClient } from "viem"
 import { privateKeyToAccount } from "viem/accounts"
 import { polygonMumbai } from "viem/chains"
 import { Chain } from "../constant"
