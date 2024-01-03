@@ -12,14 +12,12 @@ import { ensureHex, writeErrorLogToFile } from "../utils"
 import { computeContractAddress } from "./computeAddress"
 import { SmartAccountClient } from "permissionless"
 import { createKernelAccountClient, getZeroDevBundlerRPC } from "../clients"
-import { checkDeploymentOnChain } from "./findDeployment"
+import { DeploymentStatus, checkDeploymentOnChain } from "./findDeployment"
 
 class AlreadyDeployedError extends Error {
     address: Address
     constructor(address: Address) {
-        super(
-            `Contract already deployed on Address ${address}`
-        )
+        super(`Contract already deployed on Address ${address}`)
         this.name = "AlreadyDeployedError"
         this.address = address
     }
@@ -44,10 +42,11 @@ export const deployToChain = async (
                 bytecode,
                 salt
             )
-            if (await checkDeploymentOnChain(publicClient, address)) {
-                throw new AlreadyDeployedError(
-                    address
-                )
+            if (
+                (await checkDeploymentOnChain(publicClient, address)) ==
+                DeploymentStatus.Deployed
+            ) {
+                throw new AlreadyDeployedError(address)
             }
             throw new Error(
                 `Error calling contract ${DEPLOYER_CONTRACT_ADDRESS} : ${error}`
