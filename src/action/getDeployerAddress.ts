@@ -1,23 +1,56 @@
-import { ECDSAProvider } from '@zerodev/sdk';
-import { LocalAccountSigner } from '@alchemy/aa-core';
-import { ensureHex } from '../utils';
-import { PRIVATE_KEY } from '../config';
-import { getSupportedChains } from '../constant';
+import {
+    Address,
+    concat,
+    encodeFunctionData,
+    getContractAddress,
+    keccak256,
+    pad,
+    slice,
+    toHex
+} from "viem"
+import { privateKeyToAccount } from "viem/accounts"
+import { PRIVATE_KEY } from "../config"
+import { ensureHex } from "../utils"
+export const getDeployerAddress = (index: bigint): Address => {
+    const signer = privateKeyToAccount(ensureHex(PRIVATE_KEY))
+    const KernelAccountAbi = [
+        {
+            inputs: [
+                {
+                    internalType: "contract IKernelValidator",
+                    name: "_defaultValidator",
+                    type: "address"
+                },
+                {
+                    internalType: "bytes",
+                    name: "_data",
+                    type: "bytes"
+                }
+            ],
+            name: "initialize",
+            outputs: [],
+            stateMutability: "payable",
+            type: "function"
+        }
+    ]
 
-export const getDeployerAddress = async () => {
-  // find the first projectId set by the user
-  const availableProjectId = getSupportedChains().find(
-    (chain) => chain.projectId !== null
-  )?.projectId;
+    const data = encodeFunctionData({
+        abi: KernelAccountAbi,
+        functionName: "initialize",
+        args: ["0xd9AB5096a832b9ce79914329DAEE236f8Eea0390", signer.address]
+    })
+    const salt = slice(
+        keccak256(concat([data, pad(index ? toHex(index) : "0x00")])),
+        20
+    )
+    const kernelAddress = getContractAddress({
+        from: "0x5de4839a76cf55d0c90e2061ef4386d962E15ae3" as Address,
+        bytecodeHash: ensureHex(
+            "0xee9d8350bd899dd261db689aafd87eb8a30f085adbaff48152399438ff4eed73"
+        ),
+        opcode: "CREATE2",
+        salt: salt
+    })
 
-  if (!availableProjectId) {
-    throw new Error('Please set PROJECT_ID for at least one chain in .env');
-  }
-
-  const ecdsaProvider = await ECDSAProvider.init({
-    projectId: availableProjectId,
-    owner: LocalAccountSigner.privateKeyToAccountSigner(ensureHex(PRIVATE_KEY)),
-  });
-
-  return await ecdsaProvider.getAddress();
-};
+    return kernelAddress
+}

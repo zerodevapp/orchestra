@@ -1,46 +1,66 @@
-import { Hex, createPublicClient, http } from 'viem';
-import { Chain, DEPLOYER_CONTRACT_ADDRESS } from '../constant';
-import { computeAddress } from './computeAddress';
-import { createZeroDevClient } from '../clients';
+import { Address, Hex, PublicClient, createPublicClient, http } from "viem"
+import { Chain, DEPLOYER_CONTRACT_ADDRESS } from "../constant"
+import { computeContractAddress } from "./computeAddress"
+import { getZeroDevBundlerRPC } from "../clients"
+export enum DeploymentStatus {
+    Deployed = 0,
+    NotDeployed = 1,
+    Error
+}
 
-const checkDeploymentOnChain = async (chain: Chain, contractAddress: Hex) => {
-  if (chain.projectId === null) {
-    throw new Error(`PROJECT_ID for chain ${chain.name} is not specified`);
-  }
+export const checkDeploymentOnChain = async (
+    publicClient: PublicClient,
+    contractAddress: Hex
+): Promise<DeploymentStatus> => {
+    const deployedBytecode = await publicClient.getBytecode({
+        address: contractAddress
+    })
 
-  const publicClient = createPublicClient({
-    chain: chain.viemChainObject,
-    // zerodev bundler supports both public and bundler rpc
-    transport: createZeroDevClient('bundler', chain.projectId),
-  });
-  const deployedBytecode = await publicClient.getBytecode({
-    address: contractAddress,
-  });
+    const nonce = await publicClient.getTransactionCount({
+        address: contractAddress
+    })
 
-  return deployedBytecode ? 'deployed' : 'notDeployed';
-};
+    return nonce > 0 || deployedBytecode
+        ? DeploymentStatus.Deployed
+        : DeploymentStatus.NotDeployed
+}
 
 export const findDeployment = async (
-  bytecode: Hex,
-  salt: Hex,
-  chains: Chain[]
-) => {
-  const contractAddress = computeAddress(
-    DEPLOYER_CONTRACT_ADDRESS,
-    bytecode,
-    salt
-  );
+    bytecode: Hex,
+    salt: Hex,
+    chains: Chain[]
+): Promise<{
+    address: Address
+    deployedChains: Chain[]
+    notDeployedChains: Chain[]
+    errorChains?: Chain[]
+}> => {
+    const address = computeContractAddress(
+        DEPLOYER_CONTRACT_ADDRESS,
+        bytecode,
+        salt
+    )
 
-  const deploymentResults = await Promise.all(
-    chains.map((chain) => checkDeploymentOnChain(chain, contractAddress))
-  );
+    const deploymentResults = await Promise.all(
+        chains.map((chain) =>
+            checkDeploymentOnChain(
+                createPublicClient({
+                    transport: http(getZeroDevBundlerRPC(chain.projectId!))
+                }),
+                address
+            ).catch(() => DeploymentStatus.Error)
+        )
+    )
 
-  const deployedChains = chains.filter(
-    (_, index) => deploymentResults[index] === 'deployed'
-  );
-  const notDeployedChains = chains.filter(
-    (_, index) => deploymentResults[index] === 'notDeployed'
-  );
+    const deployedChains = chains.filter(
+        (_, index) => deploymentResults[index] === DeploymentStatus.Deployed
+    )
+    const notDeployedChains = chains.filter(
+        (_, index) => deploymentResults[index] === DeploymentStatus.NotDeployed
+    )
+    const errorChains = chains.filter(
+        (_, index) => deploymentResults[index] === DeploymentStatus.Error
+    )
 
-  return { contractAddress, deployedChains, notDeployedChains };
-};
+    return { address, deployedChains, notDeployedChains, errorChains }
+}
