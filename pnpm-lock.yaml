@@ -7,13 +7,13 @@ settings:
 dependencies:
   '@kerneljs/core':
     specifier: 0.0.1-alpha.5
-    version: 0.0.1-alpha.5(permissionless@0.0.20)(viem@1.21.3)
+    version: 0.0.1-alpha.5(permissionless@0.0.20)(viem@1.21.4)
   '@kerneljs/ecdsa-validator':
     specifier: 0.0.1-alpha.11
-    version: 0.0.1-alpha.11(@kerneljs/core@0.0.1-alpha.5)(permissionless@0.0.20)(viem@1.21.3)
+    version: 0.0.1-alpha.11(@kerneljs/core@0.0.1-alpha.5)(permissionless@0.0.20)(viem@1.21.4)
   '@kerneljs/presets':
     specifier: 0.0.1-alpha.3
-    version: 0.0.1-alpha.3(@kerneljs/core@0.0.1-alpha.5)(@kerneljs/ecdsa-validator@0.0.1-alpha.11)(permissionless@0.0.20)(typescript@5.3.3)(viem@1.21.3)
+    version: 0.0.1-alpha.3(@kerneljs/core@0.0.1-alpha.5)(@kerneljs/ecdsa-validator@0.0.1-alpha.11)(permissionless@0.0.20)(typescript@5.3.3)(viem@1.21.4)
   axios:
     specifier: ^1.6.3
     version: 1.6.3
@@ -27,14 +27,14 @@ dependencies:
     specifier: ^16.3.1
     version: 16.3.1
   permissionless:
-    specifier: 0.0.20
-    version: 0.0.20(viem@1.21.3)
+    specifier: ^0.0.20
+    version: 0.0.20(viem@1.21.4)
   viem:
-    specifier: ^1.21.1
-    version: 1.21.3(typescript@5.3.3)
+    specifier: ^1.21.4
+    version: 1.21.4(typescript@5.3.3)
   wagmi:
     specifier: ^1.4.12
-    version: 1.4.12(react@18.2.0)(typescript@5.3.3)(viem@1.21.3)
+    version: 1.4.12(react@18.2.0)(typescript@5.3.3)(viem@1.21.4)
 
 devDependencies:
   '@biomejs/biome':
@@ -69,7 +69,7 @@ devDependencies:
     version: 0.6.3
   ethers:
     specifier: ^6.9.1
-    version: 6.9.1
+    version: 6.9.2
   figlet:
     specifier: ^1.7.0
     version: 1.7.0
@@ -662,29 +662,29 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
 
-  /@kerneljs/core@0.0.1-alpha.5(permissionless@0.0.20)(viem@1.21.3):
+  /@kerneljs/core@0.0.1-alpha.5(permissionless@0.0.20)(viem@1.21.4):
     resolution: {integrity: sha512-8JmXTdxV+bwFu3V202l3M63q6EHpJ+BXkoGiZMKbJPXZxhhsKtFUPteZ69ic8wh8Qy0hOJDdNw/aHZR30lxQmg==}
     peerDependencies:
       permissionless: ^0.0.19
       viem: ^1.19.4
     dependencies:
-      permissionless: 0.0.20(viem@1.21.3)
-      viem: 1.21.3(typescript@5.3.3)
+      permissionless: 0.0.20(viem@1.21.4)
+      viem: 1.21.4(typescript@5.3.3)
     dev: false
 
-  /@kerneljs/ecdsa-validator@0.0.1-alpha.11(@kerneljs/core@0.0.1-alpha.5)(permissionless@0.0.20)(viem@1.21.3):
+  /@kerneljs/ecdsa-validator@0.0.1-alpha.11(@kerneljs/core@0.0.1-alpha.5)(permissionless@0.0.20)(viem@1.21.4):
     resolution: {integrity: sha512-agtLmwSGiSaqJ8OOjQjCvrfCVGMEVHyGWCnuqynGigw6Nc3PHFCepY/lXdlT8SoNht4xtzUIIj5iafsRaaKsBA==}
     peerDependencies:
       '@kerneljs/core': ^0.0.1-alpha.5
       permissionless: ^0.0.19
       viem: ^1.19.4
     dependencies:
-      '@kerneljs/core': 0.0.1-alpha.5(permissionless@0.0.20)(viem@1.21.3)
-      permissionless: 0.0.20(viem@1.21.3)
-      viem: 1.21.3(typescript@5.3.3)
+      '@kerneljs/core': 0.0.1-alpha.5(permissionless@0.0.20)(viem@1.21.4)
+      permissionless: 0.0.20(viem@1.21.4)
+      viem: 1.21.4(typescript@5.3.3)
     dev: false
 
-  /@kerneljs/presets@0.0.1-alpha.3(@kerneljs/core@0.0.1-alpha.5)(@kerneljs/ecdsa-validator@0.0.1-alpha.11)(permissionless@0.0.20)(typescript@5.3.3)(viem@1.21.3):
+  /@kerneljs/presets@0.0.1-alpha.3(@kerneljs/core@0.0.1-alpha.5)(@kerneljs/ecdsa-validator@0.0.1-alpha.11)(permissionless@0.0.20)(typescript@5.3.3)(viem@1.21.4):
     resolution: {integrity: sha512-HzVafEUpWsSSUxkjx08itHgW3ci9JhrQldqjckIilC+EJkNHUIW8nNPu3+tdUf68sGHHAlMjjXcqKFDtAdPLnQ==}
     peerDependencies:
       '@kerneljs/core': ^0.0.1-alpha.5
@@ -693,11 +693,11 @@ packages:
       typescript: ^5.0.0
       viem: ^1.21.3
     dependencies:
-      '@kerneljs/core': 0.0.1-alpha.5(permissionless@0.0.20)(viem@1.21.3)
-      '@kerneljs/ecdsa-validator': 0.0.1-alpha.11(@kerneljs/core@0.0.1-alpha.5)(permissionless@0.0.20)(viem@1.21.3)
-      permissionless: 0.0.20(viem@1.21.3)
+      '@kerneljs/core': 0.0.1-alpha.5(permissionless@0.0.20)(viem@1.21.4)
+      '@kerneljs/ecdsa-validator': 0.0.1-alpha.11(@kerneljs/core@0.0.1-alpha.5)(permissionless@0.0.20)(viem@1.21.4)
+      permissionless: 0.0.20(viem@1.21.4)
       typescript: 5.3.3
-      viem: 1.21.3(typescript@5.3.3)
+      viem: 1.21.4(typescript@5.3.3)
     dev: false
 
   /@lit-labs/ssr-dom-shim@1.1.2:
@@ -935,7 +935,6 @@ packages:
     dependencies:
       is-glob: 4.0.3
       micromatch: 4.0.5
-      napi-wasm: 1.1.0
     dev: false
     bundledDependencies:
       - napi-wasm
@@ -1006,7 +1005,7 @@ packages:
     resolution: {integrity: sha512-XJbEPuaVc7b9n23MqlF6c+ToYIS3f7P2Sel8f3cSBQ9WORE4xrSuvhMpK9fDSFqJ7by/brc+rmJR/5HViRr0/w==}
     dependencies:
       '@safe-global/safe-gateway-typescript-sdk': 3.13.3
-      viem: 1.21.3(typescript@5.3.3)
+      viem: 1.21.4(typescript@5.3.3)
     transitivePeerDependencies:
       - bufferutil
       - typescript
@@ -1339,7 +1338,7 @@ packages:
       '@types/node': 18.19.4
     dev: false
 
-  /@wagmi/connectors@3.1.10(react@18.2.0)(typescript@5.3.3)(viem@1.21.3):
+  /@wagmi/connectors@3.1.10(react@18.2.0)(typescript@5.3.3)(viem@1.21.4):
     resolution: {integrity: sha512-ZLJC1QaeiZarkF07Cr9mOlVjPO1Lf5TBx+JKBms2y5fUIXlKrxCfQgO/gDCureboI+Us2X3IRI659+XacSGpbA==}
     peerDependencies:
       typescript: '>=5.0.4'
@@ -1358,7 +1357,7 @@ packages:
       abitype: 0.8.7(typescript@5.3.3)
       eventemitter3: 4.0.7
       typescript: 5.3.3
-      viem: 1.21.3(typescript@5.3.3)
+      viem: 1.21.4(typescript@5.3.3)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -1381,7 +1380,7 @@ packages:
       - zod
     dev: false
 
-  /@wagmi/core@1.4.12(react@18.2.0)(typescript@5.3.3)(viem@1.21.3):
+  /@wagmi/core@1.4.12(react@18.2.0)(typescript@5.3.3)(viem@1.21.4):
     resolution: {integrity: sha512-bLcYmmGgjtl3jAGo8X3Sm6oUwsdjbVxFMu9SWnwHdE4S9JdYeWM57dEhQgq8SYul2yQ7yY2/gimBf1Or0Ky3dQ==}
     peerDependencies:
       typescript: '>=5.0.4'
@@ -1390,11 +1389,11 @@ packages:
       typescript:
         optional: true
     dependencies:
-      '@wagmi/connectors': 3.1.10(react@18.2.0)(typescript@5.3.3)(viem@1.21.3)
+      '@wagmi/connectors': 3.1.10(react@18.2.0)(typescript@5.3.3)(viem@1.21.4)
       abitype: 0.8.7(typescript@5.3.3)
       eventemitter3: 4.0.7
       typescript: 5.3.3
-      viem: 1.21.3(typescript@5.3.3)
+      viem: 1.21.4(typescript@5.3.3)
       zustand: 4.4.7(react@18.2.0)
     transitivePeerDependencies:
       - '@azure/app-configuration'
@@ -2743,8 +2742,8 @@ packages:
       fast-safe-stringify: 2.1.1
     dev: false
 
-  /ethers@6.9.1:
-    resolution: {integrity: sha512-kuV8fGd4/8Gj7wkurbsuUsm1DCG6N5gKGYdw3fnWG/7QGknhy1xtHD7kbkCWQAcbAYmzLCLqCPedS3FYncFkKQ==}
+  /ethers@6.9.2:
+    resolution: {integrity: sha512-YpkrtILnMQz5jSEsJQRTpduaGT/CXuLnUIuOYzHA0v/7c8IX91m2J48wSKjzGL5L9J/Us3tLoUdb+OwE3U+FFQ==}
     engines: {node: '>=14.0.0'}
     dependencies:
       '@adraffy/ens-normalize': 1.10.0
@@ -3714,10 +3713,6 @@ packages:
       picocolors: 1.0.0
     dev: true
 
-  /napi-wasm@1.1.0:
-    resolution: {integrity: sha512-lHwIAJbmLSjF9VDRm9GoVOy9AGp3aIvkjv+Kvz9h16QR3uSVYH78PNQUnT2U4X53mhlnV2M7wrhibQ3GHicDmg==}
-    dev: false
-
   /node-addon-api@2.0.2:
     resolution: {integrity: sha512-Ntyt4AIXyaLIuMHF6IOoTakB3K+RWxwtsHNRxllEoA6vPwP9o4866g6YWDLUdnucilZhmkxiHwHr11gAENw+QA==}
     dev: false
@@ -3906,12 +3901,12 @@ packages:
     resolution: {integrity: sha512-d+RQGp0MAYTIaDBIMmOfMwz3E+LOZnxx1HZd5R18mmCZY0QBlK0LDZfPc8FW8Ed2DlvsuE6PRjroDY+wg4+j/Q==}
     dev: false
 
-  /permissionless@0.0.20(viem@1.21.3):
+  /permissionless@0.0.20(viem@1.21.4):
     resolution: {integrity: sha512-vTlefC0I9Z41kxhpmyliaFLpqFqaD6xQU1DCedbL2xniXp2uHdCUiUAplKyv8FXAfyVoWeGkd5b8wU//iHxDDw==}
     peerDependencies:
       viem: ^1.19.4
     dependencies:
-      viem: 1.21.3(typescript@5.3.3)
+      viem: 1.21.4(typescript@5.3.3)
     dev: false
 
   /picocolors@1.0.0:
@@ -4866,8 +4861,8 @@ packages:
       use-sync-external-store: 1.2.0(react@18.2.0)
     dev: false
 
-  /viem@1.21.3(typescript@5.3.3):
-    resolution: {integrity: sha512-tBCRj+AtpGGcyrY7k2Xjv0k8JB6ShGQ+dxeCdtIxWJO6ATmicTp7Qbgn/0IsbyQ0nUF06LMyo8PR569cRflnIA==}
+  /viem@1.21.4(typescript@5.3.3):
+    resolution: {integrity: sha512-BNVYdSaUjeS2zKQgPs+49e5JKocfo60Ib2yiXOWBT6LuVxY1I/6fFX3waEtpXvL1Xn4qu+BVitVtMh9lyThyhQ==}
     peerDependencies:
       typescript: '>=5.0.4'
     peerDependenciesMeta:
@@ -4889,7 +4884,7 @@ packages:
       - zod
     dev: false
 
-  /wagmi@1.4.12(react@18.2.0)(typescript@5.3.3)(viem@1.21.3):
+  /wagmi@1.4.12(react@18.2.0)(typescript@5.3.3)(viem@1.21.4):
     resolution: {integrity: sha512-QRxpjhdMlZmbYTfn9VQkQMKq+l3kwA1O7tF10vaykPrjbGX+IIlyn72ib9oqW9BfQO7n/Sf/mnVz1zbxRhGPWA==}
     peerDependencies:
       react: '>=17.0.0'
@@ -4902,12 +4897,12 @@ packages:
       '@tanstack/query-sync-storage-persister': 4.36.1
       '@tanstack/react-query': 4.36.1(react@18.2.0)
       '@tanstack/react-query-persist-client': 4.36.1(@tanstack/react-query@4.36.1)
-      '@wagmi/core': 1.4.12(react@18.2.0)(typescript@5.3.3)(viem@1.21.3)
+      '@wagmi/core': 1.4.12(react@18.2.0)(typescript@5.3.3)(viem@1.21.4)
       abitype: 0.8.7(typescript@5.3.3)
       react: 18.2.0
       typescript: 5.3.3
       use-sync-external-store: 1.2.0(react@18.2.0)
-      viem: 1.21.3(typescript@5.3.3)
+      viem: 1.21.4(typescript@5.3.3)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'

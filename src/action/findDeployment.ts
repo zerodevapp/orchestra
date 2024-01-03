@@ -1,8 +1,7 @@
-import { Address, Hex, createPublicClient } from "viem"
-import { createZeroDevClient } from "../clients"
+import { Address, Hex, PublicClient, createPublicClient, http } from "viem"
 import { Chain, DEPLOYER_CONTRACT_ADDRESS } from "../constant"
 import { computeContractAddress } from "./computeAddress"
-
+import { getZeroDevBundlerRPC } from "../clients"
 export enum DeploymentStatus {
     Deployed = 0,
     NotDeployed = 1,
@@ -10,25 +9,18 @@ export enum DeploymentStatus {
 }
 
 const checkDeploymentOnChain = async (
-    chain: Chain,
+    publicClient: PublicClient,
     contractAddress: Hex
 ): Promise<DeploymentStatus> => {
-    if (chain.projectId === null) {
-        throw new Error(`PROJECT_ID for chain ${chain.name} is not specified`)
-    }
-
-    const publicClient = createPublicClient({
-        chain: chain.viemChainObject,
-        // zerodev bundler supports both public and bundler rpc
-        transport: createZeroDevClient("bundler", chain.projectId)
-    })
-
     const deployedBytecode = await publicClient.getBytecode({
         address: contractAddress
     })
-    console.log(deployedBytecode)
 
-    return deployedBytecode
+    const nonce = await publicClient.getTransactionCount({
+        address: contractAddress
+    })
+
+    return nonce > 0 || deployedBytecode
         ? DeploymentStatus.Deployed
         : DeploymentStatus.NotDeployed
 }
@@ -51,9 +43,12 @@ export const findDeployment = async (
 
     const deploymentResults = await Promise.all(
         chains.map((chain) =>
-            checkDeploymentOnChain(chain, address).catch(
-                () => DeploymentStatus.Error
-            )
+            checkDeploymentOnChain(
+                createPublicClient({
+                    transport: http(getZeroDevBundlerRPC(chain.projectId!))
+                }),
+                address
+            ).catch(() => DeploymentStatus.Error)
         )
     )
 
