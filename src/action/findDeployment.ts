@@ -1,11 +1,11 @@
-import { Address, Hex, PublicClient, createPublicClient, http } from "viem"
+import { http, Address, Hex, PublicClient, createPublicClient } from "viem"
+import { getZeroDevBundlerRPC } from "../clients"
 import { Chain, DEPLOYER_CONTRACT_ADDRESS } from "../constant"
 import { computeContractAddress } from "./computeAddress"
-import { getZeroDevBundlerRPC } from "../clients"
 export enum DeploymentStatus {
     Deployed = 0,
     NotDeployed = 1,
-    Error
+    Error = 2
 }
 
 export const checkDeploymentOnChain = async (
@@ -42,14 +42,14 @@ export const findDeployment = async (
     )
 
     const deploymentResults = await Promise.all(
-        chains.map((chain) =>
-            checkDeploymentOnChain(
+        chains.map((chain) => {
+            return checkDeploymentOnChain(
                 createPublicClient({
-                    transport: http(getZeroDevBundlerRPC(chain.projectId!))
+                    transport: http(getZeroDevBundlerRPC(chain.projectId))
                 }),
                 address
             ).catch(() => DeploymentStatus.Error)
-        )
+        })
     )
 
     const deployedChains = chains.filter(

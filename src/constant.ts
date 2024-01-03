@@ -30,14 +30,21 @@ export enum Network {
     testnet = "testnet"
 }
 
-export interface Chain {
+export interface UnvalidatedChain {
     name: string
     projectId: string | null
     viemChainObject: ViemChain
     type: Network
 }
 
-export const getSupportedChains = (): Chain[] => [
+export interface Chain {
+    name: string
+    projectId: string
+    viemChainObject: ViemChain
+    type: Network
+}
+
+export const getSupportedChains = (): UnvalidatedChain[] => [
     {
         name: "arbitrum",
         projectId: process.env.ARBITRUM_PROJECT_ID || null,

@@ -1,17 +1,17 @@
 import chalk from "chalk"
+import { SmartAccountClient } from "permissionless"
 import {
+    http,
     Address,
     Hex,
     PublicClient,
     createPublicClient,
-    getAddress,
-    http
+    getAddress
 } from "viem"
+import { createKernelAccountClient, getZeroDevBundlerRPC } from "../clients"
 import { Chain, DEPLOYER_CONTRACT_ADDRESS } from "../constant"
 import { ensureHex, writeErrorLogToFile } from "../utils"
 import { computeContractAddress } from "./computeAddress"
-import { SmartAccountClient } from "permissionless"
-import { createKernelAccountClient, getZeroDevBundlerRPC } from "../clients"
 import { DeploymentStatus, checkDeploymentOnChain } from "./findDeployment"
 
 class AlreadyDeployedError extends Error {
@@ -30,9 +30,13 @@ export const deployToChain = async (
     salt: Hex,
     expectedAddress: string | undefined
 ): Promise<[string, string]> => {
+    if (!kernelAccountClient.account) {
+        throw new Error("Kernel account is not initialized")
+    }
+
     const result = await publicClient
         .call({
-            account: kernelAccountClient.account?.address,
+            account: kernelAccountClient.account.address,
             data: ensureHex(salt + bytecode.slice(2)),
             to: DEPLOYER_CONTRACT_ADDRESS
         })
@@ -43,7 +47,7 @@ export const deployToChain = async (
                 salt
             )
             if (
-                (await checkDeploymentOnChain(publicClient, address)) ==
+                (await checkDeploymentOnChain(publicClient, address)) ===
                 DeploymentStatus.Deployed
             ) {
                 throw new AlreadyDeployedError(address)
@@ -60,9 +64,9 @@ export const deployToChain = async (
     }
 
     const opHash = await kernelAccountClient.sendUserOperation({
-        account: kernelAccountClient.account!,
+        account: kernelAccountClient.account,
         userOperation: {
-            callData: await kernelAccountClient.account!.encodeCallData({
+            callData: await kernelAccountClient.account.encodeCallData({
                 to: DEPLOYER_CONTRACT_ADDRESS,
                 value: 0n,
                 data: ensureHex(salt + bytecode.slice(2))
@@ -148,7 +152,7 @@ export const deployToChainAndUpdateStatus = async (
     } catch (error) {
         if (error instanceof AlreadyDeployedError) {
             deploymentStatus[chain.name] = {
-                status: `already deployed`,
+                status: "already deployed",
                 result: error.address
             }
         } else {
@@ -189,12 +193,12 @@ export const deployContracts = async (
             ),
         100
     )
-    let deployments = []
+    const deployments = []
     for (const chain of chains) {
         const kernelAccount = await createKernelAccountClient(chain)
         const publicClient = createPublicClient({
             chain: chain.viemChainObject,
-            transport: http(getZeroDevBundlerRPC(chain.projectId!))
+            transport: http(getZeroDevBundlerRPC(chain.projectId))
         })
         deployments.push(
             deployToChainAndUpdateStatus(

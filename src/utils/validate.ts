@@ -1,4 +1,4 @@
-import { Chain, getSupportedChains } from "../constant"
+import { Chain, UnvalidatedChain, getSupportedChains } from "../constant"
 import { readBytecodeFromFile } from "./file"
 
 const BYTECODE_REGEX = /^0x[0-9a-fA-F]*$/
@@ -19,9 +19,18 @@ export const validateInputs = (
         throw new Error("Only one of filePath and bytecode can be specified")
     }
 
-    bytecode = filePath ? readBytecodeFromFile(filePath) : bytecode
+    const bytecodeToValidate = filePath
+        ? readBytecodeFromFile(filePath)
+        : bytecode
 
-    if (!BYTECODE_REGEX.test(bytecode!) || bytecode!.length % 2 !== 0) {
+    if (!bytecodeToValidate) {
+        throw new Error("Bytecode must be specified")
+    }
+
+    if (
+        !BYTECODE_REGEX.test(bytecodeToValidate) ||
+        bytecodeToValidate.length % 2 !== 0
+    ) {
         throw new Error("Bytecode must be a hexadecimal string")
     }
 
@@ -63,22 +72,22 @@ export const processAndValidateChains = (
                 : chainOption.split(",")
     }
 
-    const chainObjects: Chain[] = chains.map((chainName: string) => {
+    const chainObjects: UnvalidatedChain[] = chains.map((chainName: string) => {
         const chain = supportedChains.find((c) => c.name === chainName)
         if (!chain) throw new Error(`Chain ${chainName} is not supported`)
         return chain
     })
 
-    validateChains(chainObjects)
-    return chainObjects
+    return validateChains(chainObjects)
 }
 
-const validateChains = (chains: Chain[]) => {
-    for (const chain of chains) {
+const validateChains = (chains: UnvalidatedChain[]): Chain[] => {
+    return chains.map((chain) => {
         if (!chain.projectId) {
             throw new Error(
                 `PROJECT_ID for chain ${chain.name} is not specified`
             )
         }
-    }
+        return chain as Chain
+    })
 }
