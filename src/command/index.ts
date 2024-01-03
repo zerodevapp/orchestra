@@ -70,13 +70,24 @@ program
 program
     .command("compute-address")
     .description("Compute the address to be deployed")
-    .argument("<path-to-bytecode>", "file path of bytecode to deploy")
     .argument("<salt>", "salt to be used for create2")
-    .action((pathToBytecode: string, salt: string) => {
-        const bytecode = readBytecodeFromFile(pathToBytecode)
+    .option(
+        "-f, --file <path-to-bytecode>",
+        "file path of bytecode to deploy, a.k.a. init code"
+    )
+    .option("-b, --bytecode <bytecode>", "bytecode to deploy")
+    .action(async (salt: string, options) => {
+        const { file, bytecode } = options
+        validateInputs(file, bytecode, salt, undefined)
+
+        let bytecodeToDeploy = bytecode
+        if (file) {
+            bytecodeToDeploy = readBytecodeFromFile(file)
+        }
+
         const address = computeContractAddress(
             DEPLOYER_CONTRACT_ADDRESS,
-            ensureHex(bytecode),
+            ensureHex(bytecodeToDeploy),
             ensureHex(salt)
         )
         console.log(`computed address: ${address}`)
