@@ -158,16 +158,16 @@ program
     .argument("<salt>", "salt used for depolyment")
     .option(
         "-f, --file <path-to-bytecode>",
-        "file path of bytecode to deploy, a.k.a. init code"
+        "file path of bytecode used for deployment, a.k.a. init code"
     )
-    .option("-b, --bytecode <bytecode>", "bytecode to deploy")
+    .option("-b, --bytecode <bytecode>", "deployed bytecode")
     .option(
         "-c, --chains [CHAINS]",
         "list of chains to check, with all selected by default",
         "all"
     )
-    .option("-t, --testnet-all", "select all testnets", false)
-    .option("-m, --mainnet-all", "select all mainnets", false)
+    .option("-t, --testnet-all", "check all testnets", false)
+    .option("-m, --mainnet-all", "check all mainnets", false)
     .action(async (salt: string, options) => {
         const { file, bytecode, chains, testnetAll, mainnetAll } = options
 
@@ -213,7 +213,7 @@ program
     .description(
         "generate a random 32 bytes salt, or convert the input to salt"
     )
-    .option("-i, --input <input>", "input to be converted to salt")
+    .option("-i, --input <input>", "input to convert to salt")
     .action((options) => {
         let salt
         if (options.input) {
