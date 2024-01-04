@@ -48,18 +48,18 @@ All commands should be prefixed with `zerodev`
 -   `chains`: Show the list of available chains
 -   `compute-address [options] <salt>`: Compute the address to be deployed
     -   `-f, --file <path-to-bytecode>`: file path of bytecode to deploy
-    -   `-b, --bytecode <bytecode>`: bytecode to deploy
+    -   `-b, --bytecode <bytecode>`: bytecode to deploy, should have constructor arguments encoded
 -   `get-deployer-address`: Get the deployer's address
 -   `deploy [options] <salt>`: Deploy contracts deterministically using CREATE2, in order of the chains specified
     -   `-f, --file <path-to-bytecode>`: file path of bytecode to deploy
-    -   `-b, --bytecode <bytecode>`: bytecode to deploy
+    -   `-b, --bytecode <bytecode>`: bytecode to deploy, should have constructor arguments encoded
     -   `-t, --testnet-all`: deploy to all testnets
     -   `-m, --mainnet-all`: deploy to all mainnets
     -   `-c, --chains [CHAINS]`: list of chains to deploy, with `all` selected by default
     -   `-e, --expected-address <address>`: expected address to confirm
 -   `check-deployment [options] <salt>`: Check if the contract has been deployed on the specified chains
     -   `-f, --file <path-to-bytecode>`: file path of bytecode used for deployment
-    -   `-b, --bytecode <bytecode>`: deployed bytecode
+    -   `-b, --bytecode <bytecode>`: bytecode to deploy, should have constructor arguments encoded
     -   `-c, --chains [CHAINS]`: list of chains to check, with `all` selected by default
     -   `-t, --testnet-all`: check all testnets
     -   `-m, --mainnet-all`: check all mainnets
