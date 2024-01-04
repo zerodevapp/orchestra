@@ -1,6 +1,6 @@
-# Contract Deployment Tool
+# Orchestra
 
-This tool is a command-line utility that enables deterministic deployment of contracts to multiple chains using a single command, thanks to Account Abstraction and CREATE2. It uses the [ZeroDev](https://zerodev.app) service to deploy contracts.
+Orchestra is a command-line utility that enables deterministic deployment of contracts to multiple chains using a single command, thanks to Account Abstraction and CREATE2. It uses the [ZeroDev](https://zerodev.app) service to deploy contracts.
 
 ## Installation
 
@@ -70,4 +70,4 @@ All commands should be prefixed with `zerodev`
 
 ## Supported Networks
 
-This tool supports all network supported by ZeroDev. Check details [here](https://docs.zerodev.app/supported-networks)
+Orchestra supports all network supported by ZeroDev. Check details [here](https://docs.zerodev.app/supported-networks)
