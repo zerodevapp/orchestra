@@ -16,7 +16,6 @@ export const createKernelAccountClient = async (
         signer,
 
         // optional
-        provider: "ALCHEMY", // defaults to a recommended provider
         index: BigInt(0), // defaults to 0
         usePaymaster: true // defaults to true
     })
