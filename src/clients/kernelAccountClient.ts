@@ -1,6 +1,4 @@
-import {
-    createEcdsaKernelAccountClient
-} from "@kerneljs/presets/zerodev"
+import { createEcdsaKernelAccountClient } from "@kerneljs/presets/zerodev"
 import { signerToEcdsaValidator } from "@kerneljs/ecdsa-validator"
 import {
     SmartAccountClient,
@@ -23,10 +21,9 @@ export const createKernelAccountClient = async (
         chain: chain.viemChainObject,
         projectId: chain.projectId,
         signer,
-    
+
         // optional
-        provider: "ALCHEMY", // defaults to a recommended provider
         index: BigInt(0), // defaults to 0
-        usePaymaster: true, // defaults to true
-      })
+        usePaymaster: true // defaults to true
+    })
 }
