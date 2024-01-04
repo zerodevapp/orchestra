@@ -195,22 +195,31 @@ export const deployContracts = async (
     )
     const deployments = []
     for (const chain of chains) {
-        const kernelAccount = await createKernelAccountClient(chain)
-        const publicClient = createPublicClient({
-            chain: chain.viemChainObject,
-            transport: http(getZeroDevBundlerRPC(chain.projectId))
-        })
-        deployments.push(
-            deployToChainAndUpdateStatus(
-                kernelAccount,
-                publicClient,
-                chain,
-                bytecode,
-                salt,
-                expectedAddress,
-                deploymentStatus
+        try {
+            const kernelAccount = await createKernelAccountClient(chain)
+            const publicClient = createPublicClient({
+                chain: chain.viemChainObject,
+                transport: http(getZeroDevBundlerRPC(chain.projectId))
+            })
+            deployments.push(
+                deployToChainAndUpdateStatus(
+                    kernelAccount,
+                    publicClient,
+                    chain,
+                    bytecode,
+                    salt,
+                    expectedAddress,
+                    deploymentStatus
+                )
             )
-        )
+        } catch (error) {
+            const errorInstance =
+                error instanceof Error ? error : new Error(String(error))
+            writeErrorLogToFile(chain.name, errorInstance)
+            deploymentStatus[chain.name] = {
+                status: `failed! check the error log at "./log" directory`
+            }
+        }
     }
 
     await Promise.all(deployments)
