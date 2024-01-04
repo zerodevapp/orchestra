@@ -1,7 +1,6 @@
 import {
-    createKernelAccount,
-    createKernelPaymasterClient
-} from "@kerneljs/core"
+    createEcdsaKernelAccountClient
+} from "@kerneljs/presets/zerodev"
 import { signerToEcdsaValidator } from "@kerneljs/ecdsa-validator"
 import {
     SmartAccountClient,
@@ -18,34 +17,16 @@ import { Chain } from "../constant"
 export const createKernelAccountClient = async (
     chain: Chain
 ): Promise<SmartAccountClient> => {
-    const publicClient = createPublicClient({
-        transport: http(getZeroDevBundlerRPC(chain.projectId))
-    })
-
     const signer = privateKeyToAccount(PRIVATE_KEY)
-
-    const ecdsaValidator = await signerToEcdsaValidator(publicClient, {
-        signer
-    })
-
-    const account = await createKernelAccount(publicClient, {
-        plugin: ecdsaValidator
-    })
-
-    return createSmartAccountClient({
-        account,
+    return await createEcdsaKernelAccountClient({
+        // required
         chain: chain.viemChainObject,
-        transport: http(getZeroDevBundlerRPC(chain.projectId)),
-        sponsorUserOperation: async ({
-            userOperation
-        }): Promise<UserOperation> => {
-            const kernelPaymaster = createKernelPaymasterClient({
-                chain: chain.viemChainObject,
-                transport: http(getZeroDevPaymasterRPC(chain.projectId))
-            })
-            return kernelPaymaster.sponsorUserOperation({
-                userOperation
-            })
-        }
-    })
+        projectId: chain.projectId,
+        signer,
+    
+        // optional
+        provider: "ALCHEMY", // defaults to a recommended provider
+        index: BigInt(0), // defaults to 0
+        usePaymaster: true, // defaults to true
+      })
 }
