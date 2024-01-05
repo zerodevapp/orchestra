@@ -57,9 +57,9 @@ export const deployToChain = async (
             )
         })
 
-    if (expectedAddress && result.data !== expectedAddress) {
+    if (expectedAddress && result.data?.toLowerCase() !== expectedAddress.toLowerCase()) {
         throw new Error(
-            `Contract will be deployed at ${result.data} does not match expected address ${expectedAddress}`
+            `Contract will be deployed at ${result.data?.toLowerCase()} does not match expected address ${expectedAddress.toLowerCase()}`
         )
     }
 
