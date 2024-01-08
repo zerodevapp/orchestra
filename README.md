@@ -7,8 +7,8 @@ Orchestra is a command-line utility that enables deterministic deployment of con
 1. Inside the `cli` directory, create a `.env` file and fill it out by refering to `.env.example.`
 2. Run `pnpm install` to install all the necessary dependencies.
 3. Run `pnpm build` to build the project.
-4. Run `pnpm link --global` to make the command `zerodev` accessible globally.
-5. Test the installation by running `zerodev -h`. If you see a guide for the command, it means the installation was successful.
+4. Run `pnpm link --global` to make the command `zerodev-orchestra` accessible globally.
+5. Test the installation by running `zerodev-orchestra -h`. If you see a guide for the command, it means the installation was successful.
 
 ## Usage
 
@@ -18,31 +18,31 @@ Orchestra is a command-line utility that enables deterministic deployment of con
 -   You can deploy a contract to multiple chains with the following command
 
 ```
-zerodev deploy [options] <salt>
+zerodev-orchestra deploy [options] <salt>
 ```
 
 -   For example, if you want to deploy a contract to the Optimism Sepolia and Polygon Mumbai testnet with `bytecode` file and zero bytes `salt`, you can run the following command
 
 ```
-zerodev deploy 0x0000000000000000000000000000000000000000000000000000000000000000 -f ./bytecode -c optimism-sepolia,polygon-mumbai
+zerodev-orchestra deploy 0x0000000000000000000000000000000000000000000000000000000000000000 -f ./bytecode -c optimism-sepolia,polygon-mumbai
 
 ```
 
 -   if you want to deploy to all testnets or all mainnets, use `-t` `--testnet-all` / `-m` `--mainnet-all` flag instead of `-c` `--chain` flag
 
 ```
-zerodev deploy 0x0000000000000000000000000000000000000000000000000000000000000000 -f ./bytecode -t
+zerodev-orchestra deploy 0x0000000000000000000000000000000000000000000000000000000000000000 -f ./bytecode -t
 ```
 
 ```
-zerodev deploy 0x0000000000000000000000000000000000000000000000000000000000000000 -f ./bytecode -m
+zerodev-orchestra deploy 0x0000000000000000000000000000000000000000000000000000000000000000 -f ./bytecode -m
 ```
 
 -   After deployment, you can see the deployed contract address and its user operation hash with jiffy scan link.
 
 ### Available Commands
 
-All commands should be prefixed with `zerodev`
+All commands should be prefixed with `zerodev-orchestra`
 
 -   `-h`, `--help`: Show help
 -   `chains`: Show the list of available chains
