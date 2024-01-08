@@ -22,16 +22,16 @@ import {
 export const program = new Command()
 
 program
-    .name("ZeroDev-Multichain-Deployer")
+    .name("zerodev-orchestra")
     .description(
         "tool for deploying contracts to multichain with account abstraction"
     )
-    .usage("zerodev <command> [options]")
+    .usage("<command> [options]")
     .version("1.0.0")
 
 program.helpInformation = function () {
     const asciiArt = chalk.blueBright(
-        figlet.textSync("ZeroDev Deployer", {
+        figlet.textSync("ZeroDev Orchestra", {
             horizontalLayout: "default",
             verticalLayout: "default",
             width: 100,

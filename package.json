@@ -1,6 +1,6 @@
 {
-  "name": "zerodev-deployer",
-  "version": "1.0.0",
+  "name": "@zerodev/orchestra",
+  "version": "0.0.1",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
@@ -9,10 +9,10 @@
     "dev": "ts-node src/index.ts",
     "format": "biome format . --write",
     "lint": "biome check .",
-    "lint:fix": "pnpm run lint --apply"
+    "lint:fix": "bun run lint --apply"
   },
   "bin": {
-    "zerodev": "./dist/index.js"
+    "zerodev-orchestra": "./dist/index.js"
   },
   "keywords": [],
   "author": "",
@@ -47,6 +47,6 @@
     "typescript": "^5.3.3"
   },
   "simple-git-hooks": {
-    "pre-commit": "pnpm run format && pnpm run lint"
+    "pre-commit": "bun run format && bun run lint"
   }
 }
