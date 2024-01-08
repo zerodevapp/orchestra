@@ -5,9 +5,9 @@ Orchestra is a command-line utility that enables deterministic deployment of con
 ## Installation
 
 1. Inside the `cli` directory, create a `.env` file and fill it out by refering to `.env.example.`
-2. Run `pnpm install` to install all the necessary dependencies.
-3. Run `pnpm build` to build the project.
-4. Run `pnpm link --global` to make the command `zerodev-orchestra` accessible globally.
+2. Run `bun install` to install all the necessary dependencies.
+3. Run `bun run build` to build the project.
+4. Run `bun link` to make the command `zerodev-orchestra` accessible globally.
 5. Test the installation by running `zerodev-orchestra -h`. If you see a guide for the command, it means the installation was successful.
 
 ## Usage
