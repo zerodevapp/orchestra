@@ -12,7 +12,7 @@
     "lint:fix": "bun run lint --apply"
   },
   "bin": {
-    "zerodev-orchestra": "./dist/index.js"
+    "zerodev": "./dist/index.js"
   },
   "keywords": [],
   "author": "",
