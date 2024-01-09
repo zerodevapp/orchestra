@@ -1,6 +1,6 @@
 # Orchestra
 
-Orchestra is a command-line utility that enables deterministic deployment of contracts to multiple chains using a single command, thanks to Account Abstraction and CREATE2. It uses the [ZeroDev](https://zerodev.app) service to deploy contracts.
+Orchestra is a CLI for deterministically deploying contracts to multiple chains, even if you don't have gas tokens for each chain.  It's able to do that thanks to ERC-4337 paymasters.  Orchestra is built on [ZeroDev](https://docs.zerodev.app/).
 
 ## Installation
 
