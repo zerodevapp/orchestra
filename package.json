@@ -1,6 +1,6 @@
 {
   "name": "@zerodev/orchestra",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
@@ -26,6 +26,9 @@
     "ora": "^3.2.0",
     "permissionless": "^0.0.20",
     "viem": "^1.21.4",
+    "chalk": "4.1.2",
+    "cli-table3": "^0.6.3",
+    "figlet": "^1.7.0",
     "wagmi": "^1.4.13"
   },
   "devDependencies": {
@@ -38,9 +41,6 @@
     "@types/figlet": "^1.5.8",
     "@types/node": "^18.19.4",
     "@types/ora": "^3.2.0",
-    "chalk": "4.1.2",
-    "cli-table3": "^0.6.3",
-    "figlet": "^1.7.0",
     "simple-git-hooks": "^2.9.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"

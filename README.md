@@ -4,13 +4,11 @@ Orchestra is a CLI for deterministically deploying contracts to multiple chains,
 
 ## Installation
 
-1. Inside the `cli` directory, create a `.env` file and fill it out by refering to `.env.example.`
-   - At the moment, Orchestra works only with ZeroDev infra, so you would fill out the `.env` file with ZeroDev project IDs that you can create on [the ZeroDev dashboard](https://dashboard.zerodev.app/). We welcome PRs to add support for other AA infra providers.
-2. Run `bun install` to install all the necessary dependencies.
-3. Run `bun run build` to build the project.
-4. Run `bun link` to make the command `zerodev` accessible globally.
-5. Test the installation by running `zerodev -h`. If you see a guide for the command, it means the installation was successful.
-
+1. `npm install -g @zerodev/orchestra`
+2. Create a `.env` file based on `.env.example`
+   - You can acquire the project IDs from [the ZeroDev dashboard](https://dashboard.zerodev.app/)
+3. Test the installation by running `zerodev -h`
+ 
 ## Usage
 
 ### Deploying a Contract
