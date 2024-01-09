@@ -1,4 +1,5 @@
 import chalk from "chalk"
+import ora from "ora"
 import { SmartAccountClient } from "permissionless"
 import {
     http,
@@ -79,155 +80,59 @@ export const deployToChain = async (
     return [getAddress(result.data as Address), opHash]
 }
 
-// Update console with deployment status, note that this clears the console and you cannot use console.log to print anything else
-const updateConsole = (
-    chains: Chain[],
-    deploymentStatus: Record<
-        string,
-        { status: string; result?: string; opHash?: string }
-    >,
-    frames: string[],
-    frameIndex: number
-) => {
-    console.clear()
-    console.log("🏁 Starting deployments...")
-    for (const chain of chains) {
-        const frame =
-            deploymentStatus[chain.name].status === "starting..."
-                ? chalk.green(frames[frameIndex])
-                : ""
-        if (deploymentStatus[chain.name].status === "done!") {
-            console.log(
-                `🟢 Contract deployed at ${
-                    deploymentStatus[chain.name].result
-                } on ${chain.name} with userOp hash ${
-                    deploymentStatus[chain.name].opHash
-                }`
-            )
-            console.log(
-                `🔗 Jiffyscan link for the transaction: https://jiffyscan.xyz/userOpHash/${
-                    deploymentStatus[chain.name].opHash
-                }`
-            )
-        } else if (deploymentStatus[chain.name].status === "already deployed") {
-            console.log(
-                `🟡 Contract already deployed at ${
-                    deploymentStatus[chain.name].result
-                } on ${chain.name}`
-            )
-        } else if (deploymentStatus[chain.name].status.startsWith("failed!")) {
-            console.log(
-                `❌ ${frame} Deployment for ${chain.name} is ${
-                    deploymentStatus[chain.name].status
-                }`
-            )
-        } else {
-            console.log(
-                `${frame} Deployment for ${chain.name} is ${
-                    deploymentStatus[chain.name].status
-                }`
-            )
-        }
-    }
-}
-
-export const deployToChainAndUpdateStatus = async (
-    kernelAccountClient: SmartAccountClient,
-    publicClient: PublicClient,
-    chain: Chain,
-    bytecode: Hex,
-    salt: Hex,
-    expectedAddress: string | undefined,
-    deploymentStatus: Record<
-        string,
-        { status: string; result?: string; opHash?: string }
-    >
-) => {
-    try {
-        const [result, opHash] = await deployToChain(
-            kernelAccountClient,
-            publicClient,
-            bytecode,
-            salt,
-            expectedAddress
-        )
-        deploymentStatus[chain.name] = { status: "done!", result, opHash }
-    } catch (error) {
-        if (error instanceof AlreadyDeployedError) {
-            deploymentStatus[chain.name] = {
-                status: "already deployed",
-                result: error.address
-            }
-        } else {
-            deploymentStatus[chain.name] = {
-                status: `failed! check the error log at "./log" directory`
-            }
-            const errorInstance =
-                error instanceof Error ? error : new Error(String(error))
-            writeErrorLogToFile(chain.name, errorInstance)
-        }
-    }
-}
-
 export const deployContracts = async (
     bytecode: Hex,
     chains: Chain[],
     salt: Hex,
     expectedAddress: string | undefined
 ) => {
-    const deploymentStatus: Record<
-        string,
-        { status: string; result?: string; opHash?: string }
-    > = {}
-    for (const chain of chains) {
-        deploymentStatus[chain.name] = { status: "starting..." }
-    }
+    const spinner = ora("Deployment is processing...").start()
+    const deployments = chains.map(async (chain) => {
+        const kernelAccount = await createKernelAccountClient(chain)
+        const publicClient = createPublicClient({
+            chain: chain.viemChainObject,
+            transport: http(getZeroDevBundlerRPC(chain.projectId))
+        })
 
-    const frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
-    let frameIndex = 0
-
-    const interval = setInterval(
-        () =>
-            updateConsole(
-                chains,
-                deploymentStatus,
-                frames,
-                frameIndex++ % frames.length
-            ),
-        100
-    )
-    const deployments = []
-    for (const chain of chains) {
-        try {
-            const kernelAccount = await createKernelAccountClient(chain)
-            const publicClient = createPublicClient({
-                chain: chain.viemChainObject,
-                transport: http(getZeroDevBundlerRPC(chain.projectId))
-            })
-            deployments.push(
-                deployToChainAndUpdateStatus(
-                    kernelAccount,
-                    publicClient,
-                    chain,
-                    bytecode,
-                    salt,
-                    expectedAddress,
-                    deploymentStatus
+        return deployToChain(
+            kernelAccount,
+            publicClient,
+            bytecode,
+            salt,
+            expectedAddress
+        )
+            .then((result) => {
+                spinner.succeed(
+                    `Contract deployed at "${result[0]}" on ${chalk.blueBright(
+                        chain.name
+                    )} with opHash "${
+                        result[1]
+                    }" \n 🔗 Jiffyscan link for the transaction: https://jiffyscan.xyz/userOpHash/${
+                        result[1]
+                    }`
                 )
-            )
-        } catch (error) {
-            const errorInstance =
-                error instanceof Error ? error : new Error(String(error))
-            writeErrorLogToFile(chain.name, errorInstance)
-            deploymentStatus[chain.name] = {
-                status: `failed! check the error log at "./log" directory`
-            }
-        }
-    }
+                spinner.start("Deployment is processing...")
+                return result
+            })
+            .catch((error) => {
+                if (error instanceof AlreadyDeployedError) {
+                    spinner.warn(
+                        `Contract already deployed at ${
+                            error.address
+                        } on ${chalk.blueBright(chain.name)}`
+                    )
+                    spinner.start("Deployment is processing...")
+                } else {
+                    writeErrorLogToFile(chain.name, error)
+                    spinner.fail(
+                        `Deployment for ${chain.name} failed! Check the error log at "./log" directory`
+                    )
+                    spinner.start("Deployment is processing...")
+                }
+            })
+    })
 
-    await Promise.all(deployments)
-
-    clearInterval(interval)
-    updateConsole(chains, deploymentStatus, frames, 0) // Final update
+    await Promise.allSettled(deployments)
+    spinner.stop()
     console.log("🏁 All deployments process successfully finished!")
 }

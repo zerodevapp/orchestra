@@ -23,6 +23,7 @@
     "@kerneljs/presets": "0.0.1-alpha.4",
     "commander": "^11.1.0",
     "dotenv": "^16.3.1",
+    "ora": "^3.2.0",
     "permissionless": "^0.0.20",
     "viem": "^1.21.4",
     "wagmi": "^1.4.13"
@@ -36,6 +37,7 @@
     "@size-limit/preset-small-lib": "^9.0.0",
     "@types/figlet": "^1.5.8",
     "@types/node": "^18.19.4",
+    "@types/ora": "^3.2.0",
     "chalk": "4.1.2",
     "cli-table3": "^0.6.3",
     "figlet": "^1.7.0",

@@ -222,7 +222,7 @@ program
     .description("clear the log files")
     .action(() => {
         clearFiles("./log")
-        console.log("done!")
+        console.log("✅ Log files are cleared!")
     })
 
 program
