@@ -24,7 +24,6 @@ zerodev deploy [options]
 
 ```
 zerodev deploy -f ./bytecode -s 0 -c optimism-sepolia,polygon-mumbai
-
 ```
 
 - if you want to deploy to all testnets or all mainnets, use `-t` `--testnet-all` / `-m` `--mainnet-all` flag instead of `-c` `--chain` flag
