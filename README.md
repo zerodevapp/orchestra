@@ -19,24 +19,24 @@ Orchestra is a CLI for deterministically deploying contracts to multiple chains,
 - You can deploy a contract to multiple chains with the following command
 
 ```
-zerodev deploy [options] <salt>
+zerodev deploy [options]
 ```
 
 - For example, if you want to deploy a contract to the Optimism Sepolia and Polygon Mumbai testnet with `bytecode` file and zero bytes `salt`, you can run the following command
 
 ```
-zerodev deploy 0x0000000000000000000000000000000000000000000000000000000000000000 -f ./bytecode -c optimism-sepolia,polygon-mumbai
+zerodev deploy -f ./bytecode -s 0 -c optimism-sepolia,polygon-mumbai
 
 ```
 
 - if you want to deploy to all testnets or all mainnets, use `-t` `--testnet-all` / `-m` `--mainnet-all` flag instead of `-c` `--chain` flag
 
 ```
-zerodev deploy 0x0000000000000000000000000000000000000000000000000000000000000000 -f ./bytecode -t
+zerodev deploy -f ./bytecode -s 0 -t
 ```
 
 ```
-zerodev deploy 0x0000000000000000000000000000000000000000000000000000000000000000 -f ./bytecode -m
+zerodev deploy -f ./bytecode -s 0 -m
 ```
 
 - After deployment, you can see the deployed contract address and its user operation hash with jiffy scan link.
@@ -47,20 +47,23 @@ All commands should be prefixed with `zerodev`
 
 - `-h`, `--help`: Show help
 - `chains`: Show the list of available chains
-- `compute-address [options] <salt>`: Compute the address to be deployed
+- `compute-address [options]`: Compute the address to be deployed
   - `-f, --file <path-to-bytecode>`: file path of bytecode to deploy
   - `-b, --bytecode <bytecode>`: bytecode to deploy, should have constructor arguments encoded
+  - `-s, --salt <salt>`: salt to use for deployment, this can be a full 32-byte hex string or a shorter numeric representation that will be converted to a 32-byte hex string.
 - `get-deployer-address`: Get the deployer's address
-- `deploy [options] <salt>`: Deploy contracts deterministically using CREATE2, in order of the chains specified
+- `deploy [options]`: Deploy contracts deterministically using CREATE2, in order of the chains specified
   - `-f, --file <path-to-bytecode>`: file path of bytecode to deploy
   - `-b, --bytecode <bytecode>`: bytecode to deploy, should have constructor arguments encoded
+  - `-s, --salt <salt>`: salt to use for deployment, this can be a full 32-byte hex string or a shorter numeric representation that will be converted to a 32-byte hex string.
   - `-t, --testnet-all`: deploy to all testnets
   - `-m, --mainnet-all`: deploy to all mainnets
   - `-c, --chains [CHAINS]`: list of chains to deploy, with `all` selected by default
   - `-e, --expected-address <address>`: expected address to confirm
-- `check-deployment [options] <salt>`: Check if the contract has been deployed on the specified chains
+- `check-deployment [options]`: Check if the contract has been deployed on the specified chains
   - `-f, --file <path-to-bytecode>`: file path of bytecode used for deployment
   - `-b, --bytecode <bytecode>`: bytecode to deploy, should have constructor arguments encoded
+  - `-s, --salt <salt>`: salt to use for deployment, this can be a full 32-byte hex string or a shorter numeric representation that will be converted to a 32-byte hex string.
   - `-c, --chains [CHAINS]`: list of chains to check, with `all` selected by default
   - `-t, --testnet-all`: check all testnets
   - `-m, --mainnet-all`: check all mainnets
