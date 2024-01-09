@@ -14,6 +14,7 @@ import { DEPLOYER_CONTRACT_ADDRESS, getSupportedChains } from "../constant"
 import {
     clearFiles,
     ensureHex,
+    normalizeSalt,
     processAndValidateChains,
     readBytecodeFromFile,
     validateInputs
@@ -70,15 +71,20 @@ program
 program
     .command("compute-address")
     .description("Compute the address to be deployed")
-    .argument("<salt>", "salt to be used for create2")
     .option(
         "-f, --file <path-to-bytecode>",
         "file path of bytecode to deploy, a.k.a. init code"
     )
     .option("-b, --bytecode <bytecode>", "bytecode to deploy")
-    .action(async (salt: string, options) => {
-        const { file, bytecode } = options
-        validateInputs(file, bytecode, salt, undefined)
+    .option(
+        "-s, --salt <salt>",
+        "salt to be used for CREATE2. This can be a full 32-byte hex string or a shorter numeric representation that will be converted to a 32-byte hex string."
+    )
+    .action(async (options) => {
+        const { file, bytecode, salt } = options
+
+        const normalizedSalt = normalizeSalt(salt)
+        validateInputs(file, bytecode, normalizedSalt, undefined)
 
         let bytecodeToDeploy = bytecode
         if (file) {
@@ -88,7 +94,7 @@ program
         const address = computeContractAddress(
             DEPLOYER_CONTRACT_ADDRESS,
             ensureHex(bytecodeToDeploy),
-            ensureHex(salt)
+            ensureHex(normalizedSalt)
         )
         console.log(`computed address: ${address}`)
     })
@@ -106,12 +112,15 @@ program
     .description(
         "Deploy contracts deterministically using CREATE2, in order of the chains specified"
     )
-    .argument("<salt>", "salt to be used for CREATE2")
     .option(
         "-f, --file <path-to-bytecode>",
         "file path of bytecode to deploy, a.k.a. init code"
     )
     .option("-b, --bytecode <bytecode>", "bytecode to deploy")
+    .option(
+        "-s, --salt <salt>",
+        "salt to be used for CREATE2. This can be a full 32-byte hex string or a shorter numeric representation that will be converted to a 32-byte hex string."
+    )
     .option("-t, --testnet-all", "select all testnets", false)
     .option("-m, --mainnet-all", "select all mainnets", false)
     .option(
@@ -120,17 +129,20 @@ program
         "all"
     )
     .option("-e, --expected-address [ADDRESS]", "expected address to confirm")
-    .action((salt: string, options) => {
+    .action((options) => {
         const {
             file,
             bytecode,
+            salt,
             testnetAll,
             mainnetAll,
             chains,
             expectedAddress
         } = options
 
-        validateInputs(file, bytecode, salt, expectedAddress)
+        const normalizedSalt = normalizeSalt(salt)
+
+        validateInputs(file, bytecode, normalizedSalt, expectedAddress)
         const chainObjects = processAndValidateChains(chains, {
             testnetAll,
             mainnetAll
@@ -144,7 +156,7 @@ program
         deployContracts(
             ensureHex(bytecodeToDeploy),
             chainObjects,
-            ensureHex(salt),
+            ensureHex(normalizedSalt),
             expectedAddress
         )
     })
@@ -155,23 +167,28 @@ program
     .description(
         "check whether the contract has already been deployed on the specified networks"
     )
-    .argument("<salt>", "salt used for depolyment")
     .option(
         "-f, --file <path-to-bytecode>",
         "file path of bytecode used for deployment, a.k.a. init code"
     )
     .option("-b, --bytecode <bytecode>", "deployed bytecode")
     .option(
+        "-s, --salt <salt>",
+        "salt to be used for CREATE2. This can be a full 32-byte hex string or a shorter numeric representation that will be converted to a 32-byte hex string."
+    )
+    .option(
         "-c, --chains [CHAINS]",
         "list of chains to check, with all selected by default",
         "all"
     )
+
     .option("-t, --testnet-all", "check all testnets", false)
     .option("-m, --mainnet-all", "check all mainnets", false)
-    .action(async (salt: string, options) => {
-        const { file, bytecode, chains, testnetAll, mainnetAll } = options
+    .action(async (options) => {
+        const { file, bytecode, salt, chains, testnetAll, mainnetAll } = options
 
-        validateInputs(file, bytecode, salt, undefined)
+        const normalizedSalt = normalizeSalt(salt)
+        validateInputs(file, bytecode, normalizedSalt, undefined)
         const chainObjects = processAndValidateChains(chains, {
             testnetAll,
             mainnetAll
@@ -185,7 +202,7 @@ program
         const { address, deployedChains, notDeployedChains } =
             await findDeployment(
                 ensureHex(bytecodeToDeploy),
-                ensureHex(salt),
+                ensureHex(normalizedSalt),
                 chainObjects
             )
 
@@ -211,7 +228,7 @@ program
 program
     .command("generate-salt")
     .description(
-        "generate a random 32 bytes salt, or convert the input to salt"
+        "generate a random 32 bytes salt, or convert the numeric input to salt"
     )
     .option("-i, --input <input>", "input to convert to salt")
     .action((options) => {
