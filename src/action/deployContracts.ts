@@ -119,13 +119,15 @@ export const deployContracts = async (
                     spinner.warn(
                         `Contract already deployed at ${
                             error.address
-                        } on ${chalk.blueBright(chain.name)}`
+                        } on ${chalk.yellowBright(chain.name)}`
                     )
                     spinner.start("Deployment is processing...")
                 } else {
                     writeErrorLogToFile(chain.name, error)
                     spinner.fail(
-                        `Deployment for ${chain.name} failed! Check the error log at "./log" directory`
+                        `Deployment for ${chalk.redBright(
+                            chain.name
+                        )} failed! Check the error log at "./log" directory`
                     )
                     spinner.start("Deployment is processing...")
                 }
