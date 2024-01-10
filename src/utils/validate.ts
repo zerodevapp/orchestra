@@ -1,9 +1,23 @@
+import { Hex } from "viem"
 import { Chain, UnvalidatedChain, getSupportedChains } from "../constant"
 import { readBytecodeFromFile } from "./file"
 
+const PRIVATE_KEY_REGEX = /^0x[0-9a-fA-F]{64}$/
 const BYTECODE_REGEX = /^0x[0-9a-fA-F]*$/
 const SALT_REGEX = /^0x[0-9a-fA-F]{64}$/
 const ADDRESS_REGEX = /^0x[0-9a-fA-F]{40}$/
+
+export const validatePrivateKey = (privateKey: Hex | null): Hex => {
+    if (!privateKey) {
+        console.error("Error: This command requires a private key")
+        process.exit(1)
+    }
+    if (!PRIVATE_KEY_REGEX.test(privateKey)) {
+        console.error("Error: Private key must be a 32 bytes hex string")
+        process.exit(1)
+    }
+    return privateKey
+}
 
 export const validateInputs = (
     filePath: string | undefined,
@@ -12,12 +26,14 @@ export const validateInputs = (
     expectedAddress: string | undefined
 ) => {
     if (!filePath && !bytecode) {
-        console.error("Either filePath or bytecode must be specified")
+        console.error("Error: Either filePath or bytecode must be specified")
         process.exit(1)
     }
 
     if (filePath && bytecode) {
-        console.error("Only one of filePath and bytecode can be specified")
+        console.error(
+            "Error: Only one of filePath and bytecode can be specified"
+        )
         process.exit(1)
     }
 
@@ -26,7 +42,7 @@ export const validateInputs = (
         : bytecode
 
     if (!bytecodeToValidate) {
-        console.error("Bytecode must be specified")
+        console.error("Error: Bytecode must be specified")
         process.exit(1)
     }
 
@@ -34,17 +50,17 @@ export const validateInputs = (
         !BYTECODE_REGEX.test(bytecodeToValidate) ||
         bytecodeToValidate.length % 2 !== 0
     ) {
-        console.error("Bytecode must be a hexadecimal string")
+        console.error("Error: Bytecode must be a hexadecimal string")
         process.exit(1)
     }
 
     if (!SALT_REGEX.test(salt)) {
-        console.error("Salt must be a 32 bytes hex string")
+        console.error("Error: Salt must be a 32 bytes hex string")
         process.exit(1)
     }
 
     if (expectedAddress && !ADDRESS_REGEX.test(expectedAddress)) {
-        console.error("Expected address must be a 20 bytes hex string")
+        console.error("Error: Expected address must be a 20 bytes hex string")
         process.exit(1)
     }
 }
@@ -60,7 +76,7 @@ export const processAndValidateChains = (
 ): Chain[] => {
     const supportedChains = getSupportedChains()
     if (chainOption.length !== 0 && options.mainnetAll && options.testnetAll) {
-        console.error("Cannot use more than one of -c, -t, -m options")
+        console.error("Error: Cannot use more than one of -c, -t, -m options")
         process.exit(1)
     }
 
@@ -83,7 +99,7 @@ export const processAndValidateChains = (
     const chainObjects: UnvalidatedChain[] = chains.map((chainName: string) => {
         const chain = supportedChains.find((c) => c.name === chainName)
         if (!chain) {
-            console.error(`Chain ${chainName} is not supported`)
+            console.error(`Error: Chain ${chainName} is not supported`)
             process.exit(1)
         }
         return chain
@@ -95,7 +111,9 @@ export const processAndValidateChains = (
 const validateChains = (chains: UnvalidatedChain[]): Chain[] => {
     return chains.map((chain) => {
         if (!chain.projectId) {
-            console.error(`PROJECT_ID for chain ${chain.name} is not specified`)
+            console.error(
+                `Error: PROJECT_ID for chain ${chain.name} is not specified`
+            )
             process.exit(1)
         }
         return chain as Chain

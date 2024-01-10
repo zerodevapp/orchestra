@@ -1,5 +1,6 @@
 import {
     Address,
+    Hex,
     concat,
     encodeFunctionData,
     getContractAddress,
@@ -9,10 +10,9 @@ import {
     toHex
 } from "viem"
 import { privateKeyToAccount } from "viem/accounts"
-import { PRIVATE_KEY } from "../config"
 import { ensureHex } from "../utils"
-export const getDeployerAddress = (index: bigint): Address => {
-    const signer = privateKeyToAccount(ensureHex(PRIVATE_KEY))
+export const getDeployerAddress = (privateKey: Hex, index: bigint): Address => {
+    const signer = privateKeyToAccount(privateKey)
     const KernelAccountAbi = [
         {
             inputs: [

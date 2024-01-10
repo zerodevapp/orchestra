@@ -81,6 +81,7 @@ export const deployToChain = async (
 }
 
 export const deployContracts = async (
+    privateKey: Hex,
     bytecode: Hex,
     chains: Chain[],
     salt: Hex,
@@ -88,7 +89,7 @@ export const deployContracts = async (
 ) => {
     const spinner = ora("Deployment is processing...").start()
     const deployments = chains.map(async (chain) => {
-        const kernelAccount = await createKernelAccountClient(chain)
+        const kernelAccount = await createKernelAccountClient(privateKey, chain)
         const publicClient = createPublicClient({
             chain: chain.viemChainObject,
             transport: http(getZeroDevBundlerRPC(chain.projectId))

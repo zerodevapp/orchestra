@@ -4,12 +4,15 @@ import { ensureHex } from "./utils"
 
 dotenv.config()
 
-function getEnvVar(name: string): string {
+function getEnvVar(name: string): string | null {
     const value = process.env[name]
     if (!value) {
-        throw new Error(`Required environment variable ${name} is missing`)
+        return null
     }
     return value
 }
 
-export const PRIVATE_KEY: Hex = ensureHex(getEnvVar("PRIVATE_KEY"))
+const privateKeyEnv = getEnvVar("PRIVATE_KEY")
+export const PRIVATE_KEY: Hex | null = privateKeyEnv
+    ? ensureHex(privateKeyEnv)
+    : null

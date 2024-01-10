@@ -10,6 +10,7 @@ import {
     findDeployment,
     getDeployerAddress
 } from "../action"
+import { PRIVATE_KEY } from "../config"
 import { DEPLOYER_CONTRACT_ADDRESS, getSupportedChains } from "../constant"
 import {
     clearFiles,
@@ -17,8 +18,10 @@ import {
     normalizeSalt,
     processAndValidateChains,
     readBytecodeFromFile,
-    validateInputs
+    validateInputs,
+    validatePrivateKey
 } from "../utils"
+
 
 export const program = new Command()
 
@@ -103,7 +106,7 @@ program
     .command("get-deployer-address")
     .description("Get the deployer's address")
     .action(async () => {
-        const address = getDeployerAddress(0n)
+        const address = getDeployerAddress(validatePrivateKey(PRIVATE_KEY), 0n)
         console.log(`deployer address: ${address}`)
     })
 
@@ -154,6 +157,7 @@ program
         }
 
         deployContracts(
+            validatePrivateKey(PRIVATE_KEY),
             ensureHex(bytecodeToDeploy),
             chainObjects,
             ensureHex(normalizedSalt),
@@ -161,7 +165,6 @@ program
         )
     })
 
-/** @notice 400 error on base-sepolia */
 program
     .command("check-deployment")
     .description(

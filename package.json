@@ -21,16 +21,16 @@
   },
   "contributors": [
     {
-      "name": "adnpark",
-      "email": "aidenp.dev@gmail.com"
-    },
-    {
       "name": "leekt",
       "email": "leekt216@gmail.com"
     },
     {
       "name": "derekchiang",
       "email": "me@derekchiang.com"
+    },
+    {
+      "name": "adnpark",
+      "email": "aidenp.dev@gmail.com"
     }
   ],
   "license": "MIT",
