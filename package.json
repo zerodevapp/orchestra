@@ -1,15 +1,15 @@
 {
   "name": "@zerodev/orchestra",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "",
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/src/index.js",
+    "start": "node dist/index.js",
     "dev": "ts-node src/index.ts",
-    "format": "biome format . --write",
-    "lint": "biome check .",
+    "format": "biome format ./src --write",
+    "lint": "biome check ./src",
     "lint:fix": "bun run lint --apply"
   },
   "bin": {
@@ -46,7 +46,8 @@
     "figlet": "^1.7.0",
     "ora": "^8.0.0",
     "permissionless": "^0.0.20",
-    "viem": "^1.21.4"
+    "viem": "^1.21.4",
+    "tslib": "^2.6.2"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.4.1",
