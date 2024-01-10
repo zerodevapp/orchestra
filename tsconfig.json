@@ -3,7 +3,7 @@
     "rootDir": "./src",
     "outDir": "./dist",
     "lib": ["es2021"],
-    "module": "commonjs",
+    "module": "ESNext",
     "target": "es2020",
     "strict": true,
     "esModuleInterop": true,

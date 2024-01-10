@@ -1,6 +1,6 @@
 import dotenv from "dotenv"
 import { Hex } from "viem"
-import { ensureHex } from "./utils"
+import { ensureHex } from "./utils/index.js"
 
 dotenv.config()
 

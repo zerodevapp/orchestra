@@ -1,6 +1,6 @@
 import { Hex } from "viem"
-import { Chain, UnvalidatedChain, getSupportedChains } from "../constant"
-import { readBytecodeFromFile } from "./file"
+import { Chain, UnvalidatedChain, getSupportedChains } from "../constant.js"
+import { readBytecodeFromFile } from "./file.js"
 
 const PRIVATE_KEY_REGEX = /^0x[0-9a-fA-F]{64}$/
 const BYTECODE_REGEX = /^0x[0-9a-fA-F]*$/

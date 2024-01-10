@@ -10,7 +10,7 @@ import {
     toHex
 } from "viem"
 import { privateKeyToAccount } from "viem/accounts"
-import { ensureHex } from "../utils"
+import { ensureHex } from "../utils/index.js"
 export const getDeployerAddress = (privateKey: Hex, index: bigint): Address => {
     const signer = privateKeyToAccount(privateKey)
     const KernelAccountAbi = [

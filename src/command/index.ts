@@ -9,9 +9,9 @@ import {
     deployContracts,
     findDeployment,
     getDeployerAddress
-} from "../action"
-import { PRIVATE_KEY } from "../config"
-import { DEPLOYER_CONTRACT_ADDRESS, getSupportedChains } from "../constant"
+} from "../action/index.js"
+import { PRIVATE_KEY } from "../config.js"
+import { DEPLOYER_CONTRACT_ADDRESS, getSupportedChains } from "../constant.js"
 import {
     clearFiles,
     ensureHex,
@@ -20,7 +20,7 @@ import {
     readBytecodeFromFile,
     validateInputs,
     validatePrivateKey
-} from "../utils"
+} from "../utils/index.js"
 
 export const program = new Command()
 
@@ -234,7 +234,7 @@ program
     )
     .option("-i, --input <input>", "input to convert to salt")
     .action((options) => {
-        let salt
+        let salt: string
         if (options.input) {
             const inputNum = BigInt(options.input)
             salt = inputNum.toString(16).padStart(64, "0") // pad the input with zeros to make it 32 bytes

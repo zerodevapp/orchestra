@@ -9,11 +9,14 @@ import {
     createPublicClient,
     getAddress
 } from "viem"
-import { createKernelAccountClient, getZeroDevBundlerRPC } from "../clients"
-import { Chain, DEPLOYER_CONTRACT_ADDRESS } from "../constant"
-import { ensureHex, writeErrorLogToFile } from "../utils"
-import { computeContractAddress } from "./computeAddress"
-import { DeploymentStatus, checkDeploymentOnChain } from "./findDeployment"
+import {
+    createKernelAccountClient,
+    getZeroDevBundlerRPC
+} from "../clients/index.js"
+import { Chain, DEPLOYER_CONTRACT_ADDRESS } from "../constant.js"
+import { ensureHex, writeErrorLogToFile } from "../utils/index.js"
+import { computeContractAddress } from "./computeAddress.js"
+import { DeploymentStatus, checkDeploymentOnChain } from "./findDeployment.js"
 
 class AlreadyDeployedError extends Error {
     address: Address

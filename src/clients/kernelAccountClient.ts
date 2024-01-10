@@ -2,7 +2,7 @@ import { createEcdsaKernelAccountClient } from "@kerneljs/presets/zerodev"
 import { SmartAccountClient } from "permissionless"
 import { Hex } from "viem"
 import { privateKeyToAccount } from "viem/accounts"
-import { Chain } from "../constant"
+import { Chain } from "../constant.js"
 
 ///@notice this only use ecdsa signer
 export const createKernelAccountClient = async (
