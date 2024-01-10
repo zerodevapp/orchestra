@@ -17,9 +17,7 @@ export const validateInputs = (
     }
 
     if (filePath && bytecode) {
-        console.error(
-            "Only one of filePath and bytecode can be specified"
-        )
+        console.error("Only one of filePath and bytecode can be specified")
         process.exit(1)
     }
 
@@ -97,9 +95,7 @@ export const processAndValidateChains = (
 const validateChains = (chains: UnvalidatedChain[]): Chain[] => {
     return chains.map((chain) => {
         if (!chain.projectId) {
-            console.error(
-                `PROJECT_ID for chain ${chain.name} is not specified`
-            )
+            console.error(`PROJECT_ID for chain ${chain.name} is not specified`)
             process.exit(1)
         }
         return chain as Chain
