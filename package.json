@@ -5,10 +5,10 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/src/index.js",
+    "start": "node dist/index.js",
     "dev": "ts-node src/index.ts",
-    "format": "biome format . --write",
-    "lint": "biome check .",
+    "format": "biome format ./src --write",
+    "lint": "biome check ./src",
     "lint:fix": "bun run lint --apply"
   },
   "bin": {
