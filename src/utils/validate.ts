@@ -12,11 +12,15 @@ export const validateInputs = (
     expectedAddress: string | undefined
 ) => {
     if (!filePath && !bytecode) {
-        throw new Error("Either filePath or bytecode must be specified")
+        console.error("Either filePath or bytecode must be specified")
+        process.exit(1)
     }
 
     if (filePath && bytecode) {
-        throw new Error("Only one of filePath and bytecode can be specified")
+        console.error(
+            "Only one of filePath and bytecode can be specified"
+        )
+        process.exit(1)
     }
 
     const bytecodeToValidate = filePath
@@ -24,22 +28,26 @@ export const validateInputs = (
         : bytecode
 
     if (!bytecodeToValidate) {
-        throw new Error("Bytecode must be specified")
+        console.error("Bytecode must be specified")
+        process.exit(1)
     }
 
     if (
         !BYTECODE_REGEX.test(bytecodeToValidate) ||
         bytecodeToValidate.length % 2 !== 0
     ) {
-        throw new Error("Bytecode must be a hexadecimal string")
+        console.error("Bytecode must be a hexadecimal string")
+        process.exit(1)
     }
 
     if (!SALT_REGEX.test(salt)) {
-        throw new Error("Salt must be a 32 bytes hex string")
+        console.error("Salt must be a 32 bytes hex string")
+        process.exit(1)
     }
 
     if (expectedAddress && !ADDRESS_REGEX.test(expectedAddress)) {
-        throw new Error("Expected address must be a 20 bytes hex string")
+        console.error("Expected address must be a 20 bytes hex string")
+        process.exit(1)
     }
 }
 
@@ -53,8 +61,10 @@ export const processAndValidateChains = (
     options: CommandOptions
 ): Chain[] => {
     const supportedChains = getSupportedChains()
-    if (chainOption.length !== 0 && options.mainnetAll && options.testnetAll)
-        throw new Error("Cannot use more than one of -c, -t, -m options")
+    if (chainOption.length !== 0 && options.mainnetAll && options.testnetAll) {
+        console.error("Cannot use more than one of -c, -t, -m options")
+        process.exit(1)
+    }
 
     let chains: string[]
     if (options.testnetAll) {
@@ -74,7 +84,10 @@ export const processAndValidateChains = (
 
     const chainObjects: UnvalidatedChain[] = chains.map((chainName: string) => {
         const chain = supportedChains.find((c) => c.name === chainName)
-        if (!chain) throw new Error(`Chain ${chainName} is not supported`)
+        if (!chain) {
+            console.error(`Chain ${chainName} is not supported`)
+            process.exit(1)
+        }
         return chain
     })
 
@@ -84,9 +97,10 @@ export const processAndValidateChains = (
 const validateChains = (chains: UnvalidatedChain[]): Chain[] => {
     return chains.map((chain) => {
         if (!chain.projectId) {
-            throw new Error(
+            console.error(
                 `PROJECT_ID for chain ${chain.name} is not specified`
             )
+            process.exit(1)
         }
         return chain as Chain
     })
