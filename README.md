@@ -72,3 +72,7 @@ All commands should be prefixed with `zerodev`
 ## Supported Networks
 
 Orchestra supports all network supported by ZeroDev. Check details [here](https://docs.zerodev.app/supported-networks)
+
+## Help Wanted
+
+- Orchestra can in principle run on any AA infra, but since ERC-4337 paymasters tend to be incompatible across vendors, currently Orchestra only support ZeroDev paymasters.  We welcome PRs to add support for other AA infra providers.  To do so, you would first add support for other infra providers to [Kernel.js](https://github.com/zerodevapp/kernel.js), which Orchestra is built on top of.  Feel free to [reach out to us](https://discord.gg/KS9MRaTSjx) if you need help with this task.
