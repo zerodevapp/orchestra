@@ -234,7 +234,7 @@ program
     )
     .option("-i, --input <input>", "input to convert to salt")
     .action((options) => {
-        let salt
+        let salt: string
         if (options.input) {
             const inputNum = BigInt(options.input)
             salt = inputNum.toString(16).padStart(64, "0") // pad the input with zeros to make it 32 bytes
