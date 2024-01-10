@@ -22,7 +22,6 @@ import {
     validatePrivateKey
 } from "../utils"
 
-
 export const program = new Command()
 
 program

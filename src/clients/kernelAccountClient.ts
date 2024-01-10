@@ -4,7 +4,6 @@ import { Hex } from "viem"
 import { privateKeyToAccount } from "viem/accounts"
 import { Chain } from "../constant"
 
-
 ///@notice this only use ecdsa signer
 export const createKernelAccountClient = async (
     privateKey: Hex,
