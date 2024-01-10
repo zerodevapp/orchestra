@@ -14,9 +14,26 @@
   "bin": {
     "zerodev": "./dist/index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["contract", "account-abstraction", "cli"],
+  "author": {
+    "name": "ZeroDev",
+    "url": "https://docs.zerodev.app/"
+  },
+  "contributors": [
+    {
+      "name": "adnpark",
+      "email": "aidenp.dev@gmail.com"
+    },
+    {
+      "name": "leekt",
+      "email": "leekt216@gmail.com"
+    },
+    {
+      "name": "derekchiang",
+      "email": "me@derekchiang.com"
+    }
+  ],
+  "license": "MIT",
   "dependencies": {
     "@kerneljs/core": "0.0.1-alpha.6",
     "@kerneljs/ecdsa-validator": "0.0.1-alpha.12",
