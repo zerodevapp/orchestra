@@ -56,6 +56,14 @@ export const deployToChain = async (
             ) {
                 throw new AlreadyDeployedError(address)
             }
+            if (
+                expectedAddress &&
+                expectedAddress.toLowerCase() !== address.toLowerCase()
+            ) {
+                throw new Error(
+                    `Contract will be deployed at ${address.toLowerCase()} does not match expected address ${expectedAddress.toLowerCase()}`
+                )
+            }
             throw new Error(
                 `Error calling contract ${DEPLOYER_CONTRACT_ADDRESS} : ${error}`
             )
