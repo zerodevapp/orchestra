@@ -24,6 +24,11 @@ import {
 
 export const program = new Command()
 
+const fileOption = [
+    "-f, --file <path-to-bytecode>",
+    "file path of bytecode to deploy, a.k.a. init code, or a JSON file containing the bytecode of the contract (such as the output file by Forge), in which case it's assumed that the constructor takes no arguments."
+] as [string, string]
+
 program
     .name("zerodev")
     .description(
@@ -73,10 +78,7 @@ program
 program
     .command("compute-address")
     .description("Compute the address to be deployed")
-    .option(
-        "-f, --file <path-to-bytecode>",
-        "file path of bytecode to deploy, a.k.a. init code"
-    )
+    .option(...fileOption)
     .option("-b, --bytecode <bytecode>", "bytecode to deploy")
     .option(
         "-s, --salt <salt>",
@@ -114,10 +116,7 @@ program
     .description(
         "Deploy contracts deterministically using CREATE2, in order of the chains specified"
     )
-    .option(
-        "-f, --file <path-to-bytecode>",
-        "file path of bytecode to deploy, a.k.a. init code"
-    )
+    .option(...fileOption)
     .option("-b, --bytecode <bytecode>", "bytecode to deploy")
     .option(
         "-s, --salt <salt>",
@@ -169,10 +168,7 @@ program
     .description(
         "check whether the contract has already been deployed on the specified networks"
     )
-    .option(
-        "-f, --file <path-to-bytecode>",
-        "file path of bytecode used for deployment, a.k.a. init code"
-    )
+    .option(...fileOption)
     .option("-b, --bytecode <bytecode>", "deployed bytecode")
     .option(
         "-s, --salt <salt>",
