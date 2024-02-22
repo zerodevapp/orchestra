@@ -95,7 +95,7 @@ export const getSupportedChains = (): UnvalidatedChain[] => [
     },
     {
         name: "sepolia",
-        projectId: process.env.SEPOILA_PROJECT_ID || null,
+        projectId: process.env.SEPOLIA_PROJECT_ID || null,
         viemChainObject: sepolia,
         type: Network.testnet
     },
