@@ -8,7 +8,7 @@ Orchestra is a CLI for deterministically deploying contracts to multiple chains,
 2. Create a `.env` file based on `.env.example`
    - You can acquire the project IDs from [the ZeroDev dashboard](https://dashboard.zerodev.app/)
 3. Test the installation by running `zerodev -h`
- 
+
 ## Usage
 
 ### Deploying a Contract
@@ -57,6 +57,7 @@ All commands should be prefixed with `zerodev`
   - `-m, --mainnet-all`: deploy to all mainnets
   - `-c, --chains [CHAINS]`: list of chains to deploy, with `all` selected by default
   - `-e, --expected-address <address>`: expected address to confirm
+  - `-v, --verify <CONTRACT_NAME>`: contract name to be verified
 - `check-deployment [options]`: Check if the contract has been deployed on the specified chains
   - `-f, --file <path-to-bytecode>`: file path of bytecode used for deployment
   - `-b, --bytecode <bytecode>`: bytecode to deploy, should have constructor arguments encoded
@@ -75,4 +76,4 @@ Orchestra supports all network supported by ZeroDev. Check details [here](https:
 
 ## Help Wanted
 
-- Orchestra can in principle run on any AA infra, but since ERC-4337 paymasters tend to be incompatible across vendors, currently Orchestra only support ZeroDev paymasters.  We welcome PRs to add support for other AA infra providers.  To do so, you would first add support for other infra providers to [Kernel.js](https://github.com/zerodevapp/kernel.js), which Orchestra is built on top of.  Feel free to [reach out to us](https://discord.gg/KS9MRaTSjx) if you need help with this task.
+- Orchestra can in principle run on any AA infra, but since ERC-4337 paymasters tend to be incompatible across vendors, currently Orchestra only support ZeroDev paymasters. We welcome PRs to add support for other AA infra providers. To do so, you would first add support for other infra providers to [Kernel.js](https://github.com/zerodevapp/kernel.js), which Orchestra is built on top of. Feel free to [reach out to us](https://discord.gg/KS9MRaTSjx) if you need help with this task.
