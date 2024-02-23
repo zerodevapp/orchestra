@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { exec } from "child_process"
 import crypto from "crypto"
 import chalk from "chalk"
 import Table from "cli-table3"
@@ -8,7 +9,8 @@ import {
     computeContractAddress,
     deployContracts,
     findDeployment,
-    getDeployerAddress
+    getDeployerAddress,
+    verifyContracts
 } from "../action/index.js"
 import { PRIVATE_KEY } from "../config.js"
 import { DEPLOYER_CONTRACT_ADDRESS, getSupportedChains } from "../constant.js"
@@ -130,7 +132,11 @@ program
         "all"
     )
     .option("-e, --expected-address [ADDRESS]", "expected address to confirm")
-    .action((options) => {
+    .option(
+        "-v, --verify-contract [CONTRACT_NAME]",
+        "verify the deployment on Etherscan"
+    )
+    .action(async (options) => {
         const {
             file,
             bytecode,
@@ -138,7 +144,8 @@ program
             testnetAll,
             mainnetAll,
             chains,
-            expectedAddress
+            expectedAddress,
+            verifyContract
         } = options
 
         const normalizedSalt = normalizeSalt(salt)
@@ -154,13 +161,25 @@ program
             bytecodeToDeploy = readBytecodeFromFile(file)
         }
 
-        deployContracts(
+        await deployContracts(
             validatePrivateKey(PRIVATE_KEY),
             ensureHex(bytecodeToDeploy),
             chainObjects,
             ensureHex(normalizedSalt),
             expectedAddress
         )
+
+        if (verifyContract) {
+            await verifyContracts(
+                verifyContract,
+                computeContractAddress(
+                    DEPLOYER_CONTRACT_ADDRESS,
+                    ensureHex(bytecodeToDeploy),
+                    ensureHex(normalizedSalt)
+                ),
+                chainObjects
+            )
+        }
     })
 
 program

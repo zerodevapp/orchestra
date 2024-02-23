@@ -4,3 +4,9 @@ dist
 bytecode
 session-key.txt
 log
+
+# for testing contract verification
+foundry.toml
+out/
+cache/
+src/HelloWorld.sol

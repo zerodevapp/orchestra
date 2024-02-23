@@ -98,7 +98,9 @@ export const deployContracts = async (
     salt: Hex,
     expectedAddress: string | undefined
 ) => {
-    const spinner = ora("Deployment is processing...").start()
+    const spinner = ora(
+        `Deploying contract on ${chains.map((chain) => chain.name).join(", ")}`
+    ).start()
     const deployments = chains.map(async (chain) => {
         const kernelAccount = await createKernelAccountClient(privateKey, chain)
         const publicClient = createPublicClient({
@@ -148,5 +150,5 @@ export const deployContracts = async (
 
     await Promise.allSettled(deployments)
     spinner.stop()
-    console.log("🏁 All deployments process successfully finished!")
+    console.log("✅ All deployments process successfully finished!")
 }
