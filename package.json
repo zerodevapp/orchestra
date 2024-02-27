@@ -18,7 +18,11 @@
   "bin": {
     "zerodev": "./dist/index.js"
   },
-  "keywords": ["contract", "account-abstraction", "cli"],
+  "keywords": [
+    "contract",
+    "account-abstraction",
+    "cli"
+  ],
   "author": {
     "name": "ZeroDev",
     "url": "https://docs.zerodev.app/"
@@ -49,8 +53,8 @@
     "figlet": "^1.7.0",
     "ora": "^8.0.0",
     "permissionless": "^0.0.20",
-    "viem": "^1.21.4",
-    "tslib": "^2.6.2"
+    "tslib": "^2.6.2",
+    "viem": "^1.21.4"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.4.1",
