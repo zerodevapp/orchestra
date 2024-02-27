@@ -74,21 +74,28 @@ export const verifyContracts = async (
     await checkForgeAvailability()
 
     const spinner = ora().start("Verifying contracts...")
+
     const verificationPromises = chains.map((chain) =>
         verifyContract(contractName, contractAddress, chain)
+            .then((message) => {
+                if (message.includes("is already verified")) {
+                    ora().warn(message).start().stop()
+                } else {
+                    ora().succeed(message).start().stop()
+                }
+            })
+            .catch((error) => {
+                ora()
+                    .fail(
+                        `Verification failed on ${chain.name}: ${error.message}`
+                    )
+                    .start()
+                    .stop()
+            })
     )
 
-    const results = await Promise.allSettled(verificationPromises)
-    results.forEach((result, index) => {
-        spinner.text = `Verifying contract ${contractName} on ${chains[index].name}`
-        if (result.status === "fulfilled") {
-            result.value.includes("is already verified")
-                ? spinner.warn(result.value)
-                : spinner.succeed(result.value)
-        } else {
-            spinner.fail(`Verification failed! ${result.reason}`)
-        }
-    })
+    // Wait for all verifications to complete
+    await Promise.all(verificationPromises)
 
     spinner.stop()
     console.log("✅ All verifications process successfully finished!")
