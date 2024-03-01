@@ -76,26 +76,26 @@ export const processAndValidateChains = (
     options: CommandOptions
 ): Chain[] => {
     const supportedChains = getSupportedChains()
-    if (
-        chainOption !== undefined &&
-        (options.testnetAll || options.mainnetAll || options.allNetworks)
-    ) {
-        console.error("Error: Cannot use -c option with -t, -m, -a options")
-        process.exit(1)
-    }
+    // Check for mutually exclusive options
+    const exclusiveOptions = [
+        chainOption !== undefined,
+        options.testnetAll,
+        options.mainnetAll,
+        options.allNetworks
+    ]
+    const selectedOptionsCount = exclusiveOptions.filter(
+        (isSelected) => isSelected
+    ).length
 
-    if (options.testnetAll && options.mainnetAll) {
-        console.error("Error: Cannot use -t and -m options together")
+    if (selectedOptionsCount === 0) {
+        console.error(
+            "Error: At least one of -c, -t, -m, -a options must be specified"
+        )
         process.exit(1)
-    }
-
-    if (options.testnetAll && options.allNetworks) {
-        console.error("Error: Cannot use -t and -a options together")
-        process.exit(1)
-    }
-
-    if (options.mainnetAll && options.allNetworks) {
-        console.error("Error: Cannot use -m and -a options together")
+    } else if (selectedOptionsCount > 1) {
+        console.error(
+            "Error: Options -c, -t, -m, -a are mutually exclusive and cannot be used together"
+        )
         process.exit(1)
     }
 

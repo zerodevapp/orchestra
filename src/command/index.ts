@@ -124,7 +124,7 @@ program
         "-s, --salt <salt>",
         "salt to be used for CREATE2. This can be a full 32-byte hex string or a shorter numeric representation that will be converted to a 32-byte hex string."
     )
-    .option("-t, --testnet-all", "select all testnets", true)
+    .option("-t, --testnet-all", "select all testnets", false)
     .option("-m, --mainnet-all", "select all mainnets", false)
     .option("-a, --all-networks", "select all networks", false)
     .option(
