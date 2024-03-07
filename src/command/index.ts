@@ -127,10 +127,7 @@ program
     .option("-t, --testnet-all", "select all testnets", false)
     .option("-m, --mainnet-all", "select all mainnets", false)
     .option("-a, --all-networks", "select all networks", false)
-    .option(
-        "-c, --chains [CHAINS]",
-        "list of chains for deploying contracts, defaults to all testnets"
-    )
+    .option("-c, --chains [CHAINS]", "list of chains for deploying contracts")
     .option("-e, --expected-address [ADDRESS]", "expected address to confirm")
     .option(
         "-v, --verify-contract [CONTRACT_NAME]",
@@ -195,22 +192,27 @@ program
         "-s, --salt <salt>",
         "salt to be used for CREATE2. This can be a full 32-byte hex string or a shorter numeric representation that will be converted to a 32-byte hex string."
     )
-    .option(
-        "-c, --chains [CHAINS]",
-        "list of chains to check, with all selected by default",
-        "all"
-    )
-
-    .option("-t, --testnet-all", "check all testnets", false)
-    .option("-m, --mainnet-all", "check all mainnets", false)
+    .option("-t, --testnet-all", "select all testnets", false)
+    .option("-m, --mainnet-all", "select all mainnets", false)
+    .option("-a, --all-networks", "select all networks", false)
+    .option("-c, --chains [CHAINS]", "list of chains for checking")
     .action(async (options) => {
-        const { file, bytecode, salt, chains, testnetAll, mainnetAll } = options
+        const {
+            file,
+            bytecode,
+            salt,
+            testnetAll,
+            mainnetAll,
+            allNetworks,
+            chains
+        } = options
 
         const normalizedSalt = normalizeSalt(salt)
         validateInputs(file, bytecode, normalizedSalt, undefined)
         const chainObjects = processAndValidateChains(chains, {
             testnetAll,
-            mainnetAll
+            mainnetAll,
+            allNetworks
         })
 
         let bytecodeToDeploy = bytecode
