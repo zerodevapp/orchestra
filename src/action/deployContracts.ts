@@ -125,7 +125,6 @@ export const deployContracts = async (
                         result[1]
                     }`
                 )
-                spinner.start("Deployment is processing...")
                 return result
             })
             .catch((error) => {
@@ -135,7 +134,6 @@ export const deployContracts = async (
                             error.address
                         } on ${chalk.yellowBright(chain.name)}`
                     )
-                    spinner.start("Deployment is processing...")
                 } else {
                     writeErrorLogToFile(chain.name, error)
                     spinner.fail(
@@ -143,7 +141,6 @@ export const deployContracts = async (
                             chain.name
                         )} failed! Check the error log at "./log" directory`
                     )
-                    spinner.start("Deployment is processing...")
                 }
             })
     })

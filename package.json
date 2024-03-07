@@ -51,7 +51,7 @@
         "commander": "^11.1.0",
         "dotenv": "^16.3.1",
         "figlet": "^1.7.0",
-        "ora": "^8.0.0",
+        "ora": "^8.0.1",
         "permissionless": "^0.0.20",
         "tslib": "^2.6.2",
         "viem": "^1.21.4"
