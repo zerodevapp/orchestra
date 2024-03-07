@@ -1,6 +1,6 @@
 import chalk from "chalk"
 import ora from "ora"
-import { SmartAccountClient } from "permissionless"
+import { SmartAccountClient, bundlerActions } from "permissionless"
 import {
     http,
     Address,
@@ -87,6 +87,11 @@ export const deployToChain = async (
                 data: ensureHex(salt + bytecode.slice(2))
             })
         }
+    })
+
+    const bundlerClient = kernelAccountClient.extend(bundlerActions)
+    await bundlerClient.waitForUserOperationReceipt({
+        hash: opHash
     })
     return [getAddress(result.data as Address), opHash]
 }
