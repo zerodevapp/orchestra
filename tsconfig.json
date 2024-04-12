@@ -15,7 +15,8 @@
     "emitDecoratorMetadata": true,
     "strictPropertyInitialization": false,
     "declaration": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "noImplicitOverride": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

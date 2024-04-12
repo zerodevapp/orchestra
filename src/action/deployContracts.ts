@@ -1,17 +1,17 @@
+import { signerToEcdsaValidator } from "@zerodev/ecdsa-validator"
+import {
+    createKernelAccount,
+    createKernelAccountClient,
+    createZeroDevPaymasterClient
+} from "@zerodev/sdk"
 import chalk from "chalk"
 import ora from "ora"
-import { SmartAccountClient, bundlerActions } from "permissionless"
+import { createBundlerClient } from "permissionless"
+import { http, Address, Hex, createPublicClient, getAddress } from "viem"
+import { privateKeyToAccount } from "viem/accounts"
 import {
-    http,
-    Address,
-    Hex,
-    PublicClient,
-    createPublicClient,
-    getAddress
-} from "viem"
-import {
-    createKernelAccountClient,
-    getZeroDevBundlerRPC
+    getZeroDevBundlerRPC,
+    getZeroDevPaymasterRPC
 } from "../clients/index.js"
 import { Chain, DEPLOYER_CONTRACT_ADDRESS } from "../constant.js"
 import { ensureHex, writeErrorLogToFile } from "../utils/index.js"
@@ -28,16 +28,38 @@ class AlreadyDeployedError extends Error {
 }
 
 export const deployToChain = async (
-    kernelAccountClient: SmartAccountClient,
-    publicClient: PublicClient,
+    privateKey: Hex,
+    chain: Chain,
     bytecode: Hex,
     salt: Hex,
     expectedAddress: string | undefined
 ): Promise<[string, string]> => {
-    if (!kernelAccountClient.account) {
-        throw new Error("Kernel account is not initialized")
-    }
-
+    const publicClient = createPublicClient({
+        transport: http(getZeroDevBundlerRPC(chain.projectId))
+    })
+    const signer = privateKeyToAccount(privateKey)
+    const ecdsaValidator = await signerToEcdsaValidator(publicClient, {
+        signer
+    })
+    const account = await createKernelAccount(publicClient, {
+        plugins: {
+            sudo: ecdsaValidator
+        }
+    })
+    const kernelAccountClient = createKernelAccountClient({
+        account,
+        chain: chain.viemChainObject,
+        transport: http(getZeroDevBundlerRPC(chain.projectId)),
+        sponsorUserOperation: async ({ userOperation }) => {
+            const zerodevPaymaster = createZeroDevPaymasterClient({
+                chain: chain.viemChainObject,
+                transport: http(getZeroDevPaymasterRPC(chain.projectId))
+            })
+            return zerodevPaymaster.sponsorUserOperation({
+                userOperation
+            })
+        }
+    })
     const result = await publicClient
         .call({
             account: kernelAccountClient.account.address,
@@ -89,7 +111,12 @@ export const deployToChain = async (
         }
     })
 
-    const bundlerClient = kernelAccountClient.extend(bundlerActions)
+    const bundlerClient = createBundlerClient({
+        chain: kernelAccountClient.chain,
+        entryPoint: "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789", // using 0.6
+        transport: http(getZeroDevBundlerRPC(chain.projectId))
+    })
+
     await bundlerClient.waitForUserOperationReceipt({
         hash: opHash
     })
@@ -107,19 +134,7 @@ export const deployContracts = async (
         `Deploying contract on ${chains.map((chain) => chain.name).join(", ")}`
     ).start()
     const deployments = chains.map(async (chain) => {
-        const kernelAccount = await createKernelAccountClient(privateKey, chain)
-        const publicClient = createPublicClient({
-            chain: chain.viemChainObject,
-            transport: http(getZeroDevBundlerRPC(chain.projectId))
-        })
-
-        return deployToChain(
-            kernelAccount,
-            publicClient,
-            bytecode,
-            salt,
-            expectedAddress
-        )
+        return deployToChain(privateKey, chain, bytecode, salt, expectedAddress)
             .then((result) => {
                 spinner.succeed(
                     `Contract deployed at "${result[0]}" on ${chalk.blueBright(

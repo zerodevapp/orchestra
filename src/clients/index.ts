@@ -18,4 +18,3 @@ export const getZeroDevPaymasterRPC = (
     }
     return rpc
 }
-export * from "./kernelAccountClient.js"

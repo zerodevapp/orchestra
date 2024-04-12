@@ -1,76 +1,76 @@
 {
-    "name": "@zerodev/orchestra",
-    "version": "0.0.16",
-    "description": "",
-    "main": "dist/index.js",
-    "type": "module",
-    "scripts": {
-        "build": "tsc",
-        "changeset": "changeset",
-        "changeset:release": "bun run build && changeset publish",
-        "changeset:version": "changeset version && bun install --lockfile-only",
-        "dev": "ts-node src/index.ts",
-        "format": "biome format ./src --write",
-        "lint": "biome check ./src",
-        "lint:fix": "bun run lint --apply",
-        "start": "node dist/index.js"
+  "name": "@zerodev/orchestra",
+  "version": "0.0.16",
+  "description": "",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "changeset": "changeset",
+    "changeset:release": "bun run build && changeset publish",
+    "changeset:version": "changeset version && bun install --lockfile-only",
+    "dev": "ts-node src/index.ts",
+    "format": "biome format ./src --write",
+    "lint": "biome check ./src",
+    "lint:fix": "bun run lint --apply",
+    "start": "node dist/index.js"
+  },
+  "bin": {
+    "zerodev": "./dist/index.js"
+  },
+  "keywords": [
+    "contract",
+    "account-abstraction",
+    "cli"
+  ],
+  "author": {
+    "name": "ZeroDev",
+    "url": "https://docs.zerodev.app/"
+  },
+  "contributors": [
+    {
+      "name": "leekt",
+      "email": "leekt216@gmail.com"
     },
-    "bin": {
-        "zerodev": "./dist/index.js"
+    {
+      "name": "derekchiang",
+      "email": "me@derekchiang.com"
     },
-    "keywords": [
-        "contract",
-        "account-abstraction",
-        "cli"
-    ],
-    "author": {
-        "name": "ZeroDev",
-        "url": "https://docs.zerodev.app/"
-    },
-    "contributors": [
-        {
-            "name": "leekt",
-            "email": "leekt216@gmail.com"
-        },
-        {
-            "name": "derekchiang",
-            "email": "me@derekchiang.com"
-        },
-        {
-            "name": "adnpark",
-            "email": "aidenp.dev@gmail.com"
-        }
-    ],
-    "license": "MIT",
-    "dependencies": {
-        "@kerneljs/core": "0.0.1-alpha.11",
-        "@kerneljs/ecdsa-validator": "0.0.1-alpha.13",
-        "@kerneljs/presets": "0.0.1-alpha.7",
-        "chalk": "4.1.2",
-        "cli-table3": "^0.6.3",
-        "commander": "^11.1.0",
-        "dotenv": "^16.3.1",
-        "figlet": "^1.7.0",
-        "ora": "^8.0.1",
-        "permissionless": "^0.0.20",
-        "tslib": "^2.6.2",
-        "viem": "^1.21.4"
-    },
-    "devDependencies": {
-        "@biomejs/biome": "^1.4.1",
-        "@changesets/changelog-git": "^0.1.14",
-        "@changesets/changelog-github": "^0.4.8",
-        "@changesets/cli": "^2.27.1",
-        "@size-limit/esbuild-why": "^9.0.0",
-        "@size-limit/preset-small-lib": "^9.0.0",
-        "@types/figlet": "^1.5.8",
-        "@types/node": "^18.19.4",
-        "@types/ora": "^3.2.0",
-        "simple-git-hooks": "^2.9.0",
-        "ts-node": "^10.9.2",
-        "typescript": "^5.3.3"
-    },
-    "simple-git-hooks": {
-        "pre-commit": "bun run format && bun run lint"
+    {
+      "name": "adnpark",
+      "email": "aidenp.dev@gmail.com"
     }
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@zerodev/ecdsa-validator": "^5.1.2",
+    "@zerodev/presets": "^5.1.4",
+    "@zerodev/sdk": "5.1.8",
+    "chalk": "4.1.2",
+    "cli-table3": "^0.6.3",
+    "commander": "^11.1.0",
+    "dotenv": "^16.3.1",
+    "figlet": "^1.7.0",
+    "ora": "^8.0.1",
+    "permissionless": "^0.1.16",
+    "tslib": "^2.6.2",
+    "viem": "^2.9.16"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.4.1",
+    "@changesets/changelog-git": "^0.1.14",
+    "@changesets/changelog-github": "^0.4.8",
+    "@changesets/cli": "^2.27.1",
+    "@size-limit/esbuild-why": "^9.0.0",
+    "@size-limit/preset-small-lib": "^9.0.0",
+    "@types/figlet": "^1.5.8",
+    "@types/node": "^18.19.4",
+    "@types/ora": "^3.2.0",
+    "simple-git-hooks": "^2.9.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "bun run format && bun run lint"
+  }
 }

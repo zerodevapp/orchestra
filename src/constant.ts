@@ -1,20 +1,29 @@
 import {
     Chain as ViemChain,
     arbitrum,
+    arbitrumNova,
     arbitrumSepolia,
-    astarZkatana,
+    astarZkEVM,
+    astarZkyoto,
     avalanche,
     avalancheFuji,
     base,
     baseSepolia,
+    blast,
+    blastSepolia,
     bsc,
+    celo,
+    celoAlfajores,
+    gnosis,
+    gnosisChiado,
     linea,
-    lineaTestnet,
+    lineaSepolia,
     mainnet,
     opBNB,
     optimism,
     optimismSepolia,
     polygon,
+    polygonAmoy,
     polygonMumbai,
     sepolia
 } from "viem/chains"
@@ -61,6 +70,14 @@ export const getSupportedChains = (): UnvalidatedChain[] => [
             process.env.ARBITRUM_SEPOLIA_ETHERSCAN_API_KEY || undefined,
         viemChainObject: arbitrumSepolia,
         type: Network.testnet
+    },
+    {
+        name: "arbitrum-nova",
+        projectId: process.env.ARBITRUM_NOVA_PROJECT_ID || null,
+        etherscanApiKey:
+            process.env.ARBITRUM_NOVA_ETHERSCAN_API_KEY || undefined,
+        viemChainObject: arbitrumNova,
+        type: Network.mainnet
     },
     {
         name: "avalanche",
@@ -144,6 +161,14 @@ export const getSupportedChains = (): UnvalidatedChain[] => [
         type: Network.testnet
     },
     {
+        name: "polygon-amoy",
+        projectId: process.env.POLYGON_AMOY_PROJECT_ID || null,
+        etherscanApiKey:
+            process.env.POLYGON_AMOY_ETHERSCAN_API_KEY || undefined,
+        viemChainObject: polygonAmoy,
+        type: Network.testnet
+    },
+    {
         name: "linea",
         projectId: process.env.LINEA_PROJECT_ID || null,
         etherscanApiKey: process.env.LINEA_ETHERSCAN_API_KEY || undefined,
@@ -151,11 +176,11 @@ export const getSupportedChains = (): UnvalidatedChain[] => [
         type: Network.mainnet
     },
     {
-        name: "linea-testnet",
-        projectId: process.env.LINEA_TESTNET_PROJECT_ID || null,
+        name: "linea-sepolia",
+        projectId: process.env.LINEA_SEPOLIA_PROJECT_ID || null,
         etherscanApiKey:
-            process.env.LINEA_TESTNET_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: lineaTestnet,
+            process.env.LINEA_SEPOLIA_ETHERSCAN_API_KEY || undefined,
+        viemChainObject: lineaSepolia,
         type: Network.testnet
     },
     {
@@ -166,11 +191,63 @@ export const getSupportedChains = (): UnvalidatedChain[] => [
         type: Network.mainnet
     },
     {
-        name: "astar-zkatana",
-        projectId: process.env.ASTAR_ZKATANA_PROJECT_ID || null,
+        name: "gnosis",
+        projectId: process.env.GNOSIS_PROJECT_ID || null,
+        etherscanApiKey: process.env.GNOSIS_ETHERSCAN_API_KEY || undefined,
+        viemChainObject: gnosis,
+        type: Network.mainnet
+    },
+    {
+        name: "gnosis-chiado",
+        projectId: process.env.GNOSIS_CHIADO_PROJECT_ID || null,
         etherscanApiKey:
-            process.env.ASTAR_ZKATANA_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: astarZkatana,
+            process.env.GNOSIS_CHIADO_ETHERSCAN_API_KEY || undefined,
+        viemChainObject: gnosisChiado,
+        type: Network.testnet
+    },
+    {
+        name: "astar-zkEVM",
+        projectId: process.env.ASTAR_ZKEVM_PROJECT_ID || null,
+        etherscanApiKey: process.env.ASTAR_ZKEVM_ETHERSCAN_API_KEY || undefined,
+        viemChainObject: astarZkEVM,
+        type: Network.mainnet
+    },
+    {
+        name: "astar-zkyoto",
+        projectId: process.env.ASTAR_ZKYOTO_PROJECT_ID || null,
+        etherscanApiKey:
+            process.env.ASTAR_ZKYOTO_ETHERSCAN_API_KEY || undefined,
+        viemChainObject: astarZkyoto,
+        type: Network.testnet
+    },
+    {
+        name: "blast",
+        projectId: process.env.BLAST_PROJECT_ID || null,
+        etherscanApiKey: process.env.BLAST_ETHERSCAN_API_KEY || undefined,
+        viemChainObject: blast,
+        type: Network.mainnet
+    },
+    {
+        name: "blast-sepolia",
+        projectId: process.env.BLAST_SEPOLIA_PROJECT_ID || null,
+        etherscanApiKey:
+            process.env.BLAST_SEPOLIA_ETHERSCAN_API_KEY || undefined,
+        viemChainObject: blastSepolia,
+        type: Network.testnet
+    },
+    {
+        name: "celo",
+        projectId: process.env.CELO_PROJECT_ID || null,
+        etherscanApiKey: process.env.CELO_ETHERSCAN_API_KEY || undefined,
+        viemChainObject: celo,
+        type: Network.mainnet
+    },
+    {
+        name: "celo-alfajores",
+        projectId: process.env.CELO_ALFAJORES_PROJECT_ID || null,
+        etherscanApiKey:
+            process.env.CELO_ALFAJORES_ETHERSCAN_API_KEY || undefined,
+        viemChainObject: celoAlfajores,
         type: Network.testnet
     }
 ]
