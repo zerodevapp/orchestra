@@ -7,7 +7,7 @@ import {
 import { KERNEL_V3_1 } from "@zerodev/sdk/constants"
 import { ENTRYPOINT_ADDRESS_V07 } from "permissionless/utils"
 import type { Hex } from "viem"
-import { http, createPublicClient} from "viem"
+import { http, createPublicClient } from "viem"
 import { privateKeyToAccount } from "viem/accounts"
 import type { Chain } from "../constant.js"
 import { getZeroDevBundlerRPC, getZeroDevPaymasterRPC } from "./index.js"
