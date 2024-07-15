@@ -58,6 +58,7 @@ All commands should be prefixed with `zerodev`
   - `-c, --chains [CHAINS]`: list of chains to deploy, with `all` selected by default
   - `-e, --expected-address <address>`: expected address to confirm
   - `-v, --verify <CONTRACT_NAME>`: contract name to be verified
+  - `-g, --call-gas-limit <call-gas-limit>`: gas limit for the call
 - `check-deployment [options]`: Check if the contract has been deployed on the specified chains
   - `-f, --file <path-to-bytecode>`: file path of bytecode used for deployment
   - `-b, --bytecode <bytecode>`: bytecode to deploy, should have constructor arguments encoded

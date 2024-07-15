@@ -135,7 +135,6 @@ program
     .option(
         "-g, --call-gas-limit <call-gas-limit>",
         "gas limit for the call",
-        "1800000"
     )
     .action(async (options) => {
         const {
