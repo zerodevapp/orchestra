@@ -1,6 +1,6 @@
 {
     "name": "@zerodev/orchestra",
-    "version": "0.0.16",
+    "version": "0.1.0",
     "description": "",
     "main": "dist/index.js",
     "type": "module",
