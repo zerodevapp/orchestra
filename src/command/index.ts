@@ -132,10 +132,7 @@ program
         "-v, --verify-contract [CONTRACT_NAME]",
         "verify the deployment on Etherscan"
     )
-    .option(
-        "-g, --call-gas-limit <call-gas-limit>",
-        "gas limit for the call",
-    )
+    .option("-g, --call-gas-limit <call-gas-limit>", "gas limit for the call")
     .action(async (options) => {
         const {
             file,
