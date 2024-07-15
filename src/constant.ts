@@ -1,13 +1,22 @@
 import {
-    Chain as ViemChain,
+    type Chain as ViemChain,
     arbitrum,
+    arbitrumNova,
     arbitrumSepolia,
-    astarZkatana,
+    astarZkEVM,
+    astarZkyoto,
     avalanche,
     avalancheFuji,
     base,
     baseSepolia,
+    blast,
+    blastSepolia,
     bsc,
+    celo,
+    celoAlfajores,
+    cyber,
+    cyberTestnet,
+    degen,
     linea,
     lineaTestnet,
     mainnet,
@@ -15,15 +24,13 @@ import {
     optimism,
     optimismSepolia,
     polygon,
-    polygonMumbai,
+    polygonAmoy,
     sepolia
 } from "viem/chains"
 
 /** @dev deterministic-deployment-proxy contract address */
 export const DEPLOYER_CONTRACT_ADDRESS =
     "0x4e59b44847b379578588920ca78fbf26c0b4956c"
-
-export const ENTRYPOINT = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789"
 
 export enum Network {
     mainnet = "mainnet",
@@ -55,11 +62,34 @@ export const getSupportedChains = (): UnvalidatedChain[] => [
         type: Network.mainnet
     },
     {
+        name: "arbitrum-nova",
+        projectId: process.env.ARBITRUM_NOVA_PROJECT_ID || null,
+        etherscanApiKey:
+            process.env.ARBITRUM_NOVA_ETHERSCAN_API_KEY || undefined,
+        viemChainObject: arbitrumNova,
+        type: Network.mainnet
+    },
+    {
         name: "arbitrum-sepolia",
         projectId: process.env.ARBITRUM_SEPOLIA_PROJECT_ID || null,
         etherscanApiKey:
             process.env.ARBITRUM_SEPOLIA_ETHERSCAN_API_KEY || undefined,
         viemChainObject: arbitrumSepolia,
+        type: Network.testnet
+    },
+    {
+        name: "astar-zkEVM",
+        projectId: process.env.ASTAR_ZKEVM_PROJECT_ID || null,
+        etherscanApiKey: process.env.ASTAR_ZKEVM_ETHERSCAN_API_KEY || undefined,
+        viemChainObject: astarZkEVM,
+        type: Network.mainnet
+    },
+    {
+        name: "astar-zkyoto",
+        projectId: process.env.ASTAR_ZKYOTO_PROJECT_ID || null,
+        etherscanApiKey:
+            process.env.ASTAR_ZKYOTO_ETHERSCAN_API_KEY || undefined,
+        viemChainObject: astarZkyoto,
         type: Network.testnet
     },
     {
@@ -93,10 +123,61 @@ export const getSupportedChains = (): UnvalidatedChain[] => [
         type: Network.testnet
     },
     {
+        name: "blast",
+        projectId: process.env.BLAST_PROJECT_ID || null,
+        etherscanApiKey: process.env.BLAST_ETHERSCAN_API_KEY || undefined,
+        viemChainObject: blast,
+        type: Network.mainnet
+    },
+    {
+        name: "blast-sepolia",
+        projectId: process.env.BLAST_SEPOLIA_PROJECT_ID || null,
+        etherscanApiKey: process.env.BLAST_ETHERSCAN_API_KEY || undefined,
+        viemChainObject: blastSepolia,
+        type: Network.testnet
+    },
+    {
         name: "bsc",
         projectId: process.env.BSC_PROJECT_ID || null,
         etherscanApiKey: process.env.BSC_ETHERSCAN_API_KEY || undefined,
         viemChainObject: bsc,
+        type: Network.mainnet
+    },
+    {
+        name: "celo",
+        projectId: process.env.CELO_PROJECT_ID || null,
+        etherscanApiKey: process.env.CELO_ETHERSCAN_API_KEY || undefined,
+        viemChainObject: celo,
+        type: Network.mainnet
+    },
+    {
+        name: "celo-alfajores",
+        projectId: process.env.CELO_ALFAJORES_PROJECT_ID || null,
+        etherscanApiKey:
+            process.env.CELO_ALFAJORES_ETHERSCAN_API_KEY || undefined,
+        viemChainObject: celoAlfajores,
+        type: Network.testnet
+    },
+    {
+        name: "cyber",
+        projectId: process.env.CYBER_PROJECT_ID || null,
+        etherscanApiKey: process.env.CYBER_ETHERSCAN_API_KEY || undefined,
+        viemChainObject: cyber,
+        type: Network.mainnet
+    },
+    {
+        name: "cyber-testnet",
+        projectId: process.env.CYBER_TESTNET_PROJECT_ID || null,
+        etherscanApiKey:
+            process.env.CYBER_TESTNET_ETHERSCAN_API_KEY || undefined,
+        viemChainObject: cyberTestnet,
+        type: Network.testnet
+    },
+    {
+        name: "degen",
+        projectId: process.env.DEGEN_PROJECT_ID || null,
+        etherscanApiKey: process.env.DEGEN_ETHERSCAN_API_KEY || undefined,
+        viemChainObject: degen,
         type: Network.mainnet
     },
     {
@@ -129,6 +210,13 @@ export const getSupportedChains = (): UnvalidatedChain[] => [
         type: Network.testnet
     },
     {
+        name: "opbnb",
+        projectId: process.env.OPBNB_PROJECT_ID || null,
+        etherscanApiKey: process.env.OPBNB_ETHERSCAN_API_KEY || undefined,
+        viemChainObject: opBNB,
+        type: Network.mainnet
+    },
+    {
         name: "polygon",
         projectId: process.env.POLYGON_PROJECT_ID || null,
         etherscanApiKey: process.env.POLYGON_ETHERSCAN_API_KEY || undefined,
@@ -136,11 +224,11 @@ export const getSupportedChains = (): UnvalidatedChain[] => [
         type: Network.mainnet
     },
     {
-        name: "polygon-mumbai",
-        projectId: process.env.POLYGON_MUMBAI_PROJECT_ID || null,
+        name: "polygon-amoy",
+        projectId: process.env.POLYGON_AMOY_PROJECT_ID || null,
         etherscanApiKey:
-            process.env.POLYGON_MUMBAI_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: polygonMumbai,
+            process.env.POLYGON_AMOY_ETHERSCAN_API_KEY || undefined,
+        viemChainObject: polygonAmoy,
         type: Network.testnet
     },
     {
@@ -156,21 +244,6 @@ export const getSupportedChains = (): UnvalidatedChain[] => [
         etherscanApiKey:
             process.env.LINEA_TESTNET_ETHERSCAN_API_KEY || undefined,
         viemChainObject: lineaTestnet,
-        type: Network.testnet
-    },
-    {
-        name: "opbnb",
-        projectId: process.env.OPBNB_PROJECT_ID || null,
-        etherscanApiKey: process.env.OPBNB_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: opBNB,
-        type: Network.mainnet
-    },
-    {
-        name: "astar-zkatana",
-        projectId: process.env.ASTAR_ZKATANA_PROJECT_ID || null,
-        etherscanApiKey:
-            process.env.ASTAR_ZKATANA_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: astarZkatana,
         type: Network.testnet
     }
 ]

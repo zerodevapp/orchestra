@@ -1,4 +1,4 @@
-import { Address, Hex, getContractAddress } from "viem"
+import { type Address, type Hex, getContractAddress } from "viem"
 
 export const computeContractAddress = (
     from: Hex,

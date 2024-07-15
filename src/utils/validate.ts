@@ -1,5 +1,5 @@
-import { Hex } from "viem"
-import { Chain, UnvalidatedChain, getSupportedChains } from "../constant.js"
+import type { Hex } from "viem"
+import { type Chain, type UnvalidatedChain, getSupportedChains } from "../constant.js"
 import { readBytecodeFromFile } from "./file.js"
 
 const PRIVATE_KEY_REGEX = /^0x[0-9a-fA-F]{64}$/

@@ -1,4 +1,4 @@
-import { Hex } from "viem"
+import type { Hex } from "viem"
 
 const HEX_REGEX = /^[0-9a-fA-F]*$/
 const SALT_REGEX = /^0x[0-9a-fA-F]{64}$/

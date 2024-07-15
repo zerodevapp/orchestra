@@ -1,6 +1,7 @@
-import { http, Address, Hex, PublicClient, createPublicClient } from "viem"
+import type { Address, Hex, PublicClient } from "viem"
+import { http, createPublicClient } from "viem"
 import { getZeroDevBundlerRPC } from "../clients/index.js"
-import { Chain, DEPLOYER_CONTRACT_ADDRESS } from "../constant.js"
+import { type Chain, DEPLOYER_CONTRACT_ADDRESS } from "../constant.js"
 import { computeContractAddress } from "./computeAddress.js"
 export enum DeploymentStatus {
     Deployed = 0,

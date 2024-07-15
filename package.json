@@ -43,18 +43,15 @@
     ],
     "license": "MIT",
     "dependencies": {
-        "@kerneljs/core": "0.0.1-alpha.11",
-        "@kerneljs/ecdsa-validator": "0.0.1-alpha.13",
-        "@kerneljs/presets": "0.0.1-alpha.7",
+        "@zerodev/sdk": "^5.3.3",
+        "@zerodev/ecdsa-validator": "^5.3.1",
         "chalk": "4.1.2",
         "cli-table3": "^0.6.3",
         "commander": "^11.1.0",
         "dotenv": "^16.3.1",
         "figlet": "^1.7.0",
         "ora": "^8.0.1",
-        "permissionless": "^0.0.20",
-        "tslib": "^2.6.2",
-        "viem": "^1.21.4"
+        "tslib": "^2.6.2"
     },
     "devDependencies": {
         "@biomejs/biome": "^1.4.1",
@@ -68,7 +65,7 @@
         "@types/ora": "^3.2.0",
         "simple-git-hooks": "^2.9.0",
         "ts-node": "^10.9.2",
-        "typescript": "^5.3.3"
+        "typescript": "^5.2.2"
     },
     "simple-git-hooks": {
         "pre-commit": "bun run format && bun run lint"

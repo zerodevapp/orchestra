@@ -1,9 +1,9 @@
-import { exec } from "child_process"
-import util from "util"
+import { exec } from "node:child_process"
+import util from "node:util"
 import chalk from "chalk"
 import ora from "ora"
-import { Address } from "viem"
-import { Chain } from "../constant"
+import type { Address } from "viem"
+import type { Chain } from "../constant.js"
 
 const execPromise = util.promisify(exec)
 

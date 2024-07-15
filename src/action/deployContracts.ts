@@ -1,19 +1,11 @@
 import chalk from "chalk"
 import ora from "ora"
-import { SmartAccountClient, bundlerActions } from "permissionless"
-import {
-    http,
-    Address,
-    Hex,
-    PublicClient,
-    createPublicClient,
-    getAddress
-} from "viem"
-import {
-    createKernelAccountClient,
-    getZeroDevBundlerRPC
-} from "../clients/index.js"
-import { Chain, DEPLOYER_CONTRACT_ADDRESS } from "../constant.js"
+import { bundlerActions } from "permissionless"
+import { ENTRYPOINT_ADDRESS_V07 } from "permissionless/utils"
+import type { Address, Hex } from "viem"
+import { http, createPublicClient, getAddress } from "viem"
+import { createKernelClient, getZeroDevBundlerRPC } from "../clients/index.js"
+import { type Chain, DEPLOYER_CONTRACT_ADDRESS } from "../constant.js"
 import { ensureHex, writeErrorLogToFile } from "../utils/index.js"
 import { computeContractAddress } from "./computeAddress.js"
 import { DeploymentStatus, checkDeploymentOnChain } from "./findDeployment.js"
@@ -27,13 +19,22 @@ class AlreadyDeployedError extends Error {
     }
 }
 
+type DeployResult = [string, string]
+
 export const deployToChain = async (
-    kernelAccountClient: SmartAccountClient,
-    publicClient: PublicClient,
+    privateKey: Hex,
+    chain: Chain,
     bytecode: Hex,
     salt: Hex,
-    expectedAddress: string | undefined
-): Promise<[string, string]> => {
+    expectedAddress: string | undefined,
+    callGasLimit: bigint | undefined
+): Promise<DeployResult> => {
+    const publicClient = createPublicClient({
+        chain: chain.viemChainObject,
+        transport: http(getZeroDevBundlerRPC(chain.projectId))
+    })
+    const kernelAccountClient = await createKernelClient(privateKey, chain)
+
     if (!kernelAccountClient.account) {
         throw new Error("Kernel account is not initialized")
     }
@@ -85,14 +86,22 @@ export const deployToChain = async (
                 to: DEPLOYER_CONTRACT_ADDRESS,
                 value: 0n,
                 data: ensureHex(salt + bytecode.slice(2))
-            })
+            }),
+            callGasLimit
         }
     })
 
-    const bundlerClient = kernelAccountClient.extend(bundlerActions)
-    await bundlerClient.waitForUserOperationReceipt({
+    const bundlerClient = kernelAccountClient.extend(
+        bundlerActions(ENTRYPOINT_ADDRESS_V07)
+    )
+    const userOpResult = await bundlerClient.waitForUserOperationReceipt({
         hash: opHash
     })
+    if (!userOpResult.success) {
+        throw new Error(
+            `User operation failed with reason: ${userOpResult.reason}, User Op Hash: ${opHash}`
+        )
+    }
     return [getAddress(result.data as Address), opHash]
 }
 
@@ -101,24 +110,20 @@ export const deployContracts = async (
     bytecode: Hex,
     chains: Chain[],
     salt: Hex,
-    expectedAddress: string | undefined
+    expectedAddress: string | undefined,
+    callGasLimit: bigint | undefined
 ) => {
     const spinner = ora(
         `Deploying contract on ${chains.map((chain) => chain.name).join(", ")}`
     ).start()
     const deployments = chains.map(async (chain) => {
-        const kernelAccount = await createKernelAccountClient(privateKey, chain)
-        const publicClient = createPublicClient({
-            chain: chain.viemChainObject,
-            transport: http(getZeroDevBundlerRPC(chain.projectId))
-        })
-
         return deployToChain(
-            kernelAccount,
-            publicClient,
+            privateKey,
+            chain,
             bytecode,
             salt,
-            expectedAddress
+            expectedAddress,
+            callGasLimit
         )
             .then((result) => {
                 spinner.succeed(

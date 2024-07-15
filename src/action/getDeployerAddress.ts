@@ -1,6 +1,6 @@
 import {
-    Address,
-    Hex,
+    type Address,
+    type Hex,
     concat,
     encodeFunctionData,
     getContractAddress,

@@ -1,5 +1,5 @@
-import fs from "fs"
-import path from "path"
+import fs from "node:fs"
+import path from "node:path"
 import { encodeDeployData } from "viem"
 
 export const readBytecodeFromFile = (pathToBytecode: string): string => {

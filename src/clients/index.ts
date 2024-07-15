@@ -4,7 +4,7 @@ export const getZeroDevBundlerRPC = (
 ): string => {
     let rpc = `https://rpc.zerodev.app/api/v2/bundler/${projectId}`
     if (provider) {
-        rpc += `?bundlerProvider=${provider}`
+        rpc += `?provider=${provider}`
     }
     return rpc
 }
@@ -14,8 +14,8 @@ export const getZeroDevPaymasterRPC = (
 ): string => {
     let rpc = `https://rpc.zerodev.app/api/v2/paymaster/${projectId}`
     if (provider) {
-        rpc += `?paymasterProvider=${provider}`
+        rpc += `?provider=${provider}`
     }
     return rpc
 }
-export * from "./kernelAccountClient.js"
+export * from "./createKernelClient.js"

@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-import { exec } from "child_process"
-import crypto from "crypto"
+import crypto from "node:crypto"
 import chalk from "chalk"
 import Table from "cli-table3"
 import { Command } from "commander"
@@ -133,6 +132,11 @@ program
         "-v, --verify-contract [CONTRACT_NAME]",
         "verify the deployment on Etherscan"
     )
+    .option(
+        "-g, --call-gas-limit <call-gas-limit>",
+        "gas limit for the call",
+        "1800000"
+    )
     .action(async (options) => {
         const {
             file,
@@ -143,7 +147,8 @@ program
             allNetworks,
             chains,
             expectedAddress,
-            verifyContract
+            verifyContract,
+            callGasLimit
         } = options
 
         const normalizedSalt = normalizeSalt(salt)
@@ -165,10 +170,14 @@ program
             ensureHex(bytecodeToDeploy),
             chainObjects,
             ensureHex(normalizedSalt),
-            expectedAddress
+            expectedAddress,
+            callGasLimit ? BigInt(callGasLimit) : undefined
         )
 
+        console.log("✅ Contracts deployed successfully!")
+
         if (verifyContract) {
+            console.log("Verifying contracts on Etherscan...")
             await verifyContracts(
                 verifyContract,
                 computeContractAddress(
@@ -179,6 +188,8 @@ program
                 chainObjects
             )
         }
+
+        console.log("✅ Contracts verified successfully!")
     })
 
 program
