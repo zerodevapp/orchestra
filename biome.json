@@ -40,7 +40,7 @@
     "javascript": {
         "formatter": {
             "semicolons": "asNeeded",
-            "trailingComma": "none"
+            "trailingCommas": "none"
         }
     }
 }

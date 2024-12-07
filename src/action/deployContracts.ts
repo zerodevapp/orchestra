@@ -78,30 +78,19 @@ export const deployToChain = async (
             `Contract will be deployed at ${result.data?.toLowerCase()} does not match expected address ${expectedAddress.toLowerCase()}`
         )
     }
-
     const opHash = await kernelAccountClient.sendUserOperation({
-        account: kernelAccountClient.account,
-        userOperation: {
-            callData: await kernelAccountClient.account.encodeCallData({
+        callData: await kernelAccountClient.account.encodeCalls([
+            {
                 to: DEPLOYER_CONTRACT_ADDRESS,
                 value: 0n,
                 data: ensureHex(salt + bytecode.slice(2))
-            }),
-            callGasLimit
-        }
+            }
+        ])
     })
 
     const bundlerClient = kernelAccountClient.extend(
         bundlerActions(ENTRYPOINT_ADDRESS_V07)
     )
-    const userOpResult = await bundlerClient.waitForUserOperationReceipt({
-        hash: opHash
-    })
-    if (!userOpResult.success) {
-        throw new Error(
-            `User operation failed with reason: ${userOpResult.reason}, User Op Hash: ${opHash}`
-        )
-    }
     return [getAddress(result.data as Address), opHash]
 }
 
