@@ -1,61 +1,59 @@
 import { signerToEcdsaValidator } from "@zerodev/ecdsa-validator"
 import {
+    type KernelAccountClient,
     createKernelAccount,
     createKernelAccountClient,
     createZeroDevPaymasterClient
 } from "@zerodev/sdk"
-import { KERNEL_V3_1 } from "@zerodev/sdk/constants"
-import { ENTRYPOINT_ADDRESS_V07 } from "permissionless/utils"
+import { KERNEL_V3_1, getEntryPoint } from "@zerodev/sdk/constants"
 import type { Hex } from "viem"
 import { http, createPublicClient } from "viem"
 import { privateKeyToAccount } from "viem/accounts"
 import type { Chain } from "../constant.js"
 import { getZeroDevBundlerRPC, getZeroDevPaymasterRPC } from "./index.js"
 
-export const createKernelClient = async (privateKey: Hex, chain: Chain) => {
-    const entryPoint = ENTRYPOINT_ADDRESS_V07
+export const createKernelClient = async (
+    privateKey: Hex,
+    chain: Chain
+): Promise<KernelAccountClient> => {
     const rpcUrl = getZeroDevBundlerRPC(chain.projectId, "PIMLICO")
     const paymasterRpcUrl = getZeroDevPaymasterRPC(chain.projectId, "PIMLICO")
-
+    const entryPoint = getEntryPoint("0.7")
     const publicClient = createPublicClient({
-        transport: http(rpcUrl)
+        transport: http(rpcUrl),
+        chain: chain.viemChainObject
     })
     const signer = privateKeyToAccount(privateKey)
 
-    const ecdsaValidatorPlugin = await signerToEcdsaValidator(publicClient, {
-        entryPoint,
+    const ecdsaValidator = await signerToEcdsaValidator(publicClient, {
         signer,
-        kernelVersion: KERNEL_V3_1
-    })
-
-    const kernelAccount = await createKernelAccount(publicClient, {
         entryPoint,
-        plugins: {
-            sudo: ecdsaValidatorPlugin
-        },
         kernelVersion: KERNEL_V3_1
     })
 
-    const kernelClient = createKernelAccountClient({
-        account: kernelAccount,
-        chain: chain.viemChainObject,
-        bundlerTransport: http(rpcUrl, {
-            timeout: 60000 // 1 min
-        }),
-        middleware: {
-            sponsorUserOperation: async ({ userOperation }) => {
-                const zeroDevPaymasterClient = createZeroDevPaymasterClient({
-                    chain: chain.viemChainObject,
-                    transport: http(paymasterRpcUrl),
-                    entryPoint
-                })
-                return zeroDevPaymasterClient.sponsorUserOperation({
-                    userOperation,
-                    entryPoint
-                })
-            }
+    // Construct a Kernel account
+    const account = await createKernelAccount(publicClient, {
+        plugins: {
+            sudo: ecdsaValidator
         },
-        entryPoint
+        entryPoint,
+        kernelVersion: KERNEL_V3_1
+    })
+
+    const zerodevPaymaster = createZeroDevPaymasterClient({
+        chain: chain.viemChainObject,
+        transport: http(paymasterRpcUrl)
+    })
+    // Construct a Kernel account client
+    const kernelClient = createKernelAccountClient({
+        account,
+        chain: chain.viemChainObject,
+        bundlerTransport: http(rpcUrl),
+        paymaster: {
+            getPaymasterData(userOperation) {
+                return zerodevPaymaster.sponsorUserOperation({ userOperation })
+            }
+        }
     })
 
     return kernelClient
