@@ -1,7 +1,5 @@
 import chalk from "chalk"
 import ora from "ora"
-import { bundlerActions } from "permissionless"
-import { ENTRYPOINT_ADDRESS_V07 } from "permissionless/utils"
 import type { Address, Hex } from "viem"
 import { http, createPublicClient, getAddress } from "viem"
 import { createKernelClient, getZeroDevBundlerRPC } from "../clients/index.js"
@@ -88,9 +86,6 @@ export const deployToChain = async (
         ])
     })
 
-    const bundlerClient = kernelAccountClient.extend(
-        bundlerActions(ENTRYPOINT_ADDRESS_V07)
-    )
     return [getAddress(result.data as Address), opHash]
 }
 
