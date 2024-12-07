@@ -36,7 +36,7 @@ program
         "tool for deploying contracts to multichain with account abstraction"
     )
     .usage("<command> [options]")
-    .version("1.0.0")
+    .version("0.1.3")
 
 program.helpInformation = function () {
     const asciiArt = chalk.blueBright(
