@@ -55,12 +55,10 @@ program.helpInformation = function () {
 program
     .command("chains")
     .description("Show the list of available chains")
-    .action(() => {
-        const chains = getSupportedChains().map((chain) => [
+    .action(async () => {
+        const chains = (await getSupportedChains()).map((chain) => [
             chain.name,
-            chain.type === "mainnet"
-                ? chalk.blue(chain.type)
-                : chalk.green(chain.type)
+            chain.testnet ? chalk.green("testnet") : chalk.blue("mainnet")
         ])
 
         const table = new Table({
@@ -150,10 +148,11 @@ program
         const normalizedSalt = normalizeSalt(salt)
 
         validateInputs(file, bytecode, normalizedSalt, expectedAddress)
-        const chainObjects = processAndValidateChains(chains, {
+        const chainObjects = await processAndValidateChains({
             testnetAll,
             mainnetAll,
-            allNetworks
+            allNetworks,
+            chainOption: chains
         })
 
         let bytecodeToDeploy = bytecode
@@ -216,10 +215,11 @@ program
 
         const normalizedSalt = normalizeSalt(salt)
         validateInputs(file, bytecode, normalizedSalt, undefined)
-        const chainObjects = processAndValidateChains(chains, {
+        const chainObjects = await processAndValidateChains({
             testnetAll,
             mainnetAll,
-            allNetworks
+            allNetworks,
+            chainOption: chains
         })
 
         let bytecodeToDeploy = bytecode

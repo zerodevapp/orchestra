@@ -1,18 +1,18 @@
 export const getZeroDevBundlerRPC = (
-    projectId: string,
+    chainId: number,
     provider?: string
 ): string => {
-    let rpc = `https://rpc.zerodev.app/api/v2/bundler/${projectId}`
+    let rpc = `https://rpc.zerodev.app/api/v3/${process.env.ZERODEV_PROJECT_ID}/chain/${chainId}`
     if (provider) {
         rpc += `?provider=${provider}`
     }
     return rpc
 }
 export const getZeroDevPaymasterRPC = (
-    projectId: string,
+    chainId: number,
     provider?: string
 ): string => {
-    let rpc = `https://rpc.zerodev.app/api/v2/paymaster/${projectId}`
+    let rpc = `https://rpc.zerodev.app/api/v3/${process.env.ZERODEV_PROJECT_ID}/chain/${chainId}`
     if (provider) {
         rpc += `?provider=${provider}`
     }

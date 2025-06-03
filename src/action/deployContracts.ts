@@ -3,7 +3,7 @@ import ora from "ora"
 import type { Address, Hex } from "viem"
 import { http, createPublicClient, getAddress } from "viem"
 import { createKernelClient, getZeroDevBundlerRPC } from "../clients/index.js"
-import { type Chain, DEPLOYER_CONTRACT_ADDRESS } from "../constant.js"
+import { DEPLOYER_CONTRACT_ADDRESS, type ZerodevChain } from "../constant.js"
 import { ensureHex, writeErrorLogToFile } from "../utils/index.js"
 import { computeContractAddress } from "./computeAddress.js"
 import { DeploymentStatus, checkDeploymentOnChain } from "./findDeployment.js"
@@ -21,15 +21,17 @@ type DeployResult = [string, string]
 
 export const deployToChain = async (
     privateKey: Hex,
-    chain: Chain,
+    chain: ZerodevChain,
     bytecode: Hex,
     salt: Hex,
     expectedAddress: string | undefined,
     callGasLimit: bigint | undefined
 ): Promise<DeployResult> => {
+    console.log("true : ", chain === undefined)
+    console.log("deploying to chain", chain.name, chain.id)
     const publicClient = createPublicClient({
-        chain: chain.viemChainObject,
-        transport: http(getZeroDevBundlerRPC(chain.projectId))
+        chain: chain,
+        transport: http()
     })
     const kernelAccountClient = await createKernelClient(privateKey, chain)
 
@@ -86,13 +88,20 @@ export const deployToChain = async (
         ])
     })
 
+    await kernelAccountClient.waitForUserOperationReceipt({
+        hash: opHash
+    })
+    await kernelAccountClient.getUserOperationReceipt({
+        hash: opHash
+    })
+
     return [getAddress(result.data as Address), opHash]
 }
 
 export const deployContracts = async (
     privateKey: Hex,
     bytecode: Hex,
-    chains: Chain[],
+    chains: ZerodevChain[],
     salt: Hex,
     expectedAddress: string | undefined,
     callGasLimit: bigint | undefined

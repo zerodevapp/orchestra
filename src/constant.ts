@@ -1,249 +1,137 @@
-import {
-    type Chain as ViemChain,
-    arbitrum,
-    arbitrumNova,
-    arbitrumSepolia,
-    astarZkEVM,
-    astarZkyoto,
-    avalanche,
-    avalancheFuji,
-    base,
-    baseSepolia,
-    blast,
-    blastSepolia,
-    bsc,
-    celo,
-    celoAlfajores,
-    cyber,
-    cyberTestnet,
-    degen,
-    linea,
-    lineaTestnet,
-    mainnet,
-    opBNB,
-    optimism,
-    optimismSepolia,
-    polygon,
-    polygonAmoy,
-    sepolia
-} from "viem/chains"
+import type { Chain } from "viem/chains"
 
 /** @dev deterministic-deployment-proxy contract address */
 export const DEPLOYER_CONTRACT_ADDRESS =
     "0x4e59b44847b379578588920ca78fbf26c0b4956c"
 
-export enum Network {
-    mainnet = "mainnet",
-    testnet = "testnet"
-}
+export type ZerodevChain = {
+    onlySelfFunded: boolean
+    rollupProvider: string | null
+    deprecated: boolean
+    explorerAPI: string | null
+} & Chain
 
-export interface UnvalidatedChain {
+interface ZerodevChainResponse {
+    chainId: number
     name: string
-    projectId: string | null
-    etherscanApiKey?: string
-    viemChainObject: ViemChain
-    type: Network
+    nativeCurrencyName: string
+    nativeCurrencySymbol: string
+    nativeCurrencyDecimals: number
+    rpcUrl: string
+    explorerUrl: string
+    testnet: boolean
+    onlySelfFunded: boolean
+    rollupProvider: string | null
+    deprecated: boolean
 }
 
-export interface Chain {
+interface ZerodevProjectResponse {
+    id: string
     name: string
-    projectId: string
-    etherscanApiKey?: string
-    viemChainObject: ViemChain
-    type: Network
+    teamId: string
+    chains: {
+        chain_id: number
+        name: string
+        testnet: boolean
+    }[]
 }
 
-export const getSupportedChains = (): UnvalidatedChain[] => [
-    {
-        name: "arbitrum",
-        projectId: process.env.ARBITRUM_PROJECT_ID || null,
-        etherscanApiKey: process.env.ARBITRUM_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: arbitrum,
-        type: Network.mainnet
-    },
-    {
-        name: "arbitrum-nova",
-        projectId: process.env.ARBITRUM_NOVA_PROJECT_ID || null,
-        etherscanApiKey:
-            process.env.ARBITRUM_NOVA_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: arbitrumNova,
-        type: Network.mainnet
-    },
-    {
-        name: "arbitrum-sepolia",
-        projectId: process.env.ARBITRUM_SEPOLIA_PROJECT_ID || null,
-        etherscanApiKey:
-            process.env.ARBITRUM_SEPOLIA_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: arbitrumSepolia,
-        type: Network.testnet
-    },
-    {
-        name: "astar-zkEVM",
-        projectId: process.env.ASTAR_ZKEVM_PROJECT_ID || null,
-        etherscanApiKey: process.env.ASTAR_ZKEVM_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: astarZkEVM,
-        type: Network.mainnet
-    },
-    {
-        name: "astar-zkyoto",
-        projectId: process.env.ASTAR_ZKYOTO_PROJECT_ID || null,
-        etherscanApiKey:
-            process.env.ASTAR_ZKYOTO_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: astarZkyoto,
-        type: Network.testnet
-    },
-    {
-        name: "avalanche",
-        projectId: process.env.AVALANCHE_PROJECT_ID || null,
-        etherscanApiKey: process.env.AVALANCHE_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: avalanche,
-        type: Network.mainnet
-    },
-    {
-        name: "avalanche-fuji",
-        projectId: process.env.AVALANCHE_FUJI_PROJECT_ID || null,
-        etherscanApiKey:
-            process.env.AVALANCHE_FUJI_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: avalancheFuji,
-        type: Network.testnet
-    },
-    {
-        name: "base",
-        projectId: process.env.BASE_PROJECT_ID || null,
-        etherscanApiKey: process.env.BASE_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: base,
-        type: Network.mainnet
-    },
-    {
-        name: "base-sepolia",
-        projectId: process.env.BASE_SEPOLIA_PROJECT_ID || null,
-        etherscanApiKey:
-            process.env.BASE_SEPOLIA_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: baseSepolia,
-        type: Network.testnet
-    },
-    {
-        name: "blast",
-        projectId: process.env.BLAST_PROJECT_ID || null,
-        etherscanApiKey: process.env.BLAST_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: blast,
-        type: Network.mainnet
-    },
-    {
-        name: "blast-sepolia",
-        projectId: process.env.BLAST_SEPOLIA_PROJECT_ID || null,
-        etherscanApiKey: process.env.BLAST_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: blastSepolia,
-        type: Network.testnet
-    },
-    {
-        name: "bsc",
-        projectId: process.env.BSC_PROJECT_ID || null,
-        etherscanApiKey: process.env.BSC_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: bsc,
-        type: Network.mainnet
-    },
-    {
-        name: "celo",
-        projectId: process.env.CELO_PROJECT_ID || null,
-        etherscanApiKey: process.env.CELO_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: celo,
-        type: Network.mainnet
-    },
-    {
-        name: "celo-alfajores",
-        projectId: process.env.CELO_ALFAJORES_PROJECT_ID || null,
-        etherscanApiKey:
-            process.env.CELO_ALFAJORES_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: celoAlfajores,
-        type: Network.testnet
-    },
-    {
-        name: "cyber",
-        projectId: process.env.CYBER_PROJECT_ID || null,
-        etherscanApiKey: process.env.CYBER_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: cyber,
-        type: Network.mainnet
-    },
-    {
-        name: "cyber-testnet",
-        projectId: process.env.CYBER_TESTNET_PROJECT_ID || null,
-        etherscanApiKey:
-            process.env.CYBER_TESTNET_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: cyberTestnet,
-        type: Network.testnet
-    },
-    {
-        name: "degen",
-        projectId: process.env.DEGEN_PROJECT_ID || null,
-        etherscanApiKey: process.env.DEGEN_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: degen,
-        type: Network.mainnet
-    },
-    {
-        name: Network.mainnet,
-        projectId: process.env.MAINNET_PROJECT_ID || null,
-        etherscanApiKey: process.env.MAINNET_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: mainnet,
-        type: Network.mainnet
-    },
-    {
-        name: "sepolia",
-        projectId: process.env.SEPOILA_PROJECT_ID || null,
-        etherscanApiKey: process.env.SEPOILA_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: sepolia,
-        type: Network.testnet
-    },
-    {
-        name: "optimism",
-        projectId: process.env.OPTIMISM_PROJECT_ID || null,
-        etherscanApiKey: process.env.OPTIMISM_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: optimism,
-        type: Network.mainnet
-    },
-    {
-        name: "optimism-sepolia",
-        projectId: process.env.OPTIMISM_SEPOLIA_PROJECT_ID || null,
-        etherscanApiKey:
-            process.env.OPTIMISM_SEPOLIA_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: optimismSepolia,
-        type: Network.testnet
-    },
-    {
-        name: "opbnb",
-        projectId: process.env.OPBNB_PROJECT_ID || null,
-        etherscanApiKey: process.env.OPBNB_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: opBNB,
-        type: Network.mainnet
-    },
-    {
-        name: "polygon",
-        projectId: process.env.POLYGON_PROJECT_ID || null,
-        etherscanApiKey: process.env.POLYGON_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: polygon,
-        type: Network.mainnet
-    },
-    {
-        name: "polygon-amoy",
-        projectId: process.env.POLYGON_AMOY_PROJECT_ID || null,
-        etherscanApiKey:
-            process.env.POLYGON_AMOY_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: polygonAmoy,
-        type: Network.testnet
-    },
-    {
-        name: "linea",
-        projectId: process.env.LINEA_PROJECT_ID || null,
-        etherscanApiKey: process.env.LINEA_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: linea,
-        type: Network.mainnet
-    },
-    {
-        name: "linea-testnet",
-        projectId: process.env.LINEA_TESTNET_PROJECT_ID || null,
-        etherscanApiKey:
-            process.env.LINEA_TESTNET_ETHERSCAN_API_KEY || undefined,
-        viemChainObject: lineaTestnet,
-        type: Network.testnet
+/*
+curl --request GET \
+     --url https://prod-api-us-east.onrender.com/v2/chains \
+     --header `X-API-KEY: ${process.env.ZERODEV_API_KEY}` \
+     --header 'accept: application/json'
+  {
+    "chainId": 1,
+    "name": "Ethereum",
+    "nativeCurrencyName": "Ether",
+    "nativeCurrencySymbol": "ETH",
+    "nativeCurrencyDecimals": 18,
+    "rpcUrl": "https://eth.llamarpc.com",
+    "explorerUrl": "https://etherscan.io",
+    "testnet": false,
+    "onlySelfFunded": false,
+    "rollupProvider": null,
+    "deprecated": false
+  },
+
+*/
+
+export const getSupportedChains = async (): Promise<ZerodevChain[]> => {
+    const response = await fetch(
+        "https://prod-api-us-east.onrender.com/v2/chains",
+        {
+            headers: {
+                "X-API-KEY": process.env.ZERODEV_API_KEY ?? "",
+                accept: "application/json"
+            }
+        }
+    )
+
+    if (!response.ok) {
+        throw new Error(`Failed to fetch chains: ${response.statusText}`)
     }
-]
+
+    const data = (await response.json()) as ZerodevChainResponse[]
+
+    const chains_all = data.reduce(
+        (acc, chain) => {
+            const key = `${chain.name}-${chain.chainId}`
+            acc[key] = {
+                id: chain.chainId,
+                name: chain.name,
+                nativeCurrency: {
+                    name: chain.nativeCurrencyName,
+                    symbol: chain.nativeCurrencySymbol,
+                    decimals: chain.nativeCurrencyDecimals
+                },
+                rpcUrls: {
+                    default: { http: [chain.rpcUrl] }
+                },
+                onlySelfFunded: chain.onlySelfFunded,
+                rollupProvider: chain.rollupProvider,
+                deprecated: chain.deprecated,
+                testnet: chain.testnet,
+                explorerAPI: chain.explorerUrl || ""
+            }
+            return acc
+        },
+        {} as Record<string, ZerodevChain>
+    )
+
+    const response_project = await fetch(
+        `https://prod-api-us-east.onrender.com/v2/projects/${process.env.ZERODEV_PROJECT_ID}`,
+        {
+            headers: {
+                "X-API-KEY": process.env.ZERODEV_API_KEY ?? "",
+                accept: "application/json"
+            }
+        }
+    )
+
+    if (!response_project.ok) {
+        throw new Error(
+            `Failed to fetch project chains: ${response_project.statusText}`
+        )
+    }
+
+    const chains_project =
+        (await response_project.json()) as ZerodevProjectResponse
+
+    const supportedChains = chains_project.chains
+        .map((chain) => {
+            const key = `${chain.name}-${chain.chain_id}`
+            const matchedChain = chains_all[key]
+            if (!matchedChain) {
+                return null
+            }
+            return matchedChain
+        })
+        .filter((chain): chain is ZerodevChain => chain !== null)
+
+    if (supportedChains.length === 0) {
+        throw new Error("No supported chains found for the project")
+    }
+
+    return supportedChains
+}
