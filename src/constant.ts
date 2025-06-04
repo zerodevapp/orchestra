@@ -93,7 +93,7 @@ export const getSupportedChains = async (): Promise<ZerodevChain[]> => {
                 testnet: chain.testnet,
                 explorerAPI:
                     process.env[
-                        `${chain.name.toUpperCase()}_EXPLORER_API_KEY`
+                        `${chain.name.toUpperCase()}_VERIFICATION_API_KEY`
                     ] ??
                     process.env.ETHERSCAN_API_KEY ??
                     "" // try get chain specific api key, if not found, use etherscan api key
