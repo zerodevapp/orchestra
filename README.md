@@ -7,6 +7,7 @@ Orchestra is a CLI for deterministically deploying contracts to multiple chains,
 1. `npm install -g @zerodev/orchestra`
 2. Create a `.env` file based on `.env.example`
    - You can acquire the project IDs from [the ZeroDev dashboard](https://dashboard.zerodev.app/)
+   - Use [this link](https://dashboard.zerodev.app/account/api-key) to get the API key for the team
 3. Test the installation by running `zerodev -h`
 
 ## Usage
