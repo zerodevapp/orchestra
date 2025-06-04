@@ -22,49 +22,35 @@ async function verifyContract(
     contractAddress: Address,
     chain: ZerodevChain
 ): Promise<string> {
-    // if (
-    //     !chain.etherscanApiKey &&
-    //     chain.name !== "avalanche" &&
-    //     chain.name !== "avalanche-fuji" &&
-    //     chain.name !== "opbnb" &&
-    //     chain.name !== "astar-zkatana"
-    // ) {
-    //     throw new Error(
-    //         `Etherscan API key is not provided for ${chalk.yellowBright(
-    //             chain.name
-    //         )}`
-    //     )
-    // }
+    if (
+        !chain.explorerAPI
+    ) {
+        throw new Error(
+            `Etherscan API key is not provided for ${chalk.yellowBright(
+                chain.name
+            )}`
+        )
+    }
+    const command = `forge verify-contract --chain ${chain.id} --verifier etherscan ${contractAddress} ${contractName} -e ${chain.explorerAPI} -a v2`
 
-    // if (["opbnb", "astar-zkatana"].includes(chain.name)) {
-    //     throw new Error(
-    //         `Verification is not supported on ${chalk.yellowBright(chain.name)}`
-    //     )
-    // }
-
-    // const effectiveChainName =
-    //     chain.name === "linea-testnet" ? "linea-goerli" : chain.name
-    // const command = `forge verify-contract -c ${effectiveChainName} ${contractAddress} ${contractName} -e ${chain.etherscanApiKey}`
-
-    // try {
-    //     const { stdout, stderr } = await execPromise(command)
-    //     if (stderr) {
-    //         return `Error verifying contract ${contractName} at ${contractAddress} on ${chalk.yellowBright(
-    //             chain.name
-    //         )}: ${stderr}`
-    //     }
-    //     if (stdout.includes("is already verified")) {
-    //         return `Contract ${contractName} at ${contractAddress} on ${chalk.yellowBright(
-    //             chain.name
-    //         )} is already verified. Skipping verification.`
-    //     }
-    //     return `Successfully verified contract ${contractName} at ${contractAddress} on ${chalk.yellowBright(
-    //         chain.name
-    //     )}.`
-    // } catch (error) {
-    //     throw new Error(`Error executing ${command}: ${error}`)
-    // }
-    return ""
+    try {
+        const { stdout, stderr } = await execPromise(command)
+        if (stderr) {
+            return `Error verifying contract ${contractName} at ${contractAddress} on ${chalk.yellowBright(
+                chain.name
+            )}: ${stderr}`
+        }
+        if (stdout.includes("is already verified")) {
+            return `Contract ${contractName} at ${contractAddress} on ${chalk.yellowBright(
+                chain.name
+            )} is already verified. Skipping verification.`
+        }
+        return `Successfully verified contract ${contractName} at ${contractAddress} on ${chalk.yellowBright(
+            chain.name
+        )}.`
+    } catch (error) {
+        throw new Error(`Error executing ${command}: ${error}`)
+    }
 }
 
 export const verifyContracts = async (
@@ -72,28 +58,35 @@ export const verifyContracts = async (
     contractAddress: Address,
     chains: ZerodevChain[]
 ) => {
-    // await checkForgeAvailability()
-    // const spinner = ora().start("Verifying contracts...")
-    // const verificationPromises = chains.map((chain) =>
-    //     verifyContract(contractName, contractAddress, chain)
-    //         .then((message) => {
-    //             if (message.includes("is already verified")) {
-    //                 ora().warn(message).start().stop()
-    //             } else {
-    //                 ora().succeed(message).start().stop()
-    //             }
-    //         })
-    //         .catch((error) => {
-    //             ora()
-    //                 .fail(
-    //                     `Verification failed on ${chain.name}: ${error.message}`
-    //                 )
-    //                 .start()
-    //                 .stop()
-    //         })
-    // )
-    // // Wait for all verifications to complete
-    // await Promise.all(verificationPromises)
-    // spinner.stop()
-    // console.log("✅ All verifications process successfully finished!")
+    await checkForgeAvailability()
+    const spinner = ora().start("Verifying contracts...")
+    let anyError = false
+    const verificationPromises = chains.map((chain) =>
+        verifyContract(contractName, contractAddress, chain)
+            .then((message) => {
+                if (message.includes("is already verified")) {
+                    ora().warn(message).start().stop()
+                } else {
+                    ora().succeed(message).start().stop()
+                }
+            })
+            .catch((error) => {
+                anyError = true
+                return ora()
+                    .fail(
+                        `Verification failed on ${chain.name}: ${error.message}`
+                    )
+                    .start()
+                    .stop()
+            })
+    )
+    // Wait for all verifications to complete
+    await Promise.all(verificationPromises)
+    spinner.stop()
+    if (anyError) {
+        console.log("❌ Some verifications failed!")
+        process.exit(1)
+    } else {
+        console.log("✅ All verifications process successfully finished!")
+    }
 }

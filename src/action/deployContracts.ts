@@ -27,8 +27,6 @@ export const deployToChain = async (
     expectedAddress: string | undefined,
     callGasLimit: bigint | undefined
 ): Promise<DeployResult> => {
-    console.log("true : ", chain === undefined)
-    console.log("deploying to chain", chain.name, chain.id)
     const publicClient = createPublicClient({
         chain: chain,
         transport: http()
@@ -109,6 +107,7 @@ export const deployContracts = async (
     const spinner = ora(
         `Deploying contract on ${chains.map((chain) => chain.name).join(", ")}`
     ).start()
+    let anyError = false
     const deployments = chains.map(async (chain) => {
         return deployToChain(
             privateKey,
@@ -139,6 +138,7 @@ export const deployContracts = async (
                     )
                 } else {
                     writeErrorLogToFile(chain.name, error)
+                    anyError = true
                     spinner.fail(
                         `Deployment for ${chalk.redBright(
                             chain.name
@@ -150,5 +150,10 @@ export const deployContracts = async (
 
     await Promise.allSettled(deployments)
     spinner.stop()
-    console.log("✅ All deployments process successfully finished!")
+    if (anyError) {
+        console.log("❌ Some deployments failed!")
+        process.exit(1)
+    } else {
+        console.log("✅ All deployments process successfully finished!")
+    }
 }
