@@ -108,15 +108,18 @@ export const processAndValidateChains = async (
     } else if (options.allNetworks) {
         chains = supportedChains
     } else if (options.chainOption) {
-        const chain = supportedChains.find(
-            (chain) =>
-                chain.name.toLowerCase() === options.chainOption?.toLowerCase()
-        )
-        if (!chain) {
-            console.error(`Error: Chain ${options.chainOption} not found`)
-            process.exit(1)
-        }
-        chains = [chain]
+        const chainNames = options.chainOption
+            ? options.chainOption.split(",")
+            : []
+
+        chains = chainNames
+            .map((chainName) =>
+                supportedChains.find(
+                    (chain) =>
+                        chain.name.toLowerCase() === chainName.toLowerCase()
+                )
+            )
+            .filter((chain) => chain !== undefined)
     } else {
         console.error(
             "Error: At least one of -c, -t, -m, -a options must be specified"

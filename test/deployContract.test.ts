@@ -15,7 +15,7 @@ test("deployContract", async () => {
             testnetAll : false,
             mainnetAll : false,
             allNetworks : false,
-            chainOption : "Sepolia"
+            chainOption : "Sepolia,Base Sepolia"
         }))[0],
         concat(['0x00', generatePrivateKey()]),
         generatePrivateKey(),
