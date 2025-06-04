@@ -91,7 +91,12 @@ export const getSupportedChains = async (): Promise<ZerodevChain[]> => {
                 rollupProvider: chain.rollupProvider,
                 deprecated: chain.deprecated,
                 testnet: chain.testnet,
-                explorerAPI: process.env[`${chain.name.toUpperCase()}_EXPLORER_API_KEY`] ?? process.env.ETHERSCAN_API_KEY ?? "" // try get chain specific api key, if not found, use etherscan api key
+                explorerAPI:
+                    process.env[
+                        `${chain.name.toUpperCase()}_EXPLORER_API_KEY`
+                    ] ??
+                    process.env.ETHERSCAN_API_KEY ??
+                    "" // try get chain specific api key, if not found, use etherscan api key
             }
             return acc
         },

@@ -22,9 +22,7 @@ async function verifyContract(
     contractAddress: Address,
     chain: ZerodevChain
 ): Promise<string> {
-    if (
-        !chain.explorerAPI
-    ) {
+    if (!chain.explorerAPI) {
         throw new Error(
             `Etherscan API key is not provided for ${chalk.yellowBright(
                 chain.name
