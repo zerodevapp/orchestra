@@ -24,7 +24,7 @@ async function verifyContract(
 ): Promise<string> {
     if (!chain.explorerAPI) {
         throw new Error(
-            `Etherscan API key is not provided for ${chalk.yellowBright(
+            `Explorer API key is not provided for ${chalk.yellowBright(
                 chain.name
             )}`
         )
