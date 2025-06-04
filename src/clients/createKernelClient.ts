@@ -5,23 +5,26 @@ import {
     createKernelAccountClient,
     createZeroDevPaymasterClient
 } from "@zerodev/sdk"
+import { getUserOperationGasPrice } from "@zerodev/sdk"
 import { KERNEL_V3_1, getEntryPoint } from "@zerodev/sdk/constants"
 import type { Hex } from "viem"
+
 import { http, createPublicClient } from "viem"
 import { privateKeyToAccount } from "viem/accounts"
-import type { Chain } from "../constant.js"
+import type { ZerodevChain } from "../constant.js"
 import { getZeroDevBundlerRPC, getZeroDevPaymasterRPC } from "./index.js"
 
 export const createKernelClient = async (
     privateKey: Hex,
-    chain: Chain
+    chain: ZerodevChain
 ): Promise<KernelAccountClient> => {
-    const rpcUrl = getZeroDevBundlerRPC(chain.projectId, "PIMLICO")
-    const paymasterRpcUrl = getZeroDevPaymasterRPC(chain.projectId, "PIMLICO")
+    const rpcUrl = getZeroDevBundlerRPC(chain.id, "PIMLICO")
+    const paymasterRpcUrl = getZeroDevPaymasterRPC(chain.id, "PIMLICO")
     const entryPoint = getEntryPoint("0.7")
+
     const publicClient = createPublicClient({
-        transport: http(rpcUrl),
-        chain: chain.viemChainObject
+        chain: chain,
+        transport: http(chain.rpcUrls.default.http[0])
     })
     const signer = privateKeyToAccount(privateKey)
 
@@ -41,13 +44,14 @@ export const createKernelClient = async (
     })
 
     const zerodevPaymaster = createZeroDevPaymasterClient({
-        chain: chain.viemChainObject,
+        chain: chain,
         transport: http(paymasterRpcUrl)
     })
     // Construct a Kernel account client
     const kernelClient = createKernelAccountClient({
-        account,
-        chain: chain.viemChainObject,
+        account: account,
+        client: publicClient,
+        chain: chain,
         bundlerTransport: http(rpcUrl),
         paymaster: {
             getPaymasterData(userOperation) {

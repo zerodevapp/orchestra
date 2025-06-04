@@ -3,7 +3,7 @@ import util from "node:util"
 import chalk from "chalk"
 import ora from "ora"
 import type { Address } from "viem"
-import type { Chain } from "../constant.js"
+import type { ZerodevChain } from "../constant.js"
 
 const execPromise = util.promisify(exec)
 
@@ -20,31 +20,16 @@ async function checkForgeAvailability() {
 async function verifyContract(
     contractName: string,
     contractAddress: Address,
-    chain: Chain
+    chain: ZerodevChain
 ): Promise<string> {
-    if (
-        !chain.etherscanApiKey &&
-        chain.name !== "avalanche" &&
-        chain.name !== "avalanche-fuji" &&
-        chain.name !== "opbnb" &&
-        chain.name !== "astar-zkatana"
-    ) {
+    if (!chain.explorerAPI) {
         throw new Error(
-            `Etherscan API key is not provided for ${chalk.yellowBright(
+            `Explorer API key is not provided for ${chalk.yellowBright(
                 chain.name
             )}`
         )
     }
-
-    if (["opbnb", "astar-zkatana"].includes(chain.name)) {
-        throw new Error(
-            `Verification is not supported on ${chalk.yellowBright(chain.name)}`
-        )
-    }
-
-    const effectiveChainName =
-        chain.name === "linea-testnet" ? "linea-goerli" : chain.name
-    const command = `forge verify-contract -c ${effectiveChainName} ${contractAddress} ${contractName} -e ${chain.etherscanApiKey}`
+    const command = `forge verify-contract --chain ${chain.id} --verifier etherscan ${contractAddress} ${contractName} -e ${chain.explorerAPI} -a v2`
 
     try {
         const { stdout, stderr } = await execPromise(command)
@@ -69,12 +54,11 @@ async function verifyContract(
 export const verifyContracts = async (
     contractName: string,
     contractAddress: Address,
-    chains: Chain[]
+    chains: ZerodevChain[]
 ) => {
     await checkForgeAvailability()
-
     const spinner = ora().start("Verifying contracts...")
-
+    let anyError = false
     const verificationPromises = chains.map((chain) =>
         verifyContract(contractName, contractAddress, chain)
             .then((message) => {
@@ -85,7 +69,8 @@ export const verifyContracts = async (
                 }
             })
             .catch((error) => {
-                ora()
+                anyError = true
+                return ora()
                     .fail(
                         `Verification failed on ${chain.name}: ${error.message}`
                     )
@@ -93,10 +78,13 @@ export const verifyContracts = async (
                     .stop()
             })
     )
-
     // Wait for all verifications to complete
     await Promise.all(verificationPromises)
-
     spinner.stop()
-    console.log("✅ All verifications process successfully finished!")
+    if (anyError) {
+        console.log("❌ Some verifications failed!")
+        process.exit(1)
+    } else {
+        console.log("✅ All verifications process successfully finished!")
+    }
 }

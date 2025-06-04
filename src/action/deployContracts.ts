@@ -3,7 +3,7 @@ import ora from "ora"
 import type { Address, Hex } from "viem"
 import { http, createPublicClient, getAddress } from "viem"
 import { createKernelClient, getZeroDevBundlerRPC } from "../clients/index.js"
-import { type Chain, DEPLOYER_CONTRACT_ADDRESS } from "../constant.js"
+import { DEPLOYER_CONTRACT_ADDRESS, type ZerodevChain } from "../constant.js"
 import { ensureHex, writeErrorLogToFile } from "../utils/index.js"
 import { computeContractAddress } from "./computeAddress.js"
 import { DeploymentStatus, checkDeploymentOnChain } from "./findDeployment.js"
@@ -21,15 +21,15 @@ type DeployResult = [string, string]
 
 export const deployToChain = async (
     privateKey: Hex,
-    chain: Chain,
+    chain: ZerodevChain,
     bytecode: Hex,
     salt: Hex,
     expectedAddress: string | undefined,
     callGasLimit: bigint | undefined
 ): Promise<DeployResult> => {
     const publicClient = createPublicClient({
-        chain: chain.viemChainObject,
-        transport: http(getZeroDevBundlerRPC(chain.projectId))
+        chain: chain,
+        transport: http()
     })
     const kernelAccountClient = await createKernelClient(privateKey, chain)
 
@@ -86,13 +86,20 @@ export const deployToChain = async (
         ])
     })
 
+    await kernelAccountClient.waitForUserOperationReceipt({
+        hash: opHash
+    })
+    await kernelAccountClient.getUserOperationReceipt({
+        hash: opHash
+    })
+
     return [getAddress(result.data as Address), opHash]
 }
 
 export const deployContracts = async (
     privateKey: Hex,
     bytecode: Hex,
-    chains: Chain[],
+    chains: ZerodevChain[],
     salt: Hex,
     expectedAddress: string | undefined,
     callGasLimit: bigint | undefined
@@ -100,6 +107,7 @@ export const deployContracts = async (
     const spinner = ora(
         `Deploying contract on ${chains.map((chain) => chain.name).join(", ")}`
     ).start()
+    let anyError = false
     const deployments = chains.map(async (chain) => {
         return deployToChain(
             privateKey,
@@ -130,6 +138,7 @@ export const deployContracts = async (
                     )
                 } else {
                     writeErrorLogToFile(chain.name, error)
+                    anyError = true
                     spinner.fail(
                         `Deployment for ${chalk.redBright(
                             chain.name
@@ -141,5 +150,10 @@ export const deployContracts = async (
 
     await Promise.allSettled(deployments)
     spinner.stop()
-    console.log("✅ All deployments process successfully finished!")
+    if (anyError) {
+        console.log("❌ Some deployments failed!")
+        process.exit(1)
+    } else {
+        console.log("✅ All deployments process successfully finished!")
+    }
 }

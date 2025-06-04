@@ -3,6 +3,7 @@ import { deployToChain,deployContracts } from "../src/action/deployContracts";
 import { processAndValidateChains } from "../src/utils";
 import {generatePrivateKey,} from "viem/accounts";
 import { concat } from 'viem'
+import { getSupportedChains } from "../src/constant";
 
 
 const PRIVATE_KEY = generatePrivateKey(); // this is copied from viem.sh docs, so don't use this in production and no it's not even ours
@@ -10,11 +11,12 @@ const PRIVATE_KEY = generatePrivateKey(); // this is copied from viem.sh docs, s
 test("deployContract", async () => {
     await deployToChain(
         PRIVATE_KEY,
-        processAndValidateChains("sepolia", {
+        (await processAndValidateChains({
             testnetAll : false,
             mainnetAll : false,
-            allNetworks : false
-        })[0],
+            allNetworks : false,
+            chainOption : "Sepolia,Base Sepolia"
+        }))[0],
         concat(['0x00', generatePrivateKey()]),
         generatePrivateKey(),
         undefined,
@@ -26,13 +28,19 @@ test("deployContractTestnet", async () => {
     await deployContracts(
         PRIVATE_KEY,
         concat(['0x00', generatePrivateKey()]),
-        processAndValidateChains(undefined, {
+        await processAndValidateChains({
             testnetAll : true,
             mainnetAll : false,
-            allNetworks : false
+            allNetworks : false,
         }),
         generatePrivateKey(),
         undefined,
         undefined
     );
 }, 30000);
+
+test("getSupportedChains", async () => {
+    const chains = await getSupportedChains();
+    console.log(chains.map((chain) => chain.name + " " + chain.id));
+    expect(chains).toBeDefined();
+});

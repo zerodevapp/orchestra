@@ -1,9 +1,5 @@
 import type { Hex } from "viem"
-import {
-    type Chain,
-    type UnvalidatedChain,
-    getSupportedChains
-} from "../constant.js"
+import { type ZerodevChain, getSupportedChains } from "../constant.js"
 import { readBytecodeFromFile } from "./file.js"
 
 const PRIVATE_KEY_REGEX = /^0x[0-9a-fA-F]{64}$/
@@ -73,16 +69,17 @@ interface CommandOptions {
     testnetAll?: boolean
     mainnetAll?: boolean
     allNetworks?: boolean
+    chainOption?: string
 }
 
-export const processAndValidateChains = (
-    chainOption: string | undefined,
+export const processAndValidateChains = async (
     options: CommandOptions
-): Chain[] => {
-    const supportedChains = getSupportedChains()
+): Promise<ZerodevChain[]> => {
+    const supportedChains = await getSupportedChains()
+
     // Check for mutually exclusive options
     const exclusiveOptions = [
-        chainOption !== undefined,
+        options.chainOption !== undefined,
         options.testnetAll,
         options.mainnetAll,
         options.allNetworks
@@ -103,41 +100,31 @@ export const processAndValidateChains = (
         process.exit(1)
     }
 
-    let chains: string[]
+    let chains: ZerodevChain[]
     if (options.testnetAll) {
-        chains = supportedChains
-            .filter((chain) => chain.type === "testnet")
-            .map((chain) => chain.name)
+        chains = supportedChains.filter((chain) => chain.testnet)
     } else if (options.mainnetAll) {
-        chains = supportedChains
-            .filter((chain) => chain.type === "mainnet")
-            .map((chain) => chain.name)
+        chains = supportedChains.filter((chain) => !chain.testnet)
     } else if (options.allNetworks) {
-        chains = supportedChains.map((chain) => chain.name)
-    } else {
-        chains = chainOption ? chainOption.split(",") : []
-    }
+        chains = supportedChains
+    } else if (options.chainOption) {
+        const chainNames = options.chainOption
+            ? options.chainOption.split(",")
+            : []
 
-    const chainObjects: UnvalidatedChain[] = chains.map((chainName: string) => {
-        const chain = supportedChains.find((c) => c.name === chainName)
-        if (!chain) {
-            console.error(`Error: Chain ${chainName} is not supported`)
-            process.exit(1)
-        }
-        return chain
-    })
-
-    return validateChains(chainObjects)
-}
-
-const validateChains = (chains: UnvalidatedChain[]): Chain[] => {
-    return chains.map((chain) => {
-        if (!chain.projectId) {
-            console.error(
-                `Error: PROJECT_ID for chain ${chain.name} is not specified`
+        chains = chainNames
+            .map((chainName) =>
+                supportedChains.find(
+                    (chain) =>
+                        chain.name.toLowerCase() === chainName.toLowerCase()
+                )
             )
-            process.exit(1)
-        }
-        return chain as Chain
-    })
+            .filter((chain) => chain !== undefined)
+    } else {
+        console.error(
+            "Error: At least one of -c, -t, -m, -a options must be specified"
+        )
+        process.exit(1)
+    }
+    return chains
 }
