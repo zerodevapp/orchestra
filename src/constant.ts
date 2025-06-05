@@ -72,34 +72,36 @@ export const getSupportedChains = async (): Promise<ZerodevChain[]> => {
 
     const data = (await response.json()) as ZerodevChainResponse[]
 
-    const chains_all = data.filter(chain => !chain.deprecated).reduce(
-        (acc, chain) => {
-            const key = `${chain.name}-${chain.chainId}`
-            acc[key] = {
-                id: chain.chainId,
-                name: chain.name,
-                nativeCurrency: {
-                    name: chain.nativeCurrencyName,
-                    symbol: chain.nativeCurrencySymbol,
-                    decimals: chain.nativeCurrencyDecimals
-                },
-                rpcUrls: {
-                    default: { http: [chain.rpcUrl] }
-                },
-                onlySelfFunded: chain.onlySelfFunded,
-                rollupProvider: chain.rollupProvider,
-                testnet: chain.testnet,
-                explorerAPI:
-                    process.env[
-                        `${chain.name.toUpperCase()}_VERIFICATION_API_KEY`
-                    ] ??
-                    process.env.ETHERSCAN_API_KEY ??
-                    "" // try get chain specific api key, if not found, use etherscan api key
-            }
-            return acc
-        },
-        {} as Record<string, ZerodevChain>
-    )
+    const chains_all = data
+        .filter((chain) => !chain.deprecated)
+        .reduce(
+            (acc, chain) => {
+                const key = `${chain.name}-${chain.chainId}`
+                acc[key] = {
+                    id: chain.chainId,
+                    name: chain.name,
+                    nativeCurrency: {
+                        name: chain.nativeCurrencyName,
+                        symbol: chain.nativeCurrencySymbol,
+                        decimals: chain.nativeCurrencyDecimals
+                    },
+                    rpcUrls: {
+                        default: { http: [chain.rpcUrl] }
+                    },
+                    onlySelfFunded: chain.onlySelfFunded,
+                    rollupProvider: chain.rollupProvider,
+                    testnet: chain.testnet,
+                    explorerAPI:
+                        process.env[
+                            `${chain.name.toUpperCase()}_VERIFICATION_API_KEY`
+                        ] ??
+                        process.env.ETHERSCAN_API_KEY ??
+                        "" // try get chain specific api key, if not found, use etherscan api key
+                }
+                return acc
+            },
+            {} as Record<string, ZerodevChain>
+        )
 
     const response_project = await fetch(
         `https://prod-api-us-east.onrender.com/v2/projects/${process.env.ZERODEV_PROJECT_ID}`,
