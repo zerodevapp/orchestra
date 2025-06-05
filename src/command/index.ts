@@ -26,7 +26,6 @@ import {
     validateInputs,
     validatePrivateKey
 } from "../utils/index.js"
-import { mirrorCommand } from "./mirror.js"
 import {
     chainSelectionOptions,
     codeOptions,
@@ -62,46 +61,10 @@ Command.prototype.addOptions = function (options: CommandOption[]) {
     return this
 }
 
-interface EtherscanContractCreationResponse {
-    status: string
-    message: string
-    result: Array<{
-        contractAddress: string
-        contractCreator: string
-        txHash: string
-        blockNumber: string
-        timestamp: string
-        contractFactory: string
-        creationBytecode: string
-    }>
-}
-
-interface EtherscanTransactionResponse {
-    jsonrpc: string
-    id: number
-    result: {
-        blockHash: string
-        blockNumber: string
-        from: string
-        gas: string
-        gasPrice: string
-        hash: string
-        input: string
-        nonce: string
-        to: string
-        transactionIndex: string
-        value: string
-        type: string
-        v: string
-        r: string
-        s: string
-    }
-}
-
 export const program = new Command()
 
 program
-    .name("orchestra")
+    .name("zerodev")
     .description("CLI tool for deploying contracts to multiple chains")
     .version(version)
 
@@ -269,9 +232,6 @@ program
             console.log(`- ${chain.name}`)
         }
     })
-
-// Add mirror command
-mirrorCommand(program)
 
 program
     .command("clear-log")
