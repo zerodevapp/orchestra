@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 import crypto from "node:crypto"
+import { readFileSync } from "node:fs"
+import { dirname, join } from "node:path"
+import { fileURLToPath } from "node:url"
 import chalk from "chalk"
 import Table from "cli-table3"
 import { Command } from "commander"
@@ -23,12 +26,125 @@ import {
     validatePrivateKey
 } from "../utils/index.js"
 
-export const program = new Command()
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+const packageJson = JSON.parse(
+    readFileSync(join(__dirname, "../../package.json"), "utf8")
+)
+const version = packageJson.version
 
-const fileOption = [
-    "-f, --file <path-to-bytecode>",
-    "file path of bytecode to deploy, a.k.a. init code, or a JSON file containing the bytecode of the contract (such as the output file by Forge), in which case it's assumed that the constructor takes no arguments."
-] as [string, string]
+// Define proper types for command options
+type CommandOption = {
+    flags: string
+    description: string
+    defaultValue?: string | boolean | string[] | undefined
+}
+
+// Extend Command class to add fluent API
+declare module "commander" {
+    interface Command {
+        addOptions(options: CommandOption[]): Command
+    }
+}
+
+Command.prototype.addOptions = function (options: CommandOption[]) {
+    for (const option of options) {
+        this.option(option.flags, option.description, option.defaultValue)
+    }
+    return this
+}
+
+// Common options
+const chainSelectionOptions: CommandOption[] = [
+    {
+        flags: "-t, --testnet-all",
+        description: "select all testnets",
+        defaultValue: false
+    },
+    {
+        flags: "-m, --mainnet-all",
+        description: "select all mainnets",
+        defaultValue: false
+    },
+    {
+        flags: "-a, --all-networks",
+        description: "select all networks",
+        defaultValue: false
+    },
+    { flags: "-c, --chains [CHAINS]", description: "list of chains to deploy" }
+]
+
+const codeOptions: CommandOption[] = [
+    {
+        flags: "-f, --file <path-to-bytecode>",
+        description:
+            "file path of bytecode to deploy, a.k.a. init code, or a JSON file containing the bytecode of the contract (such as the output file by Forge), in which case it's assumed that the constructor takes no arguments."
+    },
+    { flags: "-b, --bytecode <bytecode>", description: "bytecode to deploy" },
+    {
+        flags: "-s, --salt <salt>",
+        description:
+            "salt to be used for CREATE2. This can be a full 32-byte hex string or a shorter numeric representation that will be converted to a 32-byte hex string."
+    }
+]
+
+const deployOptions: CommandOption[] = [
+    {
+        flags: "-e, --expected-address [ADDRESS]",
+        description: "expected address to confirm"
+    },
+    {
+        flags: "-v, --verify-contract [CONTRACT_NAME]",
+        description: "verify the deployment on Etherscan"
+    },
+    {
+        flags: "-g, --call-gas-limit <call-gas-limit>",
+        description: "gas limit for the call"
+    }
+]
+
+const mirrorOption: CommandOption = {
+    flags: "-f, --from-chain <chain>",
+    description: "source chain to mirror from"
+}
+
+interface EtherscanContractCreationResponse {
+    status: string
+    message: string
+    result: Array<{
+        contractAddress: string
+        contractCreator: string
+        txHash: string
+        blockNumber: string
+        timestamp: string
+        contractFactory: string
+        creationBytecode: string
+    }>
+}
+
+interface EtherscanTransactionResponse {
+    jsonrpc: string
+    id: number
+    result: {
+        blockHash: string
+        blockNumber: string
+        from: string
+        gas: string
+        gasPrice: string
+        hash: string
+        input: string
+        nonce: string
+        to: string
+        transactionIndex: string
+        value: string
+        type: string
+        v: string
+        r: string
+        s: string
+    }
+}
+
+export const program = new Command()
 
 program
     .name("zerodev")
@@ -36,7 +152,7 @@ program
         "tool for deploying contracts to multichain with account abstraction"
     )
     .usage("<command> [options]")
-    .version("0.1.3")
+    .version(version)
 
 program.helpInformation = function () {
     const asciiArt = chalk.blueBright(
@@ -77,12 +193,7 @@ program
 program
     .command("compute-address")
     .description("Compute the address to be deployed")
-    .option(...fileOption)
-    .option("-b, --bytecode <bytecode>", "bytecode to deploy")
-    .option(
-        "-s, --salt <salt>",
-        "salt to be used for CREATE2. This can be a full 32-byte hex string or a shorter numeric representation that will be converted to a 32-byte hex string."
-    )
+    .addOptions([...codeOptions])
     .action(async (options) => {
         const { file, bytecode, salt } = options
 
@@ -115,22 +226,7 @@ program
     .description(
         "Deploy contracts deterministically using CREATE2, in order of the chains specified"
     )
-    .option(...fileOption)
-    .option("-b, --bytecode <bytecode>", "bytecode to deploy")
-    .option(
-        "-s, --salt <salt>",
-        "salt to be used for CREATE2. This can be a full 32-byte hex string or a shorter numeric representation that will be converted to a 32-byte hex string."
-    )
-    .option("-t, --testnet-all", "select all testnets", false)
-    .option("-m, --mainnet-all", "select all mainnets", false)
-    .option("-a, --all-networks", "select all networks", false)
-    .option("-c, --chains [CHAINS]", "list of chains for deploying contracts")
-    .option("-e, --expected-address [ADDRESS]", "expected address to confirm")
-    .option(
-        "-v, --verify-contract [CONTRACT_NAME]",
-        "verify the deployment on Etherscan"
-    )
-    .option("-g, --call-gas-limit <call-gas-limit>", "gas limit for the call")
+    .addOptions([...codeOptions, ...deployOptions, ...chainSelectionOptions])
     .action(async (options) => {
         const {
             file,
@@ -192,16 +288,7 @@ program
     .description(
         "check whether the contract has already been deployed on the specified networks"
     )
-    .option(...fileOption)
-    .option("-b, --bytecode <bytecode>", "deployed bytecode")
-    .option(
-        "-s, --salt <salt>",
-        "salt to be used for CREATE2. This can be a full 32-byte hex string or a shorter numeric representation that will be converted to a 32-byte hex string."
-    )
-    .option("-t, --testnet-all", "select all testnets", false)
-    .option("-m, --mainnet-all", "select all mainnets", false)
-    .option("-a, --all-networks", "select all networks", false)
-    .option("-c, --chains [CHAINS]", "list of chains for checking")
+    .addOptions([...codeOptions, ...chainSelectionOptions])
     .action(async (options) => {
         const {
             file,
@@ -243,6 +330,91 @@ program
         for (const chain of notDeployedChains) {
             console.log(`- ${chain.name}`)
         }
+    })
+
+program
+    .command("mirror")
+    .description("Mirror a contract from one chain to other chains")
+    .addOptions([mirrorOption, ...chainSelectionOptions])
+    .argument("<contract-address>", "contract address to mirror")
+    .action(async (contractAddress, options) => {
+        const { fromChain, testnetAll, mainnetAll, allNetworks, chains } =
+            options
+
+        if (!fromChain) {
+            console.error("Error: Source chain must be specified")
+            process.exit(1)
+        }
+
+        if (!contractAddress) {
+            console.error("Error: Contract address must be specified")
+            process.exit(1)
+        }
+
+        const targetChains = await processAndValidateChains({
+            testnetAll,
+            mainnetAll,
+            allNetworks,
+            chainOption: chains
+        })
+
+        // Get the source chain object
+        const sourceChain = (await getSupportedChains()).find(
+            (chain) => chain.name.toLowerCase() === fromChain.toLowerCase()
+        )
+
+        if (!sourceChain) {
+            console.error(`Error: Source chain ${fromChain} not found`)
+            process.exit(1)
+        }
+
+        // Fetch contract data from Etherscan
+        const creationResponse = await fetch(
+            `https://api.etherscan.io/v2/api?chainid=${sourceChain.id}&module=contract&action=getcontractcreation&contractaddresses=${contractAddress}&apikey=${sourceChain.explorerAPI}`
+        )
+
+        const creationData =
+            (await creationResponse.json()) as EtherscanContractCreationResponse
+        if (creationData.status !== "1" || !creationData.result?.[0]) {
+            console.error("Error: Failed to fetch contract data from Etherscan")
+            process.exit(1)
+        }
+
+        const contractData = creationData.result[0]
+        if (contractData.contractFactory !== DEPLOYER_CONTRACT_ADDRESS) {
+            console.error(
+                "Error: Contract was not deployed using the deterministic deployer"
+            )
+            process.exit(1)
+        }
+
+        // Since we can't get the salt from the internal transaction directly,
+        // we'll need to get it from the original transaction's input data
+        const originalTxResponse = await fetch(
+            `https://api.etherscan.io/v2/api?chainid=${sourceChain.id}&module=proxy&action=eth_getTransactionByHash&txhash=${contractData.txHash}&apikey=${sourceChain.explorerAPI}`
+        )
+
+        const originalTxData =
+            (await originalTxResponse.json()) as EtherscanTransactionResponse
+        if (!originalTxData.result?.input) {
+            console.error("Error: Could not get the original transaction data")
+            process.exit(1)
+        }
+
+        // Extract salt from input data (first 32 bytes after the function selector)
+        const salt = `0x${originalTxData.result.input.slice(2, 66)}` // Skip 0x and 4 bytes of function selector
+
+        // Deploy the contract to target chains
+        await deployContracts(
+            validatePrivateKey(PRIVATE_KEY),
+            ensureHex(contractData.creationBytecode),
+            targetChains,
+            ensureHex(salt),
+            contractAddress,
+            undefined
+        )
+
+        console.log("✅ Contracts mirrored successfully!")
     })
 
 program
