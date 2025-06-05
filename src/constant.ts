@@ -7,7 +7,6 @@ export const DEPLOYER_CONTRACT_ADDRESS =
 export type ZerodevChain = {
     onlySelfFunded: boolean
     rollupProvider: string | null
-    deprecated: boolean
     explorerAPI: string | null
 } & Chain
 
@@ -73,7 +72,7 @@ export const getSupportedChains = async (): Promise<ZerodevChain[]> => {
 
     const data = (await response.json()) as ZerodevChainResponse[]
 
-    const chains_all = data.reduce(
+    const chains_all = data.filter(chain => !chain.deprecated).reduce(
         (acc, chain) => {
             const key = `${chain.name}-${chain.chainId}`
             acc[key] = {
@@ -89,7 +88,6 @@ export const getSupportedChains = async (): Promise<ZerodevChain[]> => {
                 },
                 onlySelfFunded: chain.onlySelfFunded,
                 rollupProvider: chain.rollupProvider,
-                deprecated: chain.deprecated,
                 testnet: chain.testnet,
                 explorerAPI:
                     process.env[
